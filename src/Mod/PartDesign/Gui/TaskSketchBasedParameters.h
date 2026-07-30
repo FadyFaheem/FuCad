@@ -132,14 +132,9 @@ protected:
     }
 
 private:
-    /// Hide the feature preview while the profile is still the whole sketch, so an
-    /// ambiguous sketch does not show every region extruded before one is picked.
-    void setPreviewSuppressed(bool suppress);
-
     Gui::ViewProvider* previouslyVisibleViewProvider {nullptr};
     ProfileSelectionWidget* profileWidget {nullptr};
     const App::DocumentObject* profileRowOwner {nullptr};
-    bool previewSuppressed {false};
 };
 
 class TaskDlgSketchBasedParameters: public PartDesignGui::TaskDlgFeatureParameters

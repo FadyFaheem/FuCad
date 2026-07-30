@@ -868,10 +868,11 @@ bool importExternalElements(App::PropertyLinkSub& prop, std::vector<App::SubObje
 
 /**
  * The closed regions bounded by the sketch curves are precomputed as InternalFace1..N.
- * Returns the single region when the sketch bounds exactly one, otherwise an empty list:
- * an ambiguous sketch is resolved by picking regions in the 3D view from the feature dialog.
+ * Returns the first region, so a sketch bounding several does not start out extruding
+ * all of them at once. The feature dialog opens with region picking active, so the
+ * choice can be changed straight away.
  */
-std::vector<std::string> unambiguousProfileRegion(App::DocumentObject* profile)
+std::vector<std::string> firstProfileRegion(App::DocumentObject* profile)
 {
     auto* sketch = freecad_cast<Sketcher::SketchObject*>(profile);
     if (!sketch) {
@@ -883,14 +884,8 @@ std::vector<std::string> unambiguousProfileRegion(App::DocumentObject* profile)
         return {};
     }
 
-    int faceCount = 0;
-    for (TopExp_Explorer explorer(internalShape, TopAbs_FACE); explorer.More(); explorer.Next()) {
-        if (++faceCount > 1) {
-            return {};
-        }
-    }
-
-    if (faceCount != 1) {
+    TopExp_Explorer explorer(internalShape, TopAbs_FACE);
+    if (!explorer.More()) {
         return {};
     }
 
@@ -1074,7 +1069,24 @@ void prepareProfileBased(
             msgBox.exec();
         }
         else {
-            base_worker(selection.front().getObject(), selection.front().getSubNames());
+            App::DocumentObject* selected = selection.front().getObject();
+            std::vector<std::string> subs = selection.front().getSubNames();
+
+            // Selecting a sketch in the tree yields no sub-element, which would take
+            // the whole sketch and extrude every one of its regions at once.
+            const bool wholeObject = std::all_of(
+                subs.begin(),
+                subs.end(),
+                [](const std::string& sub) { return sub.empty(); }
+            );
+            if (wholeObject) {
+                if (std::vector<std::string> region = firstProfileRegion(selected);
+                    !region.empty()) {
+                    subs = std::move(region);
+                }
+            }
+
+            base_worker(selected, subs);
         }
         return;
     }
@@ -1126,7 +1138,7 @@ void prepareProfileBased(
         // which base_worker only runs for an empty sub list.
         std::vector<std::string> subs;
         if (PartDesign::Body::findBodyOf(sketch) == pcActiveBody) {
-            subs = unambiguousProfileRegion(sketch);
+            subs = firstProfileRegion(sketch);
         }
 
         base_worker(sketch, subs);
