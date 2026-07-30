@@ -35,9 +35,9 @@ using namespace Gui::Ribbon;
 
 namespace
 {
-// Matches Fusion: a tab strip over a page tall enough for a large button whose
-// label wraps over two rows, plus the panel caption underneath it.
-constexpr int ribbonBarHeight = 122;
+// Matches Fusion: a tab strip over a page tall enough for a row of icon-only
+// buttons, plus the panel caption underneath it.
+constexpr int ribbonBarHeight = 80;
 // Selected on by the stylesheet as QTabBar#RibbonTabBar[contextTab="true"].
 constexpr const char* contextTabProperty = "contextTab";
 }  // namespace

@@ -21,8 +21,6 @@
 
 
 #include <QAction>
-#include <QChar>
-#include <QFontMetrics>
 #include <QList>
 #include <QMenu>
 #include <QSize>
@@ -43,52 +41,17 @@ using namespace Gui::Ribbon;
 
 namespace
 {
-constexpr int largeIconExtent = 32;
-// Room for the icon plus two rows of label: Qt clips a tool button whose
-// maximum height is below the size hint it derives from its multi-row text.
-constexpr int largeButtonHeight = 76;
-constexpr int largeButtonMinimumWidth = 58;
-constexpr int largeButtonMaximumWidth = 90;
-constexpr int largeLabelWidth = 80;
-constexpr int largeLabelLines = 2;
-constexpr int menuIndicatorWidth = 16;
+constexpr int largeIconExtent = 24;
+// Fusion draws the command icons alone and names them only on hover, so the
+// button is a square around the icon rather than a column with a label.
+constexpr int largeButtonHeight = 34;
+constexpr int largeButtonMinimumWidth = 34;
+constexpr int largeButtonMaximumWidth = 34;
+constexpr int menuIndicatorWidth = 12;
 constexpr int smallIconExtent = 16;
 constexpr int smallButtonHeight = 24;
 constexpr int smallButtonWidth = 26;
 
-/**
- * Folds \a text over at most \a lines rows of at most \a width pixels, the way
- * Fusion stacks a long command name under its icon. Qt lays out the rows itself
- * once they are separated by newlines, but it never breaks a row on its own, so
- * the break has to be picked here.
- */
-QString wrapLabel(const QString& text, const QFontMetrics& metrics, int width, int lines)
-{
-    const QStringList words = text.split(QLatin1Char(' '), Qt::SkipEmptyParts);
-    if (words.isEmpty()) {
-        return text;
-    }
-
-    QStringList rows;
-    QString row = words.first();
-    for (int i = 1; i < words.size(); ++i) {
-        const QString candidate = row + QLatin1Char(' ') + words.at(i);
-        if (rows.size() + 1 < lines && metrics.horizontalAdvance(candidate) > width) {
-            rows.append(row);
-            row = words.at(i);
-            continue;
-        }
-
-        row = candidate;
-    }
-    rows.append(row);
-
-    for (QString& line : rows) {
-        line = metrics.elidedText(line, Qt::ElideRight, width);
-    }
-
-    return rows.join(QLatin1Char('\n'));
-}
 }  // namespace
 
 
@@ -169,8 +132,27 @@ bool RibbonButton::setCommand(
     applySize(size);
 
     if (size == ButtonSize::Large) {
+        // The name is not drawn, so it has to lead the tooltip: hovering is the only
+        // way to find out what an icon does.
         const QString caption = label.isEmpty() ? Action::commandMenuText(cmd) : label;
-        setText(wrapLabel(caption, QFontMetrics(font()), largeLabelWidth, largeLabelLines));
+        setText(caption);
+
+        const QString description = guiAction->action()->toolTip();
+        if (description.isEmpty()) {
+            setToolTip(caption);
+        }
+        else if (description.contains(caption)) {
+            // FreeCAD's tooltip already opens with the command's own name.
+            setToolTip(description);
+        }
+        else {
+            // Only differs when the ribbon renames the command, and the separator
+            // has to match the format Qt infers for the rest of the tooltip.
+            const bool rich = description.trimmed().startsWith(QLatin1Char('<'));
+            setToolTip(
+                caption + (rich ? QLatin1String("<br/>") : QLatin1String("\n")) + description
+            );
+        }
     }
 
     QList<QAction*> children;
@@ -206,8 +188,9 @@ bool RibbonButton::setCommand(
         setMenu(menu);
         setPopupMode(QToolButton::MenuButtonPopup);
 
-        // The drop-down arrow is carved out of the button, so the label keeps
-        // the width it was wrapped for only if the button grows by that much.
+        // The drop-down arrow is carved out of the button, so the icon keeps its
+        // size only if the button grows by that much.
+        setMinimumWidth(minimumWidth() + menuIndicatorWidth);
         setMaximumWidth(maximumWidth() + menuIndicatorWidth);
     }
 
@@ -218,9 +201,9 @@ void RibbonButton::applySize(ButtonSize size)
 {
     switch (size) {
         case ButtonSize::Large:
-            setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+            setToolButtonStyle(Qt::ToolButtonIconOnly);
             setIconSize(QSize(largeIconExtent, largeIconExtent));
-            setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+            setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             setMinimumSize(QSize(largeButtonMinimumWidth, largeButtonHeight));
             setMaximumSize(QSize(largeButtonMaximumWidth, largeButtonHeight));
             break;
