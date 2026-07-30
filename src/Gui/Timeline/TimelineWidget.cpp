@@ -36,6 +36,8 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QScrollArea>
+#include <QScrollBar>
+#include <QSize>
 #include <QSizePolicy>
 #include <QString>
 #include <QStyle>
@@ -67,9 +69,12 @@ using namespace Gui::Timeline;
 
 namespace
 {
-constexpr int stripMargin = 4;
-constexpr int markerSpacing = 2;
-constexpr int playheadWidth = 5;
+constexpr int stripMargin = 2;
+constexpr int markerSpacing = 1;
+constexpr int playheadWidth = 3;
+constexpr int stepButtonExtent = 20;
+constexpr int stepIconExtent = 12;
+constexpr int scrollBarThickness = 8;
 // Long enough that a slider drag or a batch of property changes collapses into
 // a single update, short enough to feel immediate.
 constexpr int updateDelay = 120;
@@ -123,6 +128,8 @@ void TimelineWidget::setupUi()
     stepBackButton->setIcon(style()->standardIcon(QStyle::SP_MediaSeekBackward));
     stepBackButton->setAutoRaise(true);
     stepBackButton->setFocusPolicy(Qt::NoFocus);
+    stepBackButton->setIconSize(QSize(stepIconExtent, stepIconExtent));
+    stepBackButton->setFixedSize(stepButtonExtent, stepButtonExtent);
     stepBackButton->setToolTip(tr("Roll the model back one feature"));
     connect(stepBackButton, &QToolButton::clicked, this, &TimelineWidget::stepBack);
 
@@ -131,6 +138,8 @@ void TimelineWidget::setupUi()
     stepForwardButton->setIcon(style()->standardIcon(QStyle::SP_MediaSeekForward));
     stepForwardButton->setAutoRaise(true);
     stepForwardButton->setFocusPolicy(Qt::NoFocus);
+    stepForwardButton->setIconSize(QSize(stepIconExtent, stepIconExtent));
+    stepForwardButton->setFixedSize(stepButtonExtent, stepButtonExtent);
     stepForwardButton->setToolTip(tr("Roll the model forward one feature"));
     connect(stepForwardButton, &QToolButton::clicked, this, &TimelineWidget::stepForward);
 
@@ -170,8 +179,11 @@ void TimelineWidget::setupUi()
     outerLayout->addWidget(controls, 0, Qt::AlignVCenter);
     outerLayout->addWidget(scrollArea, 1);
 
-    const int scrollBarExtent = style()->pixelMetric(QStyle::PM_ScrollBarExtent);
-    setFixedHeight(TimelineMarker::tileSize().height() + 2 * stripMargin + scrollBarExtent);
+    // The scroll bar's own extent has to be reserved whether or not it is showing,
+    // and the theme's is taller than the markers themselves, so it is pinned to
+    // something proportionate instead. Fusion's timeline is a thin strip.
+    scrollArea->horizontalScrollBar()->setFixedHeight(scrollBarThickness);
+    setFixedHeight(TimelineMarker::tileSize().height() + 2 * stripMargin + scrollBarThickness);
 }
 
 void TimelineWidget::connectDocumentSignals()

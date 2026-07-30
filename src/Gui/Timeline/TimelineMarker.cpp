@@ -21,7 +21,6 @@
 
 
 #include <QContextMenuEvent>
-#include <QFontMetrics>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
@@ -45,12 +44,13 @@ using namespace Gui::Timeline;
 
 namespace
 {
-constexpr int markerWidth = 68;
-constexpr int markerHeight = 52;
-constexpr int markerPadding = 4;
-constexpr int iconExtent = 22;
-constexpr int badgeExtent = 10;
-constexpr int iconLabelGap = 2;
+// Fusion's timeline is a thin strip of bare icons; the feature name lives in the
+// tooltip rather than under the icon, which is what keeps the bar so short.
+constexpr int markerWidth = 26;
+constexpr int markerHeight = 26;
+constexpr int markerPadding = 2;
+constexpr int iconExtent = 20;
+constexpr int badgeExtent = 8;
 
 QString stateName(TimelineMarker::State state)
 {
@@ -177,7 +177,7 @@ void TimelineMarker::paintEvent(QPaintEvent* event)
         = rect().adjusted(markerPadding, markerPadding, -markerPadding, -markerPadding);
 
     QRect iconRect(0, 0, iconExtent, iconExtent);
-    iconRect.moveCenter(QPoint(content.center().x(), content.top() + iconExtent / 2));
+    iconRect.moveCenter(content.center());
 
     const QIcon::Mode mode = markerState == State::RolledBack ? QIcon::Disabled : QIcon::Normal;
     featureIcon.paint(&painter, iconRect, Qt::AlignCenter, mode, QIcon::Off);
@@ -188,25 +188,6 @@ void TimelineMarker::paintEvent(QPaintEvent* event)
             painter.drawPixmap(iconRect.right() - badgeExtent / 2, iconRect.top(), badge);
         }
     }
-
-    const QRect textRect(
-        content.left(),
-        iconRect.bottom() + iconLabelGap,
-        content.width(),
-        content.bottom() - iconRect.bottom() - iconLabelGap
-    );
-    const QString elided
-        = QFontMetrics(font()).elidedText(caption, Qt::ElideRight, textRect.width());
-
-    style()->drawItemText(
-        &painter,
-        textRect,
-        Qt::AlignHCenter | Qt::AlignTop,
-        opt.palette,
-        isEnabled(),
-        elided,
-        QPalette::WindowText
-    );
 }
 
 void TimelineMarker::mousePressEvent(QMouseEvent* event)
