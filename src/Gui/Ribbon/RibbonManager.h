@@ -114,6 +114,10 @@ private:
     struct PanelDefinition
     {
         QString caption;
+        /// Workbench whose Initialize() has to run before the panel's commands exist.
+        /// A Python workbench registers its commands on first activation, so without
+        /// this the panel would stay empty until the user visited that workbench.
+        QString initWorkbench;
         /// Pushed to the trailing edge of the page instead of packed to the left.
         bool alignRight {false};
         /// The frequently used entries, shown as buttons in the panel itself.

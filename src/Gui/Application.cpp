@@ -1865,6 +1865,47 @@ bool Application::setUserEditMode(const std::string& mode)
  * The old workbench gets deactivated before. If the workbench to the handler is already
  * active or if the switch fails false is returned.
  */
+bool Application::ensureWorkbenchInitialized(const char* name)
+{
+    Base::PyGILStateLocker lock;
+
+    PyObject* pcWorkbench = PyDict_GetItemString(_pcWorkbenchDictionary, name);
+    if (!pcWorkbench) {
+        return false;
+    }
+
+    Py::Object handler(pcWorkbench);
+    if (handler.hasAttr(std::string("__Workbench__"))) {
+        return true;
+    }
+
+    try {
+        Py::Callable method(handler.getAttr(std::string("GetClassName")));
+        Py::Tuple args;
+        Py::String result(method.apply(args));
+        std::string type = result.as_std_string("ascii");
+
+        if (Base::Type::fromName(type.c_str())
+                .isDerivedFrom(Gui::PythonBaseWorkbench::getClassTypeId())) {
+            Workbench* wb = WorkbenchManager::instance()->createWorkbench(name, type);
+            if (!wb) {
+                return false;
+            }
+            handler.setAttr(std::string("__Workbench__"), Py::Object(wb->getPyObject(), true));
+        }
+
+        Py::Callable initialize(handler.getAttr(std::string("Initialize")));
+        initialize.apply(args);
+    }
+    catch (Py::Exception&) {
+        Base::PyException e;
+        e.reportException();
+        return false;
+    }
+
+    return true;
+}
+
 bool Application::activateWorkbench(const char* name)
 {
     bool ok = false;

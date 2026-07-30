@@ -485,6 +485,13 @@ bool RibbonManager::parsePanel(const QJsonObject& source, PanelDefinition& panel
 {
     panel.caption = source.value(QLatin1String("caption")).toString();
     panel.alignRight = source.value(QLatin1String("align")).toString() == QLatin1String("right");
+    panel.initWorkbench = source.value(QLatin1String("initWorkbench")).toString();
+
+    if (!panel.initWorkbench.isEmpty()) {
+        Application::Instance->ensureWorkbenchInitialized(
+            panel.initWorkbench.toUtf8().constData()
+        );
+    }
 
     const QJsonArray items = source.value(QLatin1String("items")).toArray();
     for (int i = 0; i < items.size(); ++i) {

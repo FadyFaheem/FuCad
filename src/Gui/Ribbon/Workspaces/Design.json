@@ -61,6 +61,7 @@
                 },
                 {
                     "caption": "ASSEMBLE",
+                    "initWorkbench": "AssemblyWorkbench",
                     "items": [
                         {
                             "command": "Assembly_CreateAssembly",

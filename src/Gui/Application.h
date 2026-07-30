@@ -245,6 +245,15 @@ public:
     //@{
     /// Activate a named workbench
     bool activateWorkbench(const char* name);
+    /**
+     * Run a named workbench's Initialize() without activating or switching to it, so that
+     * the commands it registers become resolvable. A Python workbench only registers its
+     * commands on first activation, which leaves anything that builds UI from command names
+     * unable to find them until the user has visited that workbench.
+     * Initialization is guarded the same way activateWorkbench() guards it, so a later
+     * activation will not run Initialize() a second time.
+     */
+    bool ensureWorkbenchInitialized(const char* name);
     QPixmap workbenchIcon(const QString&) const;
     QString workbenchToolTip(const QString&) const;
     QString workbenchMenuText(const QString&) const;
