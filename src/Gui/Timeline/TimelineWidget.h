@@ -118,7 +118,6 @@ private:
     int markerIndexAt(const QPoint& stripPos) const;
     int indexOfFeature(const std::string& name) const;
     int solidAtOrBefore(int index) const;
-    int tipSolidPosition() const;
 
     void onMarkerSelect(const QString& feature);
     void onMarkerEdit(const QString& feature);
@@ -147,6 +146,14 @@ private:
     std::string documentName;
     std::string bodyName;
     int tipIndex {-1};
+    /// Where the playhead sits, which the arrows move one marker at a time. Only a
+    /// solid feature can carry the tip, so stepping onto a sketch or datum leaves the
+    /// tip on the solid behind it while the playhead still advances; without this the
+    /// arrows could only jump between solids.
+    int playheadIndex {-1};
+    /// Survives the rebuild that moving the tip triggers, so a step is not snapped
+    /// back onto the tip.
+    int requestedPlayhead {-1};
 
     Gui::Document* trackedDocument {nullptr};
     bool pendingRebuild {false};

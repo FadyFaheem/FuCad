@@ -355,15 +355,23 @@ void TimelineWidget::rebuild()
     }
 
     const int count = static_cast<int>(markers.size());
+
+    playheadIndex = tipIndex;
+    if (requestedPlayhead >= -1 && requestedPlayhead < count
+        && solidAtOrBefore(requestedPlayhead) == tipIndex) {
+        playheadIndex = requestedPlayhead;
+    }
+    requestedPlayhead = -1;
+
     for (int i = 0; i < count; ++i) {
-        if (body && i == tipIndex + 1) {
+        if (body && i == playheadIndex + 1) {
             stripLayout->addWidget(playhead);
             playhead->show();
         }
         stripLayout->addWidget(markers[i]);
         markers[i]->show();
     }
-    if (body && tipIndex + 1 >= count) {
+    if (body && playheadIndex + 1 >= count) {
         stripLayout->addWidget(playhead);
         playhead->show();
     }
@@ -408,10 +416,9 @@ void TimelineWidget::applyStates()
         marker->setTip(i == tipIndex);
     }
 
-    const int position = tipSolidPosition();
     const bool hasBody = !bodyName.empty();
-    stepBackButton->setEnabled(hasBody && position >= 0);
-    stepForwardButton->setEnabled(hasBody && position + 1 < static_cast<int>(solidIndices.size()));
+    stepBackButton->setEnabled(hasBody && playheadIndex >= 0);
+    stepForwardButton->setEnabled(hasBody && playheadIndex + 1 < static_cast<int>(markers.size()));
 }
 
 App::Document* TimelineWidget::currentDocument() const
@@ -577,20 +584,6 @@ int TimelineWidget::solidAtOrBefore(int index) const
     }
 
     return result;
-}
-
-int TimelineWidget::tipSolidPosition() const
-{
-    int position = -1;
-    const int count = static_cast<int>(solidIndices.size());
-    for (int i = 0; i < count; ++i) {
-        if (solidIndices[i] > tipIndex) {
-            break;
-        }
-        position = i;
-    }
-
-    return position;
 }
 
 bool TimelineWidget::eventFilter(QObject* watched, QEvent* event)
@@ -809,26 +802,23 @@ void TimelineWidget::rollTo(int index)
 
 void TimelineWidget::stepBack()
 {
-    const int position = tipSolidPosition();
-    if (position < 0) {
-        return;
-    }
-    if (position == 0) {
-        rollTo(-1);
+    if (playheadIndex < 0) {
         return;
     }
 
-    rollTo(solidIndices[static_cast<std::size_t>(position - 1)]);
+    requestedPlayhead = playheadIndex - 1;
+    rollTo(requestedPlayhead);
 }
 
 void TimelineWidget::stepForward()
 {
-    const int next = tipSolidPosition() + 1;
-    if (next < 0 || next >= static_cast<int>(solidIndices.size())) {
+    const int count = static_cast<int>(markers.size());
+    if (playheadIndex + 1 >= count) {
         return;
     }
 
-    rollTo(solidIndices[static_cast<std::size_t>(next)]);
+    requestedPlayhead = playheadIndex + 1;
+    rollTo(requestedPlayhead);
 }
 
 void TimelineWidget::onSelectionChanged(const Gui::SelectionChanges& msg)
