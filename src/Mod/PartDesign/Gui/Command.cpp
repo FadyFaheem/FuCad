@@ -1104,7 +1104,7 @@ void prepareProfileBased(
 
     std::vector<PartDesignGui::TaskFeaturePick::featureStatus> status;
     std::vector<App::DocumentObject*>::iterator firstFreeSketch;
-    int freeSketches = validateSketches(sketches, status, firstFreeSketch);
+    validateSketches(sketches, status, firstFreeSketch);
 
     auto accepter = [=](const std::vector<App::DocumentObject*>& features) -> bool {
         if (features.empty()) {
@@ -1184,13 +1184,14 @@ void prepareProfileBased(
             }
 
             sketches[0] = copy;
-            firstFreeSketch = sketches.begin();
         }
     }
 
-    // Show sketch choose dialog and let user pick sketch if no sketch was selected and no free one
-    // available or multiple free ones are available
-    if (bNoSketchWasSelected && (freeSketches != 1)) {
+    // Let the user pick the profile whenever they did not select one themselves. Silently
+    // grabbing the only free sketch saves a click but takes the choice away, and Fusion always
+    // asks which profile to use. An explicit selection made before invoking the command is
+    // still honoured below.
+    if (bNoSketchWasSelected) {
 
         Gui::TaskView::TaskDialog* dlg = Gui::Control().activeDialog();
         PartDesignGui::TaskDlgFeaturePick* pickDlg
@@ -1223,15 +1224,7 @@ void prepareProfileBased(
         Gui::Control().showDialog(pickDlg, cmd->getDocument());
     }
     else {
-        std::vector<App::DocumentObject*> theSketch;
-        if (!bNoSketchWasSelected) {
-            theSketch.push_back(sketches[0]);
-        }
-        else {
-            theSketch.push_back(*firstFreeSketch);
-        }
-
-        sketch_worker(theSketch);
+        sketch_worker({sketches[0]});
     }
 }
 
