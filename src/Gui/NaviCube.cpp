@@ -100,6 +100,13 @@ public:
     void requestRedraw(bool touchNode = true);
 
 private:
+    enum class MouseDragMode
+    {
+        None,
+        MoveNaviCube,
+        RotateCamera
+    };
+
     void resetClickState();
     void setHiliteWithHysteresis(PickId);
     struct LabelTexture
@@ -107,9 +114,11 @@ private:
         qreal fontSize = 0.0;
         string label;
     };
-    bool mousePressed(short x, short y);
+    bool mousePressed(short x, short y, bool repositionModifier);
     bool mouseReleased(short x, short y);
-    bool mouseMoved(short x, short y);
+    bool mouseMoved(short x, short y, bool repositionModifier);
+    MouseDragMode resolveDragMode(PickId pick, bool repositionModifier) const;
+    bool isInsideWidgetArea(short x, short y);
     bool hasDraggedPastThreshold(short x, short y) const;
     void startCameraRotationDrag();
     void updateCameraRotationDrag(short x, short y);
@@ -166,19 +175,13 @@ public:
     SbVec2s viewSize = SbVec2s(0, 0);
 
 private:
-    enum class MouseDragMode
-    {
-        None,
-        MoveNaviCube,
-        RotateCamera
-    };
-
     bool mouseDown = false;
     bool dragStarted = false;
     bool hovering = false;
     QElapsedTimer clickTimer;
     PickId lastClickPickId = PickId::None;
     PickId pendingHiliteId = PickId::None;
+    PickId pressPickId = PickId::None;
     int pendingHiliteCount = 0;
     MouseDragMode dragMode = MouseDragMode::None;
     SbVec2s pressPos = SbVec2s(0, 0);
@@ -921,27 +924,53 @@ PickId NaviCubeImplementation::pickFace(short x, short y)
     return picked;
 }
 
-bool NaviCubeImplementation::mousePressed(short x, short y)
+bool NaviCubeImplementation::isInsideWidgetArea(short x, short y)
+{
+    if (!readyToRender()) {
+        return false;
+    }
+
+    const qreal halfWidgetSize = getPhysicalCubeWidgetSize() / 2;
+    return halfWidgetSize > 0 && std::abs(x) <= halfWidgetSize && std::abs(y) <= halfWidgetSize;
+}
+
+NaviCubeImplementation::MouseDragMode
+NaviCubeImplementation::resolveDragMode(PickId pick, bool repositionModifier) const
+{
+    if (pick != PickId::None) {
+        const FaceType faceType = getFaceType(pick);
+        if (faceType != FaceType::Main && faceType != FaceType::Edge
+            && faceType != FaceType::Corner) {
+            return MouseDragMode::None;
+        }
+    }
+
+    if (repositionModifier && draggable) {
+        return MouseDragMode::MoveNaviCube;
+    }
+
+    return MouseDragMode::RotateCamera;
+}
+
+bool NaviCubeImplementation::mousePressed(short x, short y, bool repositionModifier)
 {
     PickId pick = pickFace(x, y);
     setHilite(pick);
-    if (pick == PickId::None) {
+    if (pick == PickId::None && !isInsideWidgetArea(x, y)) {
         mouseDown = false;
         dragStarted = false;
+        pressPickId = PickId::None;
         dragMode = MouseDragMode::None;
         return false;
     }
 
     mouseDown = true;
     dragStarted = false;
+    pressPickId = pick;
     pressPos = SbVec2s(x, y);
     lastDragPos = pressPos;
 
-    const FaceType faceType = getFaceType(pick);
-    const bool dragAllowed = faceType == FaceType::Main || faceType == FaceType::Edge
-        || faceType == FaceType::Corner;
-    dragMode = dragAllowed ? (draggable ? MouseDragMode::MoveNaviCube : MouseDragMode::RotateCamera)
-                           : MouseDragMode::None;
+    dragMode = resolveDragMode(pick, repositionModifier);
     return true;
 }
 
@@ -1064,9 +1093,11 @@ bool NaviCubeImplementation::mouseReleased(short x, short y)
     }
 
     const bool wasDragging = dragStarted;
+    const bool pressedOnEmptyArea = pressPickId == PickId::None;
     const MouseDragMode releasedDragMode = dragMode;
     mouseDown = false;
     dragStarted = false;
+    pressPickId = PickId::None;
     dragMode = MouseDragMode::None;
 
     if (wasDragging) {
@@ -1075,6 +1106,9 @@ bool NaviCubeImplementation::mouseReleased(short x, short y)
                 navigation->endOrbitDrag();
             }
         }
+        resetClickState();
+    }
+    else if (pressedOnEmptyArea) {
         resetClickState();
     }
     else {
@@ -1181,7 +1215,7 @@ void NaviCubeImplementation::startCameraRotationDrag()
 {
     constexpr float minCameraDistanceFactor = 1.05F;
     constexpr float clippingRadiusFactor = 1.0F;
-    constexpr float dragSensitivity = 0.45F;
+    constexpr float dragSensitivity = 1.0F;
 
     dragStarted = true;
     setHilite(PickId::None);
@@ -1222,7 +1256,7 @@ void NaviCubeImplementation::updateCameraRotationDrag(short x, short y)
     requestRedraw(false);
 }
 
-bool NaviCubeImplementation::mouseMoved(short x, short y)
+bool NaviCubeImplementation::mouseMoved(short x, short y, bool repositionModifier)
 {
     qreal physicalCubeWidgetSize = getPhysicalCubeWidgetSize();
     bool hovering = mouseDown
@@ -1241,6 +1275,12 @@ bool NaviCubeImplementation::mouseMoved(short x, short y)
         else {
             setHilite(pick);
         }
+    }
+
+    // The modifier may be pressed or released after the button press, so the mode stays
+    // negotiable until the drag threshold is crossed.
+    if (mouseDown && !dragStarted) {
+        dragMode = resolveDragMode(pressPickId, repositionModifier);
     }
 
     if (mouseDown && dragMode == MouseDragMode::MoveNaviCube) {
@@ -1338,14 +1378,14 @@ bool NaviCubeImplementation::processSoEvent(const SoEvent* ev)
     if (ev->getTypeId().isDerivedFrom(SoMouseButtonEvent::getClassTypeId())) {
         const auto mbev = static_cast<const SoMouseButtonEvent*>(ev);
         if (mbev->isButtonPressEvent(mbev, SoMouseButtonEvent::BUTTON1)) {
-            return mousePressed(rx, ry);
+            return mousePressed(rx, ry, ev->wasCtrlDown());
         }
         if (mbev->isButtonReleaseEvent(mbev, SoMouseButtonEvent::BUTTON1)) {
             return mouseReleased(rx, ry);
         }
     }
     if (ev->getTypeId().isDerivedFrom(SoLocation2Event::getClassTypeId())) {
-        return mouseMoved(rx, ry);
+        return mouseMoved(rx, ry, ev->wasCtrlDown());
     }
     return false;
 }
@@ -1379,8 +1419,11 @@ NaviCubeDraggableCmd::NaviCubeDraggableCmd()
     : Command("NaviCubeDraggableCmd")
 {
     sGroup = "";
-    sMenuText = QT_TR_NOOP("Movable Navigation Cube");
-    sToolTipText = QT_TR_NOOP("Drags and places the NaviCube");
+    sMenuText = QT_TR_NOOP("Allow Moving the Navigation Cube");
+    sToolTipText = QT_TR_NOOP(
+        "Allows moving the navigation cube by holding Ctrl while dragging it. Dragging without "
+        "Ctrl always rotates the view."
+    );
     sWhatsThis = "";
     sStatusTip = sToolTipText;
     eType = Alter3DView;
