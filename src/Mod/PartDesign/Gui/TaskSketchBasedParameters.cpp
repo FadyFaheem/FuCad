@@ -312,15 +312,10 @@ TaskSketchBasedParameters::TaskSketchBasedParameters(
         return;
     }
 
-    const std::vector<std::string> subs = sketchBased->Profile.getSubValues();
-    const bool hasRegion = std::any_of(subs.begin(), subs.end(), [](const std::string& sub) {
-        return !sub.empty();
-    });
-
-    if (regions > 1) {
-        // Several regions to choose between, so open ready for the user to pick.
-        profileWidget->setPickingActive(true);
-    }
+    // Picking is not turned on by itself even when the sketch bounds several regions.
+    // Doing so has to reveal the sketch so the regions can be clicked, which puts the
+    // unchosen ones on screen next to the extrusion and reads as the feature previewing
+    // all of them. The Select button turns it on when the choice needs changing.
 }
 
 const QString TaskSketchBasedParameters::onAddSelection(
