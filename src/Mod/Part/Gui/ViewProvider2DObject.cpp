@@ -39,6 +39,7 @@
 #include <Base/Parameter.h>
 #include <Base/Reader.h>
 #include <Gui/Inventor/SoFCBoundingBox.h>
+#include <Mod/Part/App/AttachExtension.h>
 
 #include "ViewProvider2DObject.h"
 
@@ -406,6 +407,16 @@ void ViewProvider2DObject::updateData(const App::Property* property)
 
     if (dynamic_cast<const Part::PropertyPartShape*>(property)) {
         updatePlane();
+        return;
+    }
+
+    // Attaching an empty sketch only moves it, leaving the shape untouched, so the
+    // indicator would otherwise not reappear once a plane is finally picked.
+    const char* name = property ? property->getName() : nullptr;
+    if (name
+        && (strcmp(name, "MapMode") == 0 || strcmp(name, "AttachmentSupport") == 0
+            || strcmp(name, "Placement") == 0)) {
+        updatePlane();
     }
 }
 
@@ -414,8 +425,26 @@ void ViewProvider2DObject::onChanged(const App::Property* property)
     ViewProviderPart::onChanged(property);
 
     if (property == &ShowPlane) {
-        plane->whichChild = ShowPlane.getValue() ? SO_SWITCH_ALL : SO_SWITCH_NONE;
+        plane->whichChild = isPlaneVisible() ? SO_SWITCH_ALL : SO_SWITCH_NONE;
     }
+}
+
+bool ViewProvider2DObject::isPlaneVisible() const
+{
+    if (!ShowPlane.getValue()) {
+        return false;
+    }
+
+    // The attachment editor turns ShowPlane on so the user can see where the object
+    // will land. Until a reference is picked the object still sits unattached at the
+    // global origin, where that indicator marks no real plane and simply adds a fourth
+    // square among the three origin planes.
+    auto* attach = getObject()->getExtensionByType<Part::AttachExtension>(true, false);
+    if (attach && attach->MapMode.getValue() == Attacher::mmDeactivated) {
+        return false;
+    }
+
+    return true;
 }
 
 std::vector<std::string> ViewProvider2DObject::getDisplayModes() const
@@ -439,7 +468,7 @@ const char* ViewProvider2DObject::getDefaultDisplayMode() const
 
 void ViewProvider2DObject::updatePlane()
 {
-    plane->whichChild = ShowPlane.getValue() ? SO_SWITCH_ALL : SO_SWITCH_NONE;
+    plane->whichChild = isPlaneVisible() ? SO_SWITCH_ALL : SO_SWITCH_NONE;
 
     Gui::coinRemoveAllChildren(plane);
 
@@ -502,7 +531,7 @@ void ViewProvider2DObject::updatePlane()
 
     // Semi-transparent face fill
     auto material = new SoMaterial();
-    SbColor color(1.0f, 1.0f, 0.0f);
+    SbColor color(0.02f, 0.59f, 0.84f);
     material->transparency.setValue(0.85f);
     material->ambientColor.setValue(color);
     material->diffuseColor.setValue(color);

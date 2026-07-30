@@ -56,6 +56,10 @@ public:
 
     App::PropertyBool ShowPlane;
 
+    /// Whether the plane indicator should be rendered: ShowPlane alone is not enough,
+    /// because an unattached object has no plane for it to mark.
+    bool isPlaneVisible() const;
+
     void attach(App::DocumentObject*) override;
     void updateData(const App::Property*) override;
     void onChanged(const App::Property*) override;
