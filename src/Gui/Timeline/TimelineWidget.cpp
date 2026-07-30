@@ -528,17 +528,13 @@ void TimelineWidget::collectDocumentFeatures(
         return;
     }
 
-    // A dependency loop makes the sort give up; an unsorted list is still a
-    // better panel than an empty one.
-    std::vector<App::DocumentObject*> sorted;
-    try {
-        sorted = doc->topologicalSort();
-    }
-    catch (...) {
-        sorted = doc->getObjects();
-    }
-
-    for (App::DocumentObject* obj : sorted) {
+    // Creation order, which is what a history strip wants anyway. Sorting
+    // topologically instead would be wrong here: on a document whose dependency
+    // graph has no zero-in-degree node, which a body with an origin readily
+    // produces, topologicalSort() reports a cyclic dependency straight to stderr
+    // and hands back an empty list rather than throwing, so the panel would go
+    // blank while the report view filled up.
+    for (App::DocumentObject* obj : doc->getObjects()) {
         if (obj && obj->isAttachedToDocument() && obj->isDerivedFrom(featureType)) {
             features.push_back(obj);
         }
