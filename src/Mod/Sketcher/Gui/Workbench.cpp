@@ -23,11 +23,14 @@
  ***************************************************************************/
 
 
+#include <QString>
+
 #include "Utils.h"
 #include "Workbench.h"
 #include <Base/Console.h>
 #include <Gui/Application.h>
 #include <Gui/Document.h>
+#include <Gui/Ribbon/RibbonManager.h>
 #include <Gui/WorkbenchManager.h>
 #include <Mod/Sketcher/App/Constraint.h>
 
@@ -172,6 +175,27 @@ inline const QStringList nonEditModeToolbarNames()
 {
     return QStringList {QStringLiteral("Structure"), QStringLiteral("Sketcher")};
 }
+
+/// Id of the contextual ribbon tab that Gui/Ribbon/Workspaces/Design.json defines.
+inline const QString sketchContextTab()
+{
+    return QStringLiteral("SKETCH");
+}
+
+/// The ribbon is behind a preference, so the classic toolbar path has to stay.
+inline void setRibbonContextTabShown(bool shown)
+{
+    if (!Gui::Ribbon::RibbonManager::isEnabled()) {
+        return;
+    }
+
+    if (shown) {
+        Gui::Ribbon::RibbonManager::instance()->pushContextTab(sketchContextTab());
+    }
+    else {
+        Gui::Ribbon::RibbonManager::instance()->popContextTab(sketchContextTab());
+    }
+}
 }  // namespace
 
 void Workbench::activated()
@@ -206,6 +230,8 @@ void Workbench::activated()
 
 void Workbench::enterEditMode()
 {
+    setRibbonContextTabShown(true);
+
     /* Ensure the state left by the non-edit mode toolbars is saved (in case of changing to edit
      * mode) without changing workbench
      */
@@ -226,6 +252,8 @@ void Workbench::enterEditMode()
 
 void Workbench::leaveEditMode()
 {
+    setRibbonContextTabShown(false);
+
     /* Ensure the state left by the edit mode toolbars is saved (in case of changing to edit mode)
      * without changing workbench.
      *
