@@ -35,5 +35,15 @@
       <tag>background</tag>
       <tag>dark</tag>
     </preferencepack>
+	<preferencepack>
+	  <name>FuCad Dark</name>
+      <type>Theme</type>
+      <description>Applies the Fusion inspired dark grey theme with the Autodesk blue accent.</description>
+      <version>1.0.0</version>
+      <tag>built-in</tag>
+      <tag>background</tag>
+      <tag>dark</tag>
+      <tag>fusion</tag>
+    </preferencepack>
   </content>
 </package>

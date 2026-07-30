@@ -37,7 +37,8 @@ enum class Theme
 {
     Classic,
     Light,
-    Dark
+    Dark,
+    FuCadDark
 };
 
 /// A widget to allow selection of the UI theme (color scheme).
@@ -60,7 +61,7 @@ private:
 
     QLabel* _titleLabel;
     QLabel* _descriptionLabel;
-    std::array<QToolButton*, 3> _buttons;
+    std::array<QToolButton*, 4> _buttons;
 };
 
 }  // namespace StartGui

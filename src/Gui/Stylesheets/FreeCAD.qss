@@ -2720,3 +2720,188 @@ QComboBox[validationState="error"]:focus {
     border: 1px solid #ff3b30;
     border-image: none;
 }
+
+/*==================================================================================================
+Fusion style ribbon, see src/Gui/Ribbon
+==================================================================================================*/
+QWidget#RibbonAppBar {
+  background-color: @PrimaryColorDarken4;
+}
+
+QWidget#RibbonAppBarSeparator {
+  background-color: @GeneralBorderColor;
+  margin: 6px 0px 6px 0px;
+}
+
+QToolButton#RibbonMenuButton,
+QToolButton#RibbonQuickAccessButton {
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: @InputFieldBorderRadius;
+  padding: 2px 4px 2px 4px;
+}
+
+QToolButton#RibbonMenuButton:hover,
+QToolButton#RibbonQuickAccessButton:hover {
+  background-color: @AccentHoverColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolButton#RibbonMenuButton:pressed,
+QToolButton#RibbonQuickAccessButton:pressed {
+  background-color: @AccentBackgroundColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolButton#RibbonQuickAccessButton:disabled {
+  background-color: transparent;
+  border: 1px solid transparent;
+}
+
+QWidget#RibbonBar {
+  background-color: @PrimaryColor;
+  border-bottom: 1px solid @GeneralBorderColor;
+}
+
+QStackedWidget#RibbonPages,
+QWidget#RibbonPage,
+QWidget#RibbonPanel,
+QWidget#RibbonPanelBody,
+QWidget#RibbonPanelButtons {
+  background-color: @PrimaryColor;
+  border: none;
+}
+
+QWidget#RibbonPanelSeparator {
+  background-color: @GeneralBorderColor;
+  margin: 8px 0px 8px 0px;
+}
+
+QLabel#RibbonPanelCaption {
+  background-color: transparent;
+  color: @TextDisabledColor;
+  padding: 0px 2px 0px 2px;
+}
+
+/* Tab strip: flat labels that the active tab underlines in the accent colour. */
+QTabBar#RibbonTabBar {
+  background-color: @PrimaryColorDarken4;
+  border: none;
+}
+
+QTabBar#RibbonTabBar::tab {
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: @TextDisabledColor;
+  margin: 0px;
+  min-width: 5px;
+  padding: 4px 14px 2px 14px;
+}
+
+QTabBar#RibbonTabBar::tab:hover {
+  background-color: @AccentHoverColor;
+  color: @TextForegroundColor;
+}
+
+QTabBar#RibbonTabBar::tab:selected {
+  background-color: @PrimaryColor;
+  border-bottom: 2px solid @AccentColor;
+  color: @TextForegroundColor;
+}
+
+QTabBar#RibbonTabBar QToolButton {
+  background-color: @PrimaryColorDarken4;
+  border: none;
+  margin: 0px;
+}
+
+QTabBar#RibbonTabBar QToolButton:hover {
+  background-color: @AccentHoverColor;
+}
+
+QToolButton#RibbonButton {
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: @InputFieldBorderRadius;
+  padding: 3px 2px 2px 2px;
+}
+
+QToolButton#RibbonButton:hover {
+  background-color: @AccentHoverColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolButton#RibbonButton:pressed,
+QToolButton#RibbonButton:checked {
+  background-color: @AccentBackgroundColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolButton#RibbonButton:disabled {
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: @TextDisabledColor;
+}
+
+QToolButton#RibbonButton::menu-button {
+  border: none;
+  width: 14px;
+}
+
+QToolButton#RibbonButton::menu-arrow {
+  image: url(qss:@IconsLocationFolderName/arrow-down-lightgray.svg);
+  height: 13px;
+}
+
+QToolButton#RibbonButton::menu-arrow:hover,
+QToolButton#RibbonButton::menu-arrow:open {
+  image: url(qss:@IconsLocationFolderName/arrow-down-@StylesheetIconsColor.svg);
+}
+
+/* Contextual tab, as in the SKETCH tab that entering a sketch pushes. The bar
+   sets the contextTab property while a context tab is on the strip, and a
+   context tab is always the trailing one. */
+QTabBar#RibbonTabBar[contextTab="true"]::tab:last,
+QTabBar#RibbonTabBar[contextTab="true"]::tab:only-one {
+  background-color: @AccentBackgroundColor;
+  color: @TextForegroundColor;
+}
+
+QTabBar#RibbonTabBar[contextTab="true"]::tab:last:hover,
+QTabBar#RibbonTabBar[contextTab="true"]::tab:only-one:hover {
+  background-color: @AccentHoverColor;
+  color: @TextForegroundColor;
+}
+
+QTabBar#RibbonTabBar[contextTab="true"]::tab:last:selected,
+QTabBar#RibbonTabBar[contextTab="true"]::tab:only-one:selected {
+  background-color: @AccentColor;
+  border-bottom: 2px solid @AccentColor;
+  color: @TextForegroundColor;
+}
+
+/* The call to action of a page, as in "Finish Sketch". */
+QToolButton#RibbonPrimaryButton {
+  background-color: @AccentBackgroundColor;
+  border: 1px solid @AccentColor;
+  border-radius: @InputFieldBorderRadius;
+  padding: 3px 2px 2px 2px;
+}
+
+QToolButton#RibbonPrimaryButton:hover {
+  background-color: @AccentHoverColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolButton#RibbonPrimaryButton:pressed,
+QToolButton#RibbonPrimaryButton:checked {
+  background-color: @AccentColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolButton#RibbonPrimaryButton:disabled {
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: @TextDisabledColor;
+}
