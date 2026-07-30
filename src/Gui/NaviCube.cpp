@@ -1215,7 +1215,7 @@ void NaviCubeImplementation::startCameraRotationDrag()
 {
     constexpr float minCameraDistanceFactor = 1.05F;
     constexpr float clippingRadiusFactor = 1.0F;
-    constexpr float dragSensitivity = 1.0F;
+    constexpr float dragSensitivity = 0.65F;
 
     dragStarted = true;
     setHilite(PickId::None);

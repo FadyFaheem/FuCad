@@ -37,7 +37,7 @@ namespace
 {
 // Matches Fusion: a tab strip over a page tall enough for a row of icon-only
 // buttons, plus the panel caption underneath it.
-constexpr int ribbonBarHeight = 80;
+constexpr int ribbonBarHeight = 86;
 // Selected on by the stylesheet as QTabBar#RibbonTabBar[contextTab="true"].
 constexpr const char* contextTabProperty = "contextTab";
 }  // namespace

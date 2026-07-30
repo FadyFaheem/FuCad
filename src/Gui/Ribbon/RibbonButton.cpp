@@ -41,12 +41,12 @@ using namespace Gui::Ribbon;
 
 namespace
 {
-constexpr int largeIconExtent = 24;
+constexpr int largeIconExtent = 30;
 // Fusion draws the command icons alone and names them only on hover, so the
 // button is a square around the icon rather than a column with a label.
-constexpr int largeButtonHeight = 34;
-constexpr int largeButtonMinimumWidth = 34;
-constexpr int largeButtonMaximumWidth = 34;
+constexpr int largeButtonHeight = 40;
+constexpr int largeButtonMinimumWidth = 40;
+constexpr int largeButtonMaximumWidth = 40;
 constexpr int menuIndicatorWidth = 12;
 constexpr int smallIconExtent = 16;
 constexpr int smallButtonHeight = 24;
