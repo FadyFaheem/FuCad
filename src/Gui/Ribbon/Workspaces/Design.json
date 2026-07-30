@@ -192,6 +192,9 @@
                 },
                 {
                     "caption": "INSERT",
+                    "items": [
+                        { "command": "Std_Import", "label": "Insert" }
+                    ],
                     "menu": [
                         { "command": "Std_Import", "label": "Insert" },
                         { "command": "Part_Import", "label": "Insert CAD File" },
@@ -201,6 +204,9 @@
                 },
                 {
                     "caption": "SELECT",
+                    "items": [
+                        { "command": "Std_BoxSelection", "label": "Window Selection" }
+                    ],
                     "menu": [
                         { "command": "Std_BoxSelection", "label": "Window Selection" },
                         {
