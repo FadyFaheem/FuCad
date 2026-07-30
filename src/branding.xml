@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Branding version="1.0">
+    <Application>FuCad</Application>
+    <WindowTitle>FuCad</WindowTitle>
+    <ExeName>FuCad</ExeName>
+    <ExeVendor>FuCad</ExeVendor>
+    <AppDataSkipVendor>true</AppDataSkipVendor>
+    <MaintainerUrl>https://github.com/FadyFaheem/FuCad</MaintainerUrl>
+    <CopyrightInfo>FuCad is a fork of FreeCAD (https://www.freecad.org), (C) 2001-2026 FreeCAD contributors. FuCad is free and open-source software licensed under the terms of the LGPL-2.1-or-later license.</CopyrightInfo>
+</Branding>

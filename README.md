@@ -1,113 +1,78 @@
-<a href="https://freecad.org"><img src="/src/Gui/Icons/freecad.svg" height="100px" width="100px"></a>
+# FuCad
 
-### Your own 3D Parametric Modeler
+### A Fusion 360-style fork of FreeCAD
 
-[Website](https://www.freecad.org) •
-[Documentation](https://wiki.freecad.org) •
-[Forum](https://forum.freecad.org/) •
-[Bug tracker](https://github.com/FreeCAD/FreeCAD/issues) •
-[Git repository](https://github.com/FreeCAD/FreeCAD) •
-[Blog](https://blog.freecad.org)
+FuCad is a fork of [FreeCAD](https://www.freecad.org), the open-source parametric
+3D modeler. It keeps FreeCAD's geometry kernel, document model, Python API and
+`.FCStd` file format intact, and reworks the user experience along the lines of
+Fusion 360: a unified, task-driven interface instead of a workbench-per-discipline
+layout.
 
+Because the core is unchanged, FuCad opens existing FreeCAD documents and runs
+existing FreeCAD macros and addons.
 
-[![Release](https://img.shields.io/github/release/freecad/freecad.svg)](https://github.com/freecad/freecad/releases/latest) [![Crowdin](https://d322cqt584bo4o.cloudfront.net/freecad/localized.svg)](https://crowdin.com/project/freecad)
+[Upstream project](https://www.freecad.org) •
+[Upstream documentation](https://wiki.freecad.org) •
+[Upstream repository](https://github.com/FreeCAD/FreeCAD)
 
 <img src="/.github/images/partdesign.png" width="800"/>
 
-Overview
---------
+Status
+------
 
-* **Freedom to build what you want**  FreeCAD is an open-source parametric 3D 
-modeler made primarily to design real-life objects of any size. 
-Parametric modeling allows you to easily modify your design by going back into 
-your model history to change its parameters. 
-
-* **Create 3D from 2D and back** FreeCAD lets you sketch geometry-constrained
- 2D shapes and use them as a base to build other objects.
- It contains many components to adjust dimensions or extract design details from 
- 3D models to create high quality production-ready drawings.
-
-* **Designed for your needs** FreeCAD is designed to fit a wide range of uses
-including product design, mechanical engineering and architecture,
-whether you are a hobbyist, programmer, experienced CAD user, student or teacher.
-
-* **Cross platform** FreeCAD runs on Windows, macOS and Linux operating systems.
-
-* **Underlying technology**
-    * **OpenCASCADE** A powerful geometry kernel, the most important component of FreeCAD
-    * **Coin3D library** Open Inventor-compliant 3D scene representation model
-    * **Python** FreeCAD offers a broad Python API
-    * **Qt** Graphical user interface built with Qt
-
-
-Installing
-----------
-
-Precompiled packages for stable releases are available for Windows, macOS and Linux on the
-[latest releases page](https://github.com/FreeCAD/FreeCAD/releases/latest).
-
-On most Linux distributions, FreeCAD is also directly installable from the 
-software center application.
-
-For weekly development releases visit the [releases page](https://github.com/FreeCAD/FreeCAD/releases/).
-
-Other options are described on the [wiki Download page](https://wiki.freecad.org/Download).
+FuCad is an early-stage fork under active development. There are no precompiled
+releases yet; build from source.
 
 Compiling
 ---------
 
-See the [Developers Handbook – Getting Started](https://freecad.github.io/DevelopersHandbook/gettingstarted/)
-for build instructions.
+FuCad uses FreeCAD's build system unchanged. See the
+[Developers Handbook – Getting Started](https://freecad.github.io/DevelopersHandbook/gettingstarted/)
+for platform-specific build instructions and dependencies.
 
+Underlying technology
+---------------------
 
-Reporting Issues
----------
+* **OpenCASCADE** — the geometry kernel
+* **Coin3D** — Open Inventor-compliant 3D scene representation
+* **Python** — broad scripting API, compatible with FreeCAD's
+* **Qt** — graphical user interface
 
-To report an issue please:
+Reporting issues
+----------------
 
-- Consider posting to the [Forum](https://forum.freecad.org), [Discord](https://discord.com/invite/w2cTKGzccC) channel, or [Reddit](https://www.reddit.com/r/FreeCAD) to verify the issue; 
-- Search the existing [issues](https://github.com/FreeCAD/FreeCAD/issues) for potential duplicates; 
-- Use the most updated stable or [development versions](https://github.com/FreeCAD/FreeCAD/releases/) of FreeCAD; 
-- Post version info from `Help > About FreeCAD > Copy to clipboard`; 
-- Restart FreeCAD in safe mode `Help > Restart in safe mode` and try to reproduce the issue again. If the issue is resolved it can be fixed by deleting the FreeCAD config files.
-- Start recording a macro `Macro > Macro recording...` and repeat all steps. Stop recording after the issue occurs and upload the saved macro or copy the macro code in the issue; 
-- Post a Step-By-Step explanation on how to recreate the issue; 
-- Upload an example file (FCStd as ZIP file) to demonstrate the problem; 
+Report problems with FuCad on the [FuCad issue tracker](https://github.com/FadyFaheem/FuCad/issues).
 
-For more details see:
+If you can reproduce the same problem in upstream FreeCAD, please report it to the
+[FreeCAD issue tracker](https://github.com/FreeCAD/FreeCAD/issues) instead, so the
+fix benefits both projects.
 
-- [Bug Tracker](https://github.com/FreeCAD/FreeCAD/issues)
-- [Reporting Issues and Requesting Features](https://github.com/FreeCAD/FreeCAD/issues/new/choose)
-- [Contributing](https://github.com/FreeCAD/FreeCAD/blob/main/CONTRIBUTING.md)
-- [Help Forum](https://forum.freecad.org/viewforum.php?f=3)
-
-> [!NOTE]
-The [FPA](https://fpa.freecad.org) offers developers the opportunity
-to apply for a grant to work on projects of their choosing. Check
-[jobs and funding](https://blog.freecad.org/jobs/) to know more.
-
-
-Usage & Getting Help
+Usage & getting help
 --------------------
 
-The FreeCAD wiki contains documentation on 
-general FreeCAD usage, Python scripting, and development.
-View these pages for more information:
+FuCad's scripting API and core concepts are FreeCAD's, so the FreeCAD documentation
+applies:
 
 - [Getting started](https://wiki.freecad.org/Getting_started)
-- [Features list](https://wiki.freecad.org/Feature_list)
 - [Frequent questions](https://wiki.freecad.org/FAQ/en)
-- [Workbenches](https://wiki.freecad.org/Workbenches)
 - [Scripting](https://wiki.freecad.org/Power_users_hub)
 - [Developers Handbook](https://freecad.github.io/DevelopersHandbook/)
+- [FreeCAD forum](https://forum.freecad.org)
 
-The [FreeCAD forum](https://forum.freecad.org) is a great place
-to find help and solve specific problems when learning to use FreeCAD.
+Please do not report FuCad-specific problems to the FreeCAD forum or issue tracker;
+FuCad is not affiliated with or endorsed by the FreeCAD project or the
+[FreeCAD Project Association](https://fpa.freecad.org).
 
----
+License and attribution
+-----------------------
 
-<p>This project receives generous infrastructure support from
-  <a href="https://www.digitalocean.com/">
-    <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" width="91px">
-  </a> and <a href="https://www.kipro-pcb.com/">KiCad Services Corp.</a>
-</p>
+FuCad is a derivative work of FreeCAD, Copyright (C) 2001-2026 FreeCAD contributors.
+
+FuCad is free and open-source software licensed under the GNU Lesser General Public
+License, version 2.1 or (at your option) any later version (LGPL-2.1-or-later), the
+same terms as upstream FreeCAD. See [LICENSE](LICENSE) for the full text and
+[src/Doc/LICENSE.html](src/Doc/LICENSE.html) for details on the licenses of bundled
+third-party components.
+
+The names "FreeCAD" and the FreeCAD logo belong to the FreeCAD project and are used
+here only to identify the upstream work from which FuCad is derived.

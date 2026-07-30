@@ -1,5 +1,24 @@
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
+# App::Branding reads this from <AppHomePath>/bin, so it has to sit next to the
+# executables in both the build output tree and the install tree.
+set(Branding_Files
+    branding.xml
+)
+
+add_custom_target(Branding_data ALL
+    SOURCES ${Branding_Files}
+)
+
+fc_copy_sources(Branding_data "${CMAKE_BINARY_DIR}/bin" ${Branding_Files})
+
+install(
+    FILES
+        ${Branding_Files}
+    DESTINATION
+        ${CMAKE_INSTALL_BINDIR}
+)
+
 add_subdirectory(Build)
 add_subdirectory(3rdParty)
 add_subdirectory(Base)
