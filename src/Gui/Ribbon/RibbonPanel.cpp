@@ -21,9 +21,12 @@
 
 
 #include <QFont>
+#include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMenu>
 #include <QSizePolicy>
+#include <QToolButton>
 #include <QVBoxLayout>
 
 #include "RibbonPanel.h"
@@ -37,13 +40,20 @@ constexpr int panelMargin = 8;
 constexpr int captionPointSizeDelta = 1;
 constexpr double minimumCaptionPointSize = 6.0;
 constexpr int separatorWidth = 1;
+// Only the two border pixels the stylesheet draws: the caption row has to keep
+// the height of the label it replaces, or the page outgrows the ribbon.
+constexpr int captionButtonBorder = 2;
+constexpr int captionButtonMinimumWidth = 56;
 }  // namespace
 
 
 RibbonPanel::RibbonPanel(const QString& caption, QWidget* parent)
     : QWidget(parent)
+    , bodyLayout(nullptr)
     , buttonLayout(nullptr)
+    , captionWidget(nullptr)
     , separator(nullptr)
+    , captionText(caption)
 {
     setObjectName(QStringLiteral("RibbonPanel"));
     setAttribute(Qt::WA_StyledBackground, true);
@@ -54,7 +64,7 @@ RibbonPanel::RibbonPanel(const QString& caption, QWidget* parent)
 
     auto* body = new QWidget(this);
     body->setObjectName(QStringLiteral("RibbonPanelBody"));
-    auto* bodyLayout = new QVBoxLayout(body);
+    bodyLayout = new QVBoxLayout(body);
     bodyLayout->setContentsMargins(panelMargin, 2, panelMargin, 1);
     bodyLayout->setSpacing(0);
 
@@ -65,20 +75,14 @@ RibbonPanel::RibbonPanel(const QString& caption, QWidget* parent)
     buttonLayout->setSpacing(1);
     buttonLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
-    auto* captionLabel = new QLabel(caption, body);
+    auto* captionLabel = new QLabel(captionText, body);
     captionLabel->setObjectName(QStringLiteral("RibbonPanelCaption"));
     captionLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-
-    QFont captionFont = captionLabel->font();
-    if (captionFont.pointSizeF() > 0.0) {
-        captionFont.setPointSizeF(
-            qMax(minimumCaptionPointSize, captionFont.pointSizeF() - captionPointSizeDelta)
-        );
-        captionLabel->setFont(captionFont);
-    }
+    applyCaptionFont(captionLabel);
+    captionWidget = captionLabel;
 
     bodyLayout->addWidget(buttonRow, 1);
-    bodyLayout->addWidget(captionLabel, 0);
+    bodyLayout->addWidget(captionWidget, 0);
 
     // A plain widget rather than a QFrame line: the rule is painted from the
     // stylesheet so that it picks up the border colour of the active theme.
@@ -102,9 +106,50 @@ void RibbonPanel::addButton(QWidget* button)
     ++buttonCount;
 }
 
+void RibbonPanel::setCaptionMenu(QMenu* menu)
+{
+    if (!menu || captionMenu) {
+        return;
+    }
+
+    auto* button = new QToolButton(captionWidget->parentWidget());
+    button->setObjectName(QStringLiteral("RibbonPanelCaptionButton"));
+    button->setText(captionText);
+    button->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    button->setPopupMode(QToolButton::InstantPopup);
+    button->setAutoRaise(true);
+    button->setFocusPolicy(Qt::NoFocus);
+    button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    applyCaptionFont(button);
+    button->setMinimumWidth(captionButtonMinimumWidth);
+    button->setFixedHeight(QFontMetrics(button->font()).height() + captionButtonBorder);
+
+    button->setMenu(menu);
+    captionMenu = menu;
+
+    const int index = bodyLayout->indexOf(captionWidget);
+    bodyLayout->removeWidget(captionWidget);
+    delete captionWidget;
+    captionWidget = button;
+    bodyLayout->insertWidget(index, captionWidget, 0);
+}
+
 bool RibbonPanel::isEmpty() const
 {
-    return buttonCount == 0;
+    return buttonCount == 0 && !captionMenu;
+}
+
+void RibbonPanel::applyCaptionFont(QWidget* widget) const
+{
+    QFont captionFont = widget->font();
+    if (captionFont.pointSizeF() <= 0.0) {
+        return;
+    }
+
+    captionFont.setPointSizeF(
+        qMax(minimumCaptionPointSize, captionFont.pointSizeF() - captionPointSizeDelta)
+    );
+    widget->setFont(captionFont);
 }
 
 void RibbonPanel::setSeparatorVisible(bool visible)

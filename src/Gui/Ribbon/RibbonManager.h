@@ -36,6 +36,7 @@
 #include "RibbonBar.h"
 
 class QJsonObject;
+class QMenu;
 class QWidget;
 
 namespace Gui
@@ -105,6 +106,9 @@ private:
         QString label;
         QStringList subCommands;
         bool primary {false};
+        /// Comes from a module the page does not pull in, so its absence is not
+        /// a mistake in the definition and must not be reported as one.
+        bool optional {false};
     };
 
     struct PanelDefinition
@@ -112,7 +116,11 @@ private:
         QString caption;
         /// Pushed to the trailing edge of the page instead of packed to the left.
         bool alignRight {false};
+        /// The frequently used entries, shown as buttons in the panel itself.
         std::vector<ItemDefinition> items;
+        /// The full command set, reached through the caption drop-down. Empty
+        /// leaves the caption the plain label it has always been.
+        std::vector<ItemDefinition> menuItems;
     };
 
     struct TabDefinition
@@ -143,6 +151,8 @@ private:
     void rebuildTabs(const QString& workbench);
     void buildPage(int index);
     QWidget* createPage(const TabDefinition& tab) const;
+    /// The caption drop-down of \a panel, or nullptr when nothing resolved.
+    static QMenu* createPanelMenu(const PanelDefinition& panel, QWidget* parent);
 
     const TabDefinition* findContextTab(const QString& id) const;
     int indexOfTab(const TabDefinition* tab) const;

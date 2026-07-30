@@ -28,6 +28,8 @@
 #include <FCGlobal.h>
 
 class QHBoxLayout;
+class QMenu;
+class QVBoxLayout;
 
 namespace Gui
 {
@@ -38,6 +40,10 @@ namespace Ribbon
  * A captioned group of ribbon buttons: a horizontal row of buttons with the
  * caption centred underneath and a vertical rule along the right edge that
  * separates the panel from its neighbour.
+ *
+ * The caption is a plain label until setCaptionMenu() turns it into the
+ * drop-down button Fusion puts under a panel, which lists the full command set
+ * of the panel while the row above it only carries the frequently used ones.
  * @author FuCad contributors
  */
 class GuiExport RibbonPanel: public QWidget
@@ -49,14 +55,29 @@ public:
     ~RibbonPanel() override = default;
 
     void addButton(QWidget* button);
+
+    /**
+     * Replaces the caption label with a button that pops up \a menu, which the
+     * caller has to have parented to the panel so that it dies with it. Passing
+     * nullptr, or calling this twice, leaves the caption as it is.
+     */
+    void setCaptionMenu(QMenu* menu);
+
+    /// Whether the panel carries neither a button nor a caption menu.
     bool isEmpty() const;
 
     /// The right-hand rule is dropped on the last panel of a page.
     void setSeparatorVisible(bool visible);
 
 private:
+    void applyCaptionFont(QWidget* widget) const;
+
+    QVBoxLayout* bodyLayout;
     QHBoxLayout* buttonLayout;
+    QWidget* captionWidget;
     QWidget* separator;
+    QMenu* captionMenu {nullptr};
+    QString captionText;
     int buttonCount {0};
 
     Q_DISABLE_COPY(RibbonPanel)

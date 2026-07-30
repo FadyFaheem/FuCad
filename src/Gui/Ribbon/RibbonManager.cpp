@@ -23,6 +23,7 @@
 #include <cstddef>
 #include <utility>
 
+#include <QAction>
 #include <QByteArray>
 #include <QCoreApplication>
 #include <QFile>
@@ -33,6 +34,7 @@
 #include <QJsonParseError>
 #include <QJsonValue>
 #include <QList>
+#include <QMenu>
 #include <QWidget>
 
 #include <App/Application.h>
@@ -40,7 +42,9 @@
 #include <Base/Interpreter.h>
 #include <Base/Parameter.h>
 #include <Base/Tools.h>
+#include <Gui/Action.h>
 #include <Gui/Application.h>
+#include <Gui/Command.h>
 #include <Gui/MainWindow.h>
 #include <Gui/ToolBarManager.h>
 #include <Gui/WorkbenchManager.h>
@@ -58,6 +62,67 @@ namespace
 {
 const char* const workspaceResource = ":/ribbon/Workspaces/Design.json";
 const char* const mainWindowPreferences = "User parameter:BaseApp/Preferences/MainWindow";
+
+/// The command framework action of \a command, or nullptr when not registered.
+Gui::Action* resolveGuiAction(const QString& command)
+{
+    if (command.isEmpty() || !Application::Instance) {
+        return nullptr;
+    }
+
+    CommandManager& manager = Application::Instance->commandManager();
+    Command* cmd = manager.getCommandByName(command.toLatin1().constData());
+    if (!cmd) {
+        return nullptr;
+    }
+
+    cmd->initAction();
+    return cmd->getAction();
+}
+
+void reportMissing(const QString& command, bool quiet)
+{
+    if (quiet) {
+        Base::Console().log(
+            "Ribbon: '%s' is not available, its module is not loaded\n",
+            command.toUtf8().constData()
+        );
+        return;
+    }
+
+    Base::Console().warning(
+        "Ribbon: skipping unknown command '%s'\n",
+        command.toUtf8().constData()
+    );
+}
+
+/**
+ * A menu entry that carries \a label but triggers \a source, so that the ribbon
+ * can name a command the way Fusion does without renaming the action the rest
+ * of the application shares. The proxy follows the state of the original, which
+ * the command framework keeps up to date.
+ */
+QAction* createLabelledAction(QAction* source, const QString& label, QMenu* parent)
+{
+    auto* proxy = new QAction(source->icon(), label, parent);
+    proxy->setToolTip(source->toolTip());
+    proxy->setStatusTip(source->statusTip());
+    proxy->setWhatsThis(source->whatsThis());
+    proxy->setCheckable(source->isCheckable());
+    proxy->setChecked(source->isChecked());
+    proxy->setEnabled(source->isEnabled());
+
+    QObject::connect(proxy, &QAction::triggered, source, [source]() {
+        source->trigger();
+    });
+    QObject::connect(source, &QAction::changed, proxy, [proxy, source]() {
+        proxy->setIcon(source->icon());
+        proxy->setEnabled(source->isEnabled());
+        proxy->setChecked(source->isChecked());
+    });
+
+    return proxy;
+}
 }  // namespace
 
 
@@ -429,23 +494,33 @@ bool RibbonManager::parsePanel(const QJsonObject& source, PanelDefinition& panel
         }
 
         ItemDefinition item;
-        if (parseItem(value.toObject(), item)) {
+        if (parseItem(value.toObject(), item) && !item.command.isEmpty()) {
             panel.items.push_back(std::move(item));
         }
     }
 
-    return !panel.items.empty();
+    const QJsonArray menuItems = source.value(QLatin1String("menu")).toArray();
+    for (int i = 0; i < menuItems.size(); ++i) {
+        const QJsonValue value = menuItems.at(i);
+        if (!value.isObject()) {
+            continue;
+        }
+
+        ItemDefinition item;
+        if (parseItem(value.toObject(), item)) {
+            panel.menuItems.push_back(std::move(item));
+        }
+    }
+
+    return !panel.items.empty() || !panel.menuItems.empty();
 }
 
 bool RibbonManager::parseItem(const QJsonObject& source, ItemDefinition& item)
 {
     item.command = source.value(QLatin1String("command")).toString();
-    if (item.command.isEmpty()) {
-        return false;
-    }
-
     item.label = source.value(QLatin1String("label")).toString();
     item.primary = source.value(QLatin1String("primary")).toBool(false);
+    item.optional = source.value(QLatin1String("optional")).toBool(false);
 
     const QJsonArray subCommands = source.value(QLatin1String("commands")).toArray();
     for (int i = 0; i < subCommands.size(); ++i) {
@@ -455,7 +530,9 @@ bool RibbonManager::parseItem(const QJsonObject& source, ItemDefinition& item)
         }
     }
 
-    return true;
+    // A menu entry may be a bare submenu, which needs a name and something to
+    // put under it but no command of its own.
+    return !item.command.isEmpty() || (!item.label.isEmpty() && !item.subCommands.isEmpty());
 }
 
 void RibbonManager::rebuildTabs(const QString& workbench)
@@ -602,8 +679,13 @@ QWidget* RibbonManager::createPage(const TabDefinition& tab) const
 
         for (const ItemDefinition& item : panelDefinition.items) {
             auto* button = new RibbonButton(panel);
-            const bool bound
-                = button->setCommand(item.command, item.label, item.subCommands, ButtonSize::Large);
+            const bool bound = button->setCommand(
+                item.command,
+                item.label,
+                item.subCommands,
+                ButtonSize::Large,
+                item.optional
+            );
             if (!bound) {
                 delete button;
                 continue;
@@ -612,6 +694,8 @@ QWidget* RibbonManager::createPage(const TabDefinition& tab) const
             button->setPrimary(item.primary);
             panel->addButton(button);
         }
+
+        panel->setCaptionMenu(createPanelMenu(panelDefinition, panel));
 
         if (panel->isEmpty()) {
             delete panel;
@@ -645,6 +729,73 @@ QWidget* RibbonManager::createPage(const TabDefinition& tab) const
     }
 
     return page;
+}
+
+QMenu* RibbonManager::createPanelMenu(const PanelDefinition& panel, QWidget* parent)
+{
+    if (panel.menuItems.empty()) {
+        return nullptr;
+    }
+
+    auto* menu = new QMenu(parent);
+    menu->setObjectName(QStringLiteral("RibbonPanelMenu"));
+
+    for (const ItemDefinition& item : panel.menuItems) {
+        Gui::Action* guiAction = resolveGuiAction(item.command);
+        QAction* action = guiAction ? guiAction->action() : nullptr;
+
+        if (!item.command.isEmpty() && !action) {
+            reportMissing(item.command, item.optional);
+            continue;
+        }
+
+        QList<QAction*> children;
+        for (const QString& subCommand : item.subCommands) {
+            if (QAction* child = RibbonButton::resolveAction(subCommand)) {
+                children.append(child);
+            }
+            else {
+                reportMissing(subCommand, item.optional);
+            }
+        }
+
+        // A group command already carries its variants, which is how a single
+        // FreeCAD command stands in for a row of Fusion entries.
+        if (children.isEmpty()) {
+            if (auto* group = qobject_cast<Gui::ActionGroup*>(guiAction)) {
+                children = group->actions();
+            }
+        }
+
+        if (!children.isEmpty()) {
+            const QString title = item.label.isEmpty() && action ? action->text() : item.label;
+            if (title.isEmpty()) {
+                continue;
+            }
+
+            QMenu* submenu = menu->addMenu(title);
+            if (action) {
+                submenu->setIcon(action->icon());
+            }
+            submenu->addActions(children);
+            continue;
+        }
+
+        if (!action) {
+            continue;
+        }
+
+        menu->addAction(
+            item.label.isEmpty() ? action : createLabelledAction(action, item.label, menu)
+        );
+    }
+
+    if (menu->isEmpty()) {
+        delete menu;
+        return nullptr;
+    }
+
+    return menu;
 }
 
 #include "moc_RibbonManager.cpp"

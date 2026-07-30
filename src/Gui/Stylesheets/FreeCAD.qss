@@ -2783,6 +2783,42 @@ QLabel#RibbonPanelCaption {
   padding: 0px 2px 0px 2px;
 }
 
+/* Caption of a panel that carries a drop-down of its full command set, as in
+   Fusion's "CREATE v". Flat until hovered, so that it still reads as a caption. */
+QToolButton#RibbonPanelCaptionButton {
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: @InputFieldBorderRadius;
+  color: @TextDisabledColor;
+  padding: 0px 14px 0px 4px;
+}
+
+QToolButton#RibbonPanelCaptionButton:hover {
+  background-color: @AccentHoverColor;
+  border: 1px solid @AccentColor;
+  color: @TextForegroundColor;
+}
+
+QToolButton#RibbonPanelCaptionButton:pressed,
+QToolButton#RibbonPanelCaptionButton:open {
+  background-color: @AccentBackgroundColor;
+  border: 1px solid @AccentColor;
+  color: @TextForegroundColor;
+}
+
+QToolButton#RibbonPanelCaptionButton::menu-indicator {
+  image: url(qss:@IconsLocationFolderName/arrow-down-lightgray.svg);
+  height: 11px;
+  width: 11px;
+  subcontrol-origin: padding;
+  subcontrol-position: center right;
+}
+
+QToolButton#RibbonPanelCaptionButton::menu-indicator:hover,
+QToolButton#RibbonPanelCaptionButton::menu-indicator:open {
+  image: url(qss:@IconsLocationFolderName/arrow-down-@StylesheetIconsColor.svg);
+}
+
 /* Tab strip: flat labels that the active tab underlines in the accent colour. */
 QTabBar#RibbonTabBar {
   background-color: @PrimaryColorDarken4;

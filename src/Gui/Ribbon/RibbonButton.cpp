@@ -129,7 +129,8 @@ bool RibbonButton::setCommand(
     const QString& command,
     const QString& label,
     const QStringList& subCommands,
-    ButtonSize size
+    ButtonSize size,
+    bool quiet
 )
 {
     if (!Application::Instance) {
@@ -139,7 +140,18 @@ bool RibbonButton::setCommand(
     CommandManager& manager = Application::Instance->commandManager();
     Command* cmd = manager.getCommandByName(command.toLatin1().constData());
     if (!cmd) {
-        Base::Console().warning("Ribbon: skipping unknown command '%s'\n", command.toUtf8().constData());
+        if (quiet) {
+            Base::Console().log(
+                "Ribbon: '%s' is not available, its module is not loaded\n",
+                command.toUtf8().constData()
+            );
+        }
+        else {
+            Base::Console().warning(
+                "Ribbon: skipping unknown command '%s'\n",
+                command.toUtf8().constData()
+            );
+        }
         return false;
     }
 
@@ -165,6 +177,13 @@ bool RibbonButton::setCommand(
     for (const QString& subCommand : subCommands) {
         if (QAction* action = resolveAction(subCommand)) {
             children.append(action);
+        }
+        else if (quiet) {
+            Base::Console().log(
+                "Ribbon: sub-command '%s' of '%s' is not available\n",
+                subCommand.toUtf8().constData(),
+                command.toUtf8().constData()
+            );
         }
         else {
             Base::Console().warning(

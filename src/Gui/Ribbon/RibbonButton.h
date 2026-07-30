@@ -64,12 +64,17 @@ public:
      * command keeps the name it is known and translated under everywhere else.
      * Returns false when the command is not registered, in which case the
      * button is left unusable and should be discarded by the caller.
+     *
+     * \a quiet marks an entry whose module is not loaded by the workbench that
+     * backs the page, so that it disappears without the warning an entry the
+     * definition simply gets wrong deserves.
      */
     bool setCommand(
         const QString& command,
         const QString& label,
         const QStringList& subCommands,
-        ButtonSize size
+        ButtonSize size,
+        bool quiet
     );
 
     /**
