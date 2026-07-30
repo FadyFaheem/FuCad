@@ -104,6 +104,8 @@ protected:
     bool setEdit(int ModNum) override;
     void unsetEdit(int ModNum) override;
     void updateData(const App::Property* prop) override;
+    /// Match the preview colour to the feature's current operation.
+    void updatePreviewColor();
 
     void attachPreview() override;
     void updatePreview() override;

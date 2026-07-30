@@ -78,14 +78,36 @@ void ViewProvider::attach(App::DocumentObject* pcObject)
 
     auto* styleParameterManager = Base::provideService<Gui::StyleParameters::ParameterManager>();
 
-    if (auto addSubFeature = getObject<PartDesign::FeatureAddSub>()) {
-        bool isAdditive = addSubFeature->getAddSubType() == PartDesign::FeatureAddSub::Additive;
+    Q_UNUSED(styleParameterManager)
 
-        PreviewColor.setValue(
-            isAdditive ? styleParameterManager->resolve(StyleParameters::PreviewAdditiveColor)
-                       : styleParameterManager->resolve(StyleParameters::PreviewSubtractiveColor)
-        );
+    updatePreviewColor();
+}
+
+void ViewProvider::updatePreviewColor()
+{
+    auto addSubFeature = getObject<PartDesign::FeatureAddSub>();
+    if (!addSubFeature) {
+        return;
     }
+
+    auto* styleParameterManager = Base::provideService<Gui::StyleParameters::ParameterManager>();
+
+    auto parameter = StyleParameters::PreviewAdditiveColor;
+    switch (addSubFeature->getOperationType()) {
+        case PartDesign::FeatureAddSub::OperationType::Cut:
+            parameter = StyleParameters::PreviewSubtractiveColor;
+            break;
+        case PartDesign::FeatureAddSub::OperationType::Intersect:
+            parameter = StyleParameters::PreviewCommonColor;
+            break;
+        case PartDesign::FeatureAddSub::OperationType::Join:
+        case PartDesign::FeatureAddSub::OperationType::NewBody:
+            break;
+        default:
+            throw Base::ValueError("Unhandled value of the Operation property");
+    }
+
+    PreviewColor.setValue(styleParameterManager->resolve(parameter));
 }
 
 bool ViewProvider::doubleClicked()
@@ -212,6 +234,13 @@ void ViewProvider::unsetEdit(int ModNum)
 
 void ViewProvider::updateData(const App::Property* prop)
 {
+    if (strcmp(prop->getName(), "Operation") == 0) {
+        // Resolved per change rather than once at attach: the operation is chosen in
+        // the task dialog, and the preview has to switch between the additive,
+        // subtractive and common colours as the user changes it.
+        updatePreviewColor();
+    }
+
     if (strcmp(prop->getName(), "PreviewShape") == 0) {
         updatePreview();
     }

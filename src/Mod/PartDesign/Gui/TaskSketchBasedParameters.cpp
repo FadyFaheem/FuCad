@@ -303,6 +303,7 @@ TaskSketchBasedParameters::TaskSketchBasedParameters(
     profileWidget = new ProfileSelectionWidget(sketchBased, this);
     groupLayout()->insertWidget(0, profileWidget);
     connect(profileWidget, &ProfileSelectionWidget::profileChanged, this, [this]() {
+        setPreviewSuppressed(false);
         recomputeFeature();
     });
 
@@ -319,6 +320,22 @@ TaskSketchBasedParameters::TaskSketchBasedParameters(
 
     if (regions > 1 && !hasRegion) {
         profileWidget->setPickingActive(true);
+        // With no region chosen the profile is still the whole sketch, so the feature
+        // would preview every region extruded at once. Wait until the user picks one.
+        setPreviewSuppressed(true);
+    }
+}
+
+void TaskSketchBasedParameters::setPreviewSuppressed(bool suppress)
+{
+    if (previewSuppressed == suppress) {
+        return;
+    }
+
+    previewSuppressed = suppress;
+
+    if (auto* view = getViewObject<PartDesignGui::ViewProvider>()) {
+        view->showPreview(!suppress);
     }
 }
 
