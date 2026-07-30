@@ -36,6 +36,7 @@ class QMimeData;
 class QUrl;
 class QMdiSubWindow;
 class QMenu;
+class QMenuBar;
 
 namespace App
 {
@@ -192,6 +193,17 @@ public:
     /** @name Menu
      */
     //@{
+    /**
+     * Returns the application menu bar.
+     *
+     * This deliberately hides QMainWindow::menuBar(). In ribbon mode the single
+     * QMainWindow layout slot for a menu bar is taken by the ribbon container,
+     * and QMainWindow::menuBar() would react to that by creating a second bar
+     * and deleting the container. The bar hosted by the ribbon app bar is
+     * returned instead, so MenuManager and every other caller keep working on
+     * the real menus. Outside ribbon mode this forwards to QMainWindow.
+     */
+    QMenuBar* menuBar() const;
     /// Set menu for dock windows.
     void setDockWindowMenu(QMenu*);
     /// Set menu for toolbars.
@@ -358,6 +370,7 @@ protected:
     void changeEvent(QEvent* e) override;
 
 private:
+    void setupRibbon();
     void setupDockWindows();
     bool setupTaskView();
     bool setupSelectionView();

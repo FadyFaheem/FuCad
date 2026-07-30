@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/ribbon">
+        <file>Workspaces/Design.json</file>
+    </qresource>
+</RCC>

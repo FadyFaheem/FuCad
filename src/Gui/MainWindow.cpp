@@ -52,6 +52,7 @@
 #include <QTimer>
 #include <QToolBar>
 #include <QUrlQuery>
+#include <QVBoxLayout>
 #include <QWhatsThis>
 #include <QWindow>
 #include <QPushButton>
@@ -107,6 +108,9 @@
 #include "PropertyView.h"
 #include "PythonConsole.h"
 #include "ReportView.h"
+#include "Ribbon/AppBar.h"
+#include "Ribbon/RibbonBar.h"
+#include "Ribbon/RibbonManager.h"
 #include "SelectionView.h"
 #include "SplashScreen.h"
 #include "StatusBarLabel.h"
@@ -338,6 +342,9 @@ struct MainWindowP
     QTimer saveStateTimer;
     QTimer restoreStateTimer;
     QMdiArea* mdiArea;
+    /// The application menu bar when the ribbon shell is installed, else null.
+    /// Owned by the ribbon app bar, not by the QMainWindow menu slot.
+    QMenuBar* ribbonMenuBar = nullptr;
     QPointer<MDIView> activeView;
     QSignalMapper* windowMapper;
     SplashScreen* splashscreen;
@@ -386,6 +393,11 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags f)
 
     // global access
     instance = this;
+
+    // Must run before anything can reach menuBar(): the ribbon takes over the
+    // QMainWindow menu slot and any bar Qt creates for that slot beforehand
+    // would be destroyed by setMenuWidget().
+    setupRibbon();
 
     d->connParam = App::GetApplication().GetUserParameter().signalParamChanged.connect(
         [this](ParameterGrp* Param, ParameterGrp::ParamType, const char* Name, const char*) {
@@ -634,6 +646,46 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags f)
     statusBar()->showMessage(tr("Ready"), 2001);
 }
 
+void MainWindow::setupRibbon()
+{
+    if (!Ribbon::RibbonManager::isEnabled()) {
+        return;
+    }
+
+    // setMenuWidget() is the only place QMainWindow offers for a full width
+    // widget above the central area, and it also removes the menu bar the way
+    // Fusion has none.
+    auto* container = new QWidget(this);
+    container->setObjectName(QStringLiteral("RibbonContainer"));
+
+    auto* layout = new QVBoxLayout(container);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    auto* appBar = new Ribbon::AppBar(container);
+    auto* ribbonBar = new Ribbon::RibbonBar(container);
+    layout->addWidget(appBar);
+    layout->addWidget(ribbonBar);
+
+    // The app bar creates the real QMenuBar and keeps it as a plain child, so
+    // it never enters the layout slot that setMenuWidget() is about to claim
+    // and can therefore not be deleted by it.
+    d->ribbonMenuBar = appBar->menuBar();
+
+    setMenuWidget(container);
+
+    Ribbon::RibbonManager::instance()->attach(ribbonBar);
+}
+
+QMenuBar* MainWindow::menuBar() const
+{
+    if (d->ribbonMenuBar) {
+        return d->ribbonMenuBar;
+    }
+
+    return QMainWindow::menuBar();
+}
+
 MainWindow::~MainWindow()
 {
     // QWidget teardown may still emit subWindowActivated while child MDI
@@ -642,6 +694,7 @@ MainWindow::~MainWindow()
     if (d->mdiArea) {
         disconnect(d->mdiArea, &QMdiArea::subWindowActivated, this, &MainWindow::onWindowActivated);
     }
+    Ribbon::RibbonManager::destruct();
     delete d->status;
     delete d;
     instance = nullptr;

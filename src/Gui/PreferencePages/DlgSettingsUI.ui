@@ -507,6 +507,34 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="title">
+      <string>Main Window</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="Gui::PrefCheckBox" name="useRibbonCheckBox">
+        <property name="toolTip">
+         <string>Replace the per-workbench toolbars and the menu bar with a Fusion style ribbon.</string>
+        </property>
+        <property name="text">
+         <string>Use ribbon interface (requires restart)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>UseRibbon</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>MainWindow</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
       <string>Suggested Actions</string>
@@ -590,6 +618,7 @@
   <tabstop>overlayAutoHideCheckBox</tabstop>
   <tabstop>mouseClickPassThroughCheckBox</tabstop>
   <tabstop>mouseWheelPassThroughCheckBox</tabstop>
+  <tabstop>useRibbonCheckBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>

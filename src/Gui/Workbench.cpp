@@ -25,6 +25,7 @@
 
 #include <QDockWidget>
 #include <QStatusBar>
+#include <QString>
 
 
 #include "Workbench.h"
@@ -38,6 +39,7 @@
 #include "MainWindow.h"
 #include "MenuManager.h"
 #include "PythonWorkbenchPy.h"
+#include "Ribbon/RibbonManager.h"
 #include "Selection.h"
 #include "ToolBarManager.h"
 #include "ToolBoxManager.h"
@@ -455,7 +457,17 @@ bool Workbench::activate()
     ToolBarItem* tb = setupToolBars();
     setupCustomToolbars(tb, "Toolbar");
     WorkbenchManipulator::changeToolBars(tb);
-    ToolBarManager::getInstance()->setup(tb);
+    if (Ribbon::RibbonManager::isEnabled()) {
+        // The ribbon presents these commands instead, but the tree is still the
+        // only description an add-on workbench gives of its tools, so it is kept
+        // for the generated fallback tab.
+        Ribbon::RibbonManager::instance()->rememberToolBars(QString::fromStdString(name()), tb);
+        ToolBarItem noToolBars;
+        ToolBarManager::getInstance()->setup(&noToolBars);
+    }
+    else {
+        ToolBarManager::getInstance()->setup(tb);
+    }
     delete tb;
 
     // ToolBarItem* cb = setupCommandBars();

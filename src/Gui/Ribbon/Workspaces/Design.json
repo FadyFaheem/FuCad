@@ -1,0 +1,324 @@
+{
+    "name": "Design",
+    "tabs": [
+        {
+            "id": "SOLID",
+            "workbench": "PartDesignWorkbench",
+            "panels": [
+                {
+                    "caption": "Create",
+                    "items": [
+                        { "command": "PartDesign_NewSketch", "label": "Create Sketch" },
+                        { "command": "PartDesign_Extrude" },
+                        { "command": "PartDesign_Revolve" },
+                        { "command": "PartDesign_Sweep" },
+                        { "command": "PartDesign_Loft" },
+                        { "command": "PartDesign_Coil" },
+                        { "command": "PartDesign_CompPrimitive", "label": "Create Primitive" }
+                    ]
+                },
+                {
+                    "caption": "Modify",
+                    "items": [
+                        { "command": "PartDesign_Fillet" },
+                        { "command": "PartDesign_Chamfer" },
+                        { "command": "PartDesign_Draft" },
+                        { "command": "PartDesign_Thickness", "label": "Shell" },
+                        { "command": "PartDesign_Hole" }
+                    ]
+                },
+                {
+                    "caption": "Create Pattern",
+                    "items": [
+                        { "command": "PartDesign_LinearPattern", "label": "Rectangular Pattern" },
+                        { "command": "PartDesign_PolarPattern", "label": "Circular Pattern" },
+                        { "command": "PartDesign_Mirrored", "label": "Mirror" },
+                        { "command": "PartDesign_MultiTransform", "label": "Pattern on Path" }
+                    ]
+                },
+                {
+                    "caption": "Modify Bodies",
+                    "items": [
+                        { "command": "PartDesign_Boolean", "label": "Combine" }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "SURFACE",
+            "workbench": "SurfaceWorkbench",
+            "optional": true,
+            "panels": [
+                {
+                    "caption": "Create",
+                    "items": [
+                        { "command": "Surface_Filling", "label": "Patch" },
+                        { "command": "Surface_GeomFillSurface", "label": "Boundary Fill" },
+                        { "command": "Surface_Sections", "label": "Loft" },
+                        { "command": "Surface_BlendCurve", "label": "Bridge Curve" }
+                    ]
+                },
+                {
+                    "caption": "Modify",
+                    "items": [
+                        { "command": "Surface_ExtendFace", "label": "Extend" },
+                        { "command": "Surface_CurveOnMesh" }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "SHEET METAL",
+            "workbench": "SMWorkbench",
+            "optional": true,
+            "panels": [
+                {
+                    "caption": "Create",
+                    "items": [
+                        { "command": "SheetMetal_AddBase", "label": "Base Flange" },
+                        { "command": "SheetMetal_AddWall", "label": "Flange" },
+                        { "command": "SheetMetal_AddHem", "label": "Hem" },
+                        { "command": "SheetMetal_AddBend", "label": "Bend" }
+                    ]
+                },
+                {
+                    "caption": "Modify",
+                    "items": [
+                        { "command": "SheetMetal_AddCornerRelief", "label": "Corner Relief" },
+                        { "command": "SheetMetal_Extrude" },
+                        { "command": "SheetMetal_Unfold", "label": "Unfold" }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "ASSEMBLE",
+            "workbench": "AssemblyWorkbench",
+            "optional": true,
+            "panels": [
+                {
+                    "caption": "Assemble",
+                    "items": [
+                        { "command": "Assembly_CreateAssembly" },
+                        { "command": "Assembly_InsertLink", "label": "Insert Component" },
+                        { "command": "Assembly_InsertNewPart", "label": "New Component" },
+                        { "command": "Assembly_SolveAssembly" }
+                    ]
+                },
+                {
+                    "caption": "Joint",
+                    "items": [
+                        {
+                            "command": "Assembly_CreateJointFixed",
+                            "label": "Rigid Joint",
+                            "commands": [
+                                "Assembly_CreateJointRevolute",
+                                "Assembly_CreateJointCylindrical",
+                                "Assembly_CreateJointSlider",
+                                "Assembly_CreateJointBall"
+                            ]
+                        },
+                        { "command": "Assembly_CreateJointDistance" },
+                        { "command": "Assembly_CreateJointAngle" },
+                        { "command": "Assembly_ToggleGrounded", "label": "Ground" }
+                    ]
+                },
+                {
+                    "caption": "Document",
+                    "items": [
+                        { "command": "Assembly_CreateBom", "label": "Bill of Materials" },
+                        { "command": "Assembly_CreateView", "label": "Exploded View" }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "CONSTRUCT",
+            "workbench": "PartDesignWorkbench",
+            "panels": [
+                {
+                    "caption": "Datum",
+                    "items": [
+                        { "command": "PartDesign_Plane", "label": "Offset Plane" },
+                        { "command": "PartDesign_Line", "label": "Axis" },
+                        { "command": "PartDesign_Point", "label": "Point" },
+                        { "command": "PartDesign_CoordinateSystem", "label": "Coordinate System" },
+                        { "command": "PartDesign_CompDatums" }
+                    ]
+                },
+                {
+                    "caption": "Reference",
+                    "items": [
+                        { "command": "PartDesign_ShapeBinder" },
+                        { "command": "PartDesign_SubShapeBinder" },
+                        { "command": "PartDesign_Clone" }
+                    ]
+                },
+                {
+                    "caption": "Body",
+                    "items": [
+                        { "command": "PartDesign_Body", "label": "New Body" },
+                        { "command": "PartDesign_MoveTip", "label": "Roll To Here" }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "INSPECT",
+            "workbench": null,
+            "panels": [
+                {
+                    "caption": "Measure",
+                    "items": [
+                        { "command": "Std_Measure" },
+                        { "command": "Std_MassProperties" }
+                    ]
+                },
+                {
+                    "caption": "Analyze",
+                    "items": [
+                        { "command": "Part_CheckGeometry" },
+                        { "command": "Part_ShapeInfo" },
+                        { "command": "Part_SectionCut", "label": "Section Analysis" }
+                    ]
+                },
+                {
+                    "caption": "Document",
+                    "items": [
+                        { "command": "Std_ProjectInfo" },
+                        { "command": "Std_DependencyGraph" },
+                        { "command": "Std_SceneInspector" }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "INSERT",
+            "workbench": "PartWorkbench",
+            "optional": true,
+            "panels": [
+                {
+                    "caption": "Primitives",
+                    "items": [
+                        { "command": "Part_Box" },
+                        { "command": "Part_Cylinder" },
+                        { "command": "Part_Sphere" },
+                        { "command": "Part_Cone" },
+                        { "command": "Part_Torus" },
+                        { "command": "Part_Primitives" }
+                    ]
+                },
+                {
+                    "caption": "Boolean",
+                    "items": [
+                        {
+                            "command": "Part_Boolean",
+                            "label": "Combine",
+                            "commands": [
+                                "Part_Cut",
+                                "Part_Fuse",
+                                "Part_Common"
+                            ]
+                        },
+                        { "command": "Part_Compound" },
+                        { "command": "Part_Mirror" }
+                    ]
+                },
+                {
+                    "caption": "Insert",
+                    "items": [
+                        { "command": "Std_Import" },
+                        { "command": "Part_Import" },
+                        { "command": "Part_Export" }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "TOOLS",
+            "workbench": null,
+            "panels": [
+                {
+                    "caption": "Macro",
+                    "items": [
+                        { "command": "Std_DlgMacroRecord" },
+                        { "command": "Std_DlgMacroExecute" },
+                        { "command": "Std_DlgMacroExecuteDirect" }
+                    ]
+                },
+                {
+                    "caption": "Customize",
+                    "items": [
+                        { "command": "Std_DlgCustomize" },
+                        { "command": "Std_DlgPreferences" },
+                        { "command": "Std_DlgParameter" }
+                    ]
+                },
+                {
+                    "caption": "Utility",
+                    "items": [
+                        { "command": "Std_UnitsCalculator" },
+                        { "command": "Std_ProjectUtil" },
+                        { "command": "Std_TextDocument" }
+                    ]
+                }
+            ]
+        }
+    ],
+    "contextTabs": [
+        {
+            "id": "SKETCH",
+            "workbench": "SketcherWorkbench",
+            "panels": [
+                {
+                    "caption": "Create",
+                    "items": [
+                        { "command": "Sketcher_CreateLine", "label": "Line" },
+                        { "command": "Sketcher_CreateRectangle", "label": "Rectangle" },
+                        { "command": "Sketcher_CreateCircle", "label": "Circle" },
+                        { "command": "Sketcher_CreateArc", "label": "Arc" },
+                        { "command": "Sketcher_CreatePolyline", "label": "Polyline" },
+                        { "command": "Sketcher_CreatePoint", "label": "Point" },
+                        { "command": "Sketcher_CreateSlot", "label": "Slot" },
+                        { "command": "Sketcher_CreateFillet", "label": "Fillet" },
+                        { "command": "Sketcher_Trimming", "label": "Trim" },
+                        { "command": "Sketcher_Extend", "label": "Extend" },
+                        { "command": "Sketcher_CompExternal", "label": "Project" }
+                    ]
+                },
+                {
+                    "caption": "Constrain",
+                    "items": [
+                        { "command": "Sketcher_ConstrainCoincidentUnified", "label": "Coincident" },
+                        { "command": "Sketcher_ConstrainDistance", "label": "Distance" },
+                        { "command": "Sketcher_ConstrainHorVer", "label": "Horizontal Vertical" },
+                        { "command": "Sketcher_ConstrainParallel", "label": "Parallel" },
+                        { "command": "Sketcher_ConstrainPerpendicular", "label": "Perpendicular" },
+                        { "command": "Sketcher_ConstrainTangent", "label": "Tangent" },
+                        { "command": "Sketcher_ConstrainEqual", "label": "Equal" },
+                        { "command": "Sketcher_ConstrainSymmetric", "label": "Symmetry" }
+                    ]
+                },
+                {
+                    "caption": "Modify",
+                    "items": [
+                        { "command": "Sketcher_Move" },
+                        { "command": "Sketcher_Clone" },
+                        { "command": "Sketcher_RectangularArray", "label": "Rectangular Pattern" }
+                    ]
+                },
+                {
+                    "caption": "Finish",
+                    "align": "right",
+                    "items": [
+                        {
+                            "command": "Sketcher_LeaveSketch",
+                            "label": "Finish Sketch",
+                            "primary": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

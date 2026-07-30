@@ -455,6 +455,7 @@ qt_create_resource_file_prefix(${FreeCAD_TR_QRC} ${QM_SRCS})
 set(Gui_RES_SRCS
     Icons/resource.qrc
     Language/translation.qrc
+    Ribbon/ribbon.qrc
     ${FreeCAD_TR_QRC}
 )
 
@@ -1304,6 +1305,23 @@ SET(Workbench_SRCS
 )
 SOURCE_GROUP("Workbench" FILES ${Workbench_SRCS})
 
+SET(Ribbon_CPP_SRCS
+    Ribbon/AppBar.cpp
+    Ribbon/RibbonBar.cpp
+    Ribbon/RibbonButton.cpp
+    Ribbon/RibbonManager.cpp
+    Ribbon/RibbonPanel.cpp
+)
+SET(Ribbon_SRCS
+    ${Ribbon_CPP_SRCS}
+    Ribbon/AppBar.h
+    Ribbon/RibbonBar.h
+    Ribbon/RibbonButton.h
+    Ribbon/RibbonManager.h
+    Ribbon/RibbonPanel.h
+)
+SOURCE_GROUP("Ribbon" FILES ${Ribbon_SRCS})
+
 SET(Selection_SRCS
     Selection/BoxSelection.cpp
     Selection/BoxSelection.h
@@ -1450,6 +1468,7 @@ SET(FreeCADGui_SRCS
     ${Params_SRCS}
     ${View_SRCS}
     ${Workbench_SRCS}
+    ${Ribbon_SRCS}
     ${Selection_SRCS}
     ${FreeCADGui_SRCS}
 )
@@ -1480,6 +1499,7 @@ if(MSVC)
         ${Viewprovider_CPP_SRCS}
         ${Widget_CPP_SRCS}
         ${Workbench_CPP_SRCS}
+        ${Ribbon_CPP_SRCS}
         ${FreeCADGui_CPP_SRCS}
     )
 endif(MSVC)

@@ -83,6 +83,9 @@ void DlgSettingsUI::saveSettings()
     ui->mouseClickPassThroughCheckBox->onSave();
     ui->mouseWheelPassThroughCheckBox->onSave();
 
+    // Main Window
+    ui->useRibbonCheckBox->onSave();
+
     // TaskWatcher
     ui->showTaskWatcherCheckBox->onSave();
 }
@@ -111,6 +114,9 @@ void DlgSettingsUI::loadSettings()
     ui->overlayAutoHideCheckBox->onRestore();
     ui->mouseClickPassThroughCheckBox->onRestore();
     ui->mouseWheelPassThroughCheckBox->onRestore();
+
+    // Main Window
+    ui->useRibbonCheckBox->onRestore();
 
     // TaskWatcher
     ui->showTaskWatcherCheckBox->onRestore();
