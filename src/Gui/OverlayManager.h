@@ -115,6 +115,12 @@ public:
     };
     /// Set overlay mode
     void setOverlayMode(OverlayMode mode);
+    /**
+     * Move a single dock widget onto, or off, the overlay over the MDI area.
+     * The OverlayMode values act either on the focused dock or on all of them,
+     * which is too coarse when only one panel should float over the 3D view.
+     */
+    void setDockOverlay(QDockWidget* dock, bool enable);
 
     /// Enable/disable mouse transparent mode
     void setMouseTransparent(bool enabled);

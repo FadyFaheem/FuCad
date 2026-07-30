@@ -1602,6 +1602,11 @@ void OverlayManager::setOverlayMode(OverlayMode mode)
     d->setOverlayMode(mode);
 }
 
+void OverlayManager::setDockOverlay(QDockWidget* dock, bool enable)
+{
+    d->toggleOverlay(dock, enable ? ToggleMode::Set : ToggleMode::Unset);
+}
+
 
 void OverlayManager::initDockWidget(QDockWidget* dw)
 {

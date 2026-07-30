@@ -377,6 +377,8 @@ private:
     bool setupReportView();
     bool setupPythonConsole();
     bool setupTimelineView();
+    /// One-time default that floats the model tree over the 3D view.
+    void applyDefaultModelOverlay();
     bool updateTreeView(bool show);
     bool updatePropertyView(bool show);
     bool updateTaskView(bool show);

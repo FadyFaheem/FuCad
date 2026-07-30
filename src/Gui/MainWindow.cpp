@@ -2329,6 +2329,40 @@ void MainWindow::loadWindowSettings()
                                              ->GetGroup("DockWindows");
         timeline->setVisible(dockGroup->GetBool("Std_TimelineView", true));
     }
+
+    applyDefaultModelOverlay();
+}
+
+void MainWindow::applyDefaultModelOverlay()
+{
+    // Float the model tree over the 3D view the way Fusion's browser does, so the
+    // canvas keeps the full width of the window. Applied once rather than on every
+    // start: the overlay manager persists its own state, and forcing it here would
+    // undo the user's choice every time they moved the panel back.
+    ParameterGrp::handle group = App::GetApplication()
+                                     .GetUserParameter()
+                                     .GetGroup("BaseApp")
+                                     ->GetGroup("MainWindow")
+                                     ->GetGroup("DockWindows");
+
+    if (group->GetBool("ModelOverlayApplied", false)) {
+        return;
+    }
+    group->SetBool("ModelOverlayApplied", true);
+
+    QDockWidget* model = DockWindowManager::instance()->getDockContainer("Model");
+    if (!model) {
+        model = DockWindowManager::instance()->getDockContainer("Tree view");
+    }
+    if (!model) {
+        return;
+    }
+
+    auto* overlay = OverlayManager::instance();
+    overlay->setDockOverlay(model, true);
+    // Only after a dock is on the overlay, otherwise TransparentAll falls back to
+    // putting every dock there.
+    overlay->setOverlayMode(OverlayManager::OverlayMode::TransparentAll);
 }
 
 bool MainWindow::isRestoringWindowState() const
