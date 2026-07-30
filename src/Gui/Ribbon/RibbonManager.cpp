@@ -586,8 +586,12 @@ void RibbonManager::rebuildTabs(const QString& workbench)
             }
         }
 
-        for (const ContextTabState& state : activeContextTabs) {
-            if (state.tab->workbench == workbench) {
+        // A workbench that a context tab speaks for is described even while that tab is
+        // not pushed yet. Sketcher activates before enterEditMode() pushes SKETCH, so
+        // testing only the pushed tabs would generate a redundant "Sketcher" tab that
+        // then sits next to the contextual one.
+        for (const TabDefinition& tab : contextTabs) {
+            if (!tab.workbench.isEmpty() && tab.workbench == workbench) {
                 described = true;
                 break;
             }
