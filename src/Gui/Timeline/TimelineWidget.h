@@ -118,6 +118,10 @@ private:
     int markerIndexAt(const QPoint& stripPos) const;
     int indexOfFeature(const std::string& name) const;
     int solidAtOrBefore(int index) const;
+    /// The solid feature before \a index, or -1 for the state with nothing applied.
+    int previousSolid(int index) const;
+    /// The solid feature after \a index, or \a index when there is none.
+    int nextSolid(int index) const;
 
     void onMarkerSelect(const QString& feature);
     void onMarkerEdit(const QString& feature);

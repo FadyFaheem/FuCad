@@ -417,8 +417,8 @@ void TimelineWidget::applyStates()
     }
 
     const bool hasBody = !bodyName.empty();
-    stepBackButton->setEnabled(hasBody && playheadIndex >= 0);
-    stepForwardButton->setEnabled(hasBody && playheadIndex + 1 < static_cast<int>(markers.size()));
+    stepBackButton->setEnabled(hasBody && tipIndex >= 0);
+    stepForwardButton->setEnabled(hasBody && nextSolid(tipIndex) != tipIndex);
 }
 
 App::Document* TimelineWidget::currentDocument() const
@@ -802,23 +802,51 @@ void TimelineWidget::rollTo(int index)
 
 void TimelineWidget::stepBack()
 {
-    if (playheadIndex < 0) {
+    // Step between states the model can actually be in rather than between markers.
+    // Only a solid feature can carry the tip, so landing on a sketch would resolve
+    // back to the same solid and the click would change nothing on screen.
+    const int previous = previousSolid(tipIndex);
+    if (previous == tipIndex) {
         return;
     }
 
-    requestedPlayhead = playheadIndex - 1;
-    rollTo(requestedPlayhead);
+    requestedPlayhead = previous;
+    rollTo(previous);
 }
 
 void TimelineWidget::stepForward()
 {
-    const int count = static_cast<int>(markers.size());
-    if (playheadIndex + 1 >= count) {
+    const int next = nextSolid(tipIndex);
+    if (next == tipIndex) {
         return;
     }
 
-    requestedPlayhead = playheadIndex + 1;
-    rollTo(requestedPlayhead);
+    requestedPlayhead = next;
+    rollTo(next);
+}
+
+int TimelineWidget::previousSolid(int index) const
+{
+    int result = -1;
+    for (int solid : solidIndices) {
+        if (solid >= index) {
+            break;
+        }
+        result = solid;
+    }
+
+    return result;
+}
+
+int TimelineWidget::nextSolid(int index) const
+{
+    for (int solid : solidIndices) {
+        if (solid > index) {
+            return solid;
+        }
+    }
+
+    return index;
 }
 
 void TimelineWidget::onSelectionChanged(const Gui::SelectionChanges& msg)
