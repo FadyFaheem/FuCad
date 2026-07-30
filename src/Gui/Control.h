@@ -56,6 +56,26 @@ class GuiExport ControlSingleton: public QObject
     Q_OBJECT
 
 public:
+    /** Overrides the document that dialogs attach to while no document is passed explicitly.
+     *
+     * A view provider entering or leaving edit is not necessarily owned by the active document,
+     * so the active document is the wrong fallback for the dialogs it opens and closes. Scope
+     * this guard around such calls to attach them to the owning document instead.
+     */
+    class GuiExport DefaultDocument
+    {
+    public:
+        explicit DefaultDocument(App::Document* doc);
+        ~DefaultDocument();
+        DefaultDocument(const DefaultDocument&) = delete;
+        DefaultDocument& operator=(const DefaultDocument&) = delete;
+        DefaultDocument(DefaultDocument&&) = delete;
+        DefaultDocument& operator=(DefaultDocument&&) = delete;
+
+    private:
+        App::Document* previous;
+    };
+
     static ControlSingleton& instance();
     static void destruct();
 
@@ -127,10 +147,12 @@ private:
     void aboutToShowDialog(QDockWidget* widget);
     void aboutToHideDialog(QDockWidget* widget);
 
-    // Returns attachTo if not nullptr, otherwise return the active document
+    // Returns attachTo if not nullptr, otherwise the document set by DefaultDocument, otherwise
+    // the active document
     static App::Document* docOrDefault(App::Document* attachedTo);
 
     static ControlSingleton* _pcSingleton;
+    static App::Document* _defaultDocument;
 };
 
 /// Get the global instance

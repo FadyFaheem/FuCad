@@ -248,3 +248,101 @@ class TestGuiDocument(unittest.TestCase):
 
         self.assertTrue(self._processEventsUntil(lambda: os.path.exists(self._recoveryArchive())))
         self._assertRecoveryArchiveContains(expected_label="AutoSaveBurst7")
+
+
+class EditableViewProvider:
+    """Minimal view provider that accepts edit mode and counts the edit callbacks."""
+
+    def __init__(self, vobj):
+        self.setEditCalls = 0
+        self.unsetEditCalls = 0
+        vobj.Proxy = self
+
+    def attach(self, vobj):
+        self.ViewObject = vobj
+        self.Object = vobj.Object
+
+    def setEdit(self, vobj, mode):
+        self.setEditCalls += 1
+        return True
+
+    def unsetEdit(self, vobj, mode):
+        self.unsetEditCalls += 1
+        return True
+
+
+class TestGuiEditIsolation(unittest.TestCase):
+    """Every document owns its edit session, so switching documents does not disturb it."""
+
+    def setUp(self):
+        self.addCleanup(self._closeTestDocuments)
+        self.docA = FreeCAD.newDocument("EditIsolationA")
+        self.docB = FreeCAD.newDocument("EditIsolationB")
+        self.guiA = FreeCADGui.getDocument(self.docA)
+        self.guiB = FreeCADGui.getDocument(self.docB)
+
+        if not all(gui.mdiViewsOfType("Gui::View3DInventor") for gui in (self.guiA, self.guiB)):
+            self.skipTest("edit sessions need a 3D view to attach to")
+
+        self.objA = self.docA.addObject("App::FeaturePython", "EditableA")
+        self.objB = self.docB.addObject("App::FeaturePython", "EditableB")
+        self.proxyA = EditableViewProvider(self.objA.ViewObject)
+        self.proxyB = EditableViewProvider(self.objB.ViewObject)
+
+        # setEdit() resolves the editing parent from the selection when no subname is given
+        FreeCADGui.Selection.clearSelection()
+
+    def _closeTestDocuments(self):
+        for name in ("EditIsolationA", "EditIsolationB"):
+            if name in FreeCAD.listDocuments():
+                FreeCADGui.getDocument(name).resetEdit()
+                FreeCAD.closeDocument(name)
+
+    def _editDocumentName(self):
+        editDoc = FreeCADGui.editDocument()
+        return editDoc.Document.Name if editDoc else None
+
+    def testEditDocumentFollowsTheActiveDocument(self):
+        self.assertTrue(self.guiA.setEdit(self.objA, 0))
+        FreeCAD.setActiveDocument(self.docB.Name)
+        self.assertTrue(self.guiB.setEdit(self.objB, 0))
+
+        self.assertEqual(self._editDocumentName(), self.docB.Name)
+
+        FreeCAD.setActiveDocument(self.docA.Name)
+        self.assertEqual(self._editDocumentName(), self.docA.Name)
+
+    def testEditDocumentFallsBackToTheSuspendedSession(self):
+        self.assertTrue(self.guiA.setEdit(self.objA, 0))
+        FreeCAD.setActiveDocument(self.docB.Name)
+
+        self.assertEqual(self._editDocumentName(), self.docA.Name)
+
+    def testLeavingADocumentSuspendsRatherThanCancelsItsEdit(self):
+        self.assertTrue(self.guiA.setEdit(self.objA, 0))
+        FreeCAD.setActiveDocument(self.docB.Name)
+        self.assertTrue(self.guiB.setEdit(self.objB, 0))
+
+        self.assertEqual(self.proxyA.setEditCalls, 1)
+        self.assertEqual(self.proxyA.unsetEditCalls, 0)
+
+        FreeCAD.setActiveDocument(self.docA.Name)
+
+        self.assertEqual(self.proxyA.setEditCalls, 1)
+        self.assertIsNotNone(self.guiA.getInEdit())
+        self.assertEqual(self.proxyB.unsetEditCalls, 0)
+
+    def testResettingOneDocumentLeavesTheOtherInEdit(self):
+        self.assertTrue(self.guiA.setEdit(self.objA, 0))
+        FreeCAD.setActiveDocument(self.docB.Name)
+        self.assertTrue(self.guiB.setEdit(self.objB, 0))
+
+        self.guiB.resetEdit()
+
+        self.assertEqual(self.proxyB.unsetEditCalls, 1)
+        self.assertEqual(self.proxyA.unsetEditCalls, 0)
+        self.assertIsNone(self.guiB.getInEdit())
+        self.assertEqual(self._editDocumentName(), self.docA.Name)
+
+        FreeCAD.setActiveDocument(self.docA.Name)
+        self.assertIsNotNone(self.guiA.getInEdit())

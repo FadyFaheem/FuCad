@@ -287,7 +287,12 @@ struct DocumentP
         _editMode = ModNum;
         _editViewProvider = svp;  // Used to resolve start editing (find the document in edit from
                                   // within the viewprovider)
-        _editViewProvider = svp->startEditing(ModNum);
+        {
+            // The view being edited is only activated after this call, so the owning document is
+            // not necessarily active yet while the view provider opens its task dialog.
+            ControlSingleton::DefaultDocument defaultDoc(_pcDocument);
+            _editViewProvider = svp->startEditing(ModNum);
+        }
         if (!_editViewProvider) {
             _editViewProviderParent = nullptr;
             _editObjs.clear();
@@ -614,7 +619,7 @@ void Document::resetIfEditing()
     // Fix regression: https://forum.freecad.org/viewtopic.php?f=19&t=43629&p=371972#p371972
     // When an object is already in edit mode a subsequent call for editing is only possible
     // when resetting the currently edited object.
-    if (d->_editViewProvider) {
+    if (hasEditSession()) {
         _resetEdit();
     }
 }
@@ -698,6 +703,13 @@ void Document::setEditingTransform(const Base::Matrix4D& mat)
 {
     d->_editObjs.clear();
     d->_editingTransform = mat;
+    if (d->_editingViewer) {
+        d->_editingViewer->setEditingTransform(mat);
+        return;
+    }
+
+    // Callers such as ViewProviderLink::startEditing() amend the transform before the session
+    // has picked its viewer, so the active view is still the best guess at that point.
     auto activeView = dynamic_cast<View3DInventor*>(getActiveView());
     if (activeView) {
         activeView->getViewer()->setEditingTransform(mat);
@@ -729,7 +741,10 @@ void Document::_resetEdit()
             }
         }
 
-        d->_editViewProvider->finishEditing();
+        {
+            ControlSingleton::DefaultDocument defaultDoc(getDocument());
+            d->_editViewProvider->finishEditing();
+        }
 
         d->_editViewProviderPrevious = d->_editViewProvider;
         d->_editModePrevious = d->_editMode;
@@ -781,10 +796,9 @@ ViewProvider* Document::getInEdit(
         *mode = d->_editMode;
     }
 
-    if (d->_editViewProvider) {
-        // there is only one 3d view which is in edit mode
+    if (d->_editViewProvider && d->_editingViewer) {
         auto activeView = dynamic_cast<View3DInventor*>(getActiveView());
-        if (activeView && activeView->getViewer()->isEditingViewProvider()) {
+        if (activeView && activeView->getViewer() == d->_editingViewer) {
             return d->_editViewProvider;
         }
     }
@@ -794,6 +808,35 @@ ViewProvider* Document::getInEdit(
 ViewProvider* Document::getEditViewProvider() const
 {
     return d->_editViewProvider;
+}
+
+bool Document::hasEditSession() const
+{
+    return d->_editViewProvider != nullptr;
+}
+
+bool Document::isEditSessionSuspended() const
+{
+    return hasEditSession() && !getInEdit();
+}
+
+View3DInventorViewer* Document::getEditingViewer() const
+{
+    return d->_editingViewer;
+}
+
+void Document::moveEditingViewer(View3DInventorViewer* viewer)
+{
+    if (!viewer || !d->_editViewProvider || d->_editingViewer == viewer) {
+        return;
+    }
+
+    if (d->_editingViewer) {
+        d->_editingViewer->resetEditingViewProvider();
+    }
+    d->_editingViewer = viewer;
+    viewer->setEditingViewProvider(d->_editViewProvider, d->_editMode);
+    viewer->setEditingTransform(d->_editingTransform);
 }
 
 void Document::setInEdit(ViewProviderDocumentObject* parentVp, const char* subname)
@@ -1383,6 +1426,10 @@ App::Document* Document::getDocument() const
 }
 void Document::setIsActive(bool active)
 {
+    if (d->_isActive == active) {
+        return;
+    }
+
     d->_isActive = active;
     if (d->_editViewProvider) {
         d->_editViewProvider->setActive(active);
@@ -2432,6 +2479,11 @@ void Document::detachView(Gui::BaseView* pcView, bool bPassiv)
             d->baseViews.remove(pcView);
         }
 
+        auto view3d = dynamic_cast<View3DInventor*>(pcView);
+        if (view3d && view3d->getViewer() == d->_editingViewer) {
+            d->_editingViewer = nullptr;
+        }
+
         // last view?
         if (d->baseViews.empty()) {
             // decouple a passive view
@@ -2573,11 +2625,8 @@ bool Document::canClose(bool checkModify, bool checkLink)
         if (!Gui::Control().isAllowedAlterDocument(getDocument())) {
             std::string name = Gui::Control().activeDialog(getDocument())->getDocumentName();
             if (name == this->getDocument()->getName()) {
-                // getInEdit() only checks if the currently active MDI view is
-                // a 3D view and that it is in edit mode. However, when closing a
-                // document then the edit mode must be reset independent of the
-                // active view.
-                if (d->_editViewProvider) {
+                // A suspended session must be reset too, so this cannot go through getInEdit().
+                if (hasEditSession()) {
                     this->_resetEdit();
                 }
             }

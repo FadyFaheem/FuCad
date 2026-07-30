@@ -207,12 +207,8 @@ View3DInventor* View3DInventor::clone()
 
     // FIXME: Add parameter to define behaviour by the calling instance
     // View provider editing
-
-    int editMode;
-    ViewProvider* editViewProvider = _pcDocument->getInEdit(nullptr, nullptr, &editMode);
-    if (editViewProvider) {
-        getViewer()->resetEditingViewProvider();
-        view3D->getViewer()->setEditingViewProvider(editViewProvider, editMode);
+    if (_pcDocument->getEditingViewer() == getViewer()) {
+        _pcDocument->moveEditingViewer(view3D->getViewer());
     }
 
     return view3D;

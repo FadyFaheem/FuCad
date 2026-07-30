@@ -184,7 +184,13 @@ public:
     /// Set the active document
     void setActiveDocument(Gui::Document* pcDocument);
 
-    /// Getter for the editing document, will be removed soon
+    /** Getter for the editing document, will be removed soon
+     *
+     * Several documents can be in edit at the same time, so this is inherently ambiguous. It
+     * resolves to the active document when that document is in edit, and to the document that
+     * entered edit first otherwise. Prefer the functor overload whenever the caller knows which
+     * edit session it means.
+     */
     Gui::Document* editDocument() const;
     /// Getter for the first editing document that matches a functor
     Gui::Document* editDocument(const std::function<bool(Gui::Document*)>& eval);

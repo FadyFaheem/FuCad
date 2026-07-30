@@ -45,6 +45,18 @@ using namespace std;
 /* TRANSLATOR Gui::ControlSingleton */
 
 ControlSingleton* ControlSingleton::_pcSingleton = nullptr;
+App::Document* ControlSingleton::_defaultDocument = nullptr;
+
+ControlSingleton::DefaultDocument::DefaultDocument(App::Document* doc)
+    : previous(_defaultDocument)
+{
+    _defaultDocument = doc;
+}
+
+ControlSingleton::DefaultDocument::~DefaultDocument()
+{
+    _defaultDocument = previous;
+}
 
 ControlSingleton::ControlSingleton()
     : oldTabIndex(-1)
@@ -315,10 +327,16 @@ bool ControlSingleton::isAllowedAlterSelection(App::Document* attachedTo) const
 
 App::Document* ControlSingleton::docOrDefault(App::Document* attachedTo)
 {
-    if (!attachedTo && Application::Instance->activeDocument()) {
-        attachedTo = Application::Instance->activeDocument()->getDocument();
+    if (attachedTo) {
+        return attachedTo;
     }
-    return attachedTo;
+    if (_defaultDocument) {
+        return _defaultDocument;
+    }
+    if (Application::Instance->activeDocument()) {
+        return Application::Instance->activeDocument()->getDocument();
+    }
+    return nullptr;
 }
 
 // -------------------------------------------

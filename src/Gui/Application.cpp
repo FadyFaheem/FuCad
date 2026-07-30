@@ -1291,8 +1291,17 @@ void Application::slotActiveDocument(const App::Document& Doc)
         // this can happen when calling App.setActiveDocument directly from Python
         // because no MDI view will be activated
         if (d->activeDocument != doc->second) {
+            // The MDI activation that follows below cannot be relied on to notify the documents:
+            // it goes through setActiveDocument(), which bails out because d->activeDocument has
+            // already been reassigned here. Without this, a document keeps its edit session
+            // attached to the global UI after the user moved on to another document.
+            if (d->activeDocument) {
+                d->activeDocument->setIsActive(false);
+            }
             d->activeDocument = doc->second;
             if (d->activeDocument) {
+                d->activeDocument->setIsActive(true);
+
                 Base::PyGILStateLocker lock;
                 Py::Object active(d->activeDocument->getPyObject(), true);
                 Py::Module("FreeCADGui").setAttr(std::string("ActiveDocument"), active);
@@ -1520,7 +1529,11 @@ Gui::Document* Application::editDocument() const
     if (d->editDocuments.empty()) {
         return nullptr;
     }
-    return d->editDocuments[0];
+    auto found = std::ranges::find(d->editDocuments, d->activeDocument);
+    if (found != d->editDocuments.end()) {
+        return *found;
+    }
+    return d->editDocuments.front();
 }
 Gui::Document* Application::editDocument(const std::function<bool(Gui::Document*)>& eval)
 {

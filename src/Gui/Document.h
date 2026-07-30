@@ -54,6 +54,7 @@ namespace Gui
 class BaseView;
 class MDIView;
 class View3DInventor;
+class View3DInventorViewer;
 class ViewProvider;
 class ViewProviderDocumentObject;
 class Application;
@@ -288,7 +289,12 @@ public:
     void _resetEdit();
     /// set if the edit asks for restore or not.
     void setEditRestore(bool val);
-    /// get the in edit ViewProvider or NULL
+    /** Get the ViewProvider being edited in the view the user is currently looking at, or NULL
+     *
+     * Returns NULL for an edit session that this document owns but that is not presented in its
+     * active view, so that commands acting on "what the user sees" do not reach it. Use
+     * hasEditSession() or getEditViewProvider() to reach the session regardless of the view.
+     */
     ViewProvider* getInEdit(
         ViewProviderDocumentObject** parentVp = nullptr,
         std::string* subname = nullptr,
@@ -297,6 +303,18 @@ public:
     ) const;
     ViewProvider* getEditViewProvider() const;  // Returns the _editViewProvider even if it is not
                                                 // in edit at the moment
+    /// True while this document owns an edit session, whichever document or view is active
+    bool hasEditSession() const;
+    /** True while this document owns an edit session that getInEdit() does not report
+     *
+     * This is the state a document is left in after the user switches to another document: the
+     * session and its task dialog stay alive and are resumed when the document is activated again.
+     */
+    bool isEditSessionSuspended() const;
+    /// The viewer the edit session was started in, or NULL if there is no session
+    View3DInventorViewer* getEditingViewer() const;
+    /// Hand the edit session over to another viewer, e.g. when its view gets cloned
+    void moveEditingViewer(View3DInventorViewer* viewer);
     /// set the in edit ViewProvider subname reference
     void setInEdit(ViewProviderDocumentObject* parentVp, const char* subname);
     /** Add or remove view provider from scene graphs of all views
