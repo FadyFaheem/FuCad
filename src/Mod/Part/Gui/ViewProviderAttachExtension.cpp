@@ -108,13 +108,15 @@ void ViewProviderAttachExtension::extensionSetupContextMenu(QMenu* menu, QObject
 
 void ViewProviderAttachExtension::showAttachmentEditor(
     std::function<void()> onAccept,
-    std::function<void()> onReject
+    std::function<void()> onReject,
+    bool singleReference
 )
 {
     if (Gui::Control().activeDialog(getExtendedViewProvider()->getDocument()->getDocument())) {
         Gui::Control().closeDialog(getExtendedViewProvider()->getDocument()->getDocument());
     }
-    auto* task = new TaskDlgAttacher(getExtendedViewProvider(), true, onAccept, onReject);
+    auto* task
+        = new TaskDlgAttacher(getExtendedViewProvider(), true, onAccept, onReject, singleReference);
     Gui::Control().showDialog(task, getExtendedViewProvider()->getDocument()->getDocument());
 }
 

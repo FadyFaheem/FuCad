@@ -89,6 +89,16 @@ public:
     bool getFlip() const;
 
     /**
+     * @brief setSingleReferenceMode restricts picking to one reference.
+     * Attaching a sketch to a plane or face needs exactly one reference, but the
+     * default behaviour advances to the next reference slot after every pick, so
+     * further clicks accumulate references and push the attacher onto a mode that
+     * needs several (InertialCS), which fails outright on infinite origin planes.
+     * In this mode every pick replaces the first reference instead.
+     */
+    void setSingleReferenceMode(bool on);
+
+    /**
      * @brief getActiveMapMode returns either the default mode for selected
      * references, or the mode that was selected by the user in the list. If
      * no modes fit current set of references, mmDeactivated is returned.
@@ -188,6 +198,7 @@ private:
                      // reference is being picked.
     bool autoNext;   // if we should automatically switch to next reference (true after dialog
                      // launch, false afterwards)
+    bool singleReferenceMode = false;
     std::vector<Attacher::eMapMode> modesInList;  // this list is synchronous to what is populated
                                                   // into listOfModes widget.
     Attacher::SuggestResult lastSuggestResult;
@@ -213,7 +224,8 @@ public:
         Gui::ViewProviderDocumentObject* ViewProvider,
         bool createBox = true,
         std::function<void()> onAccept = {},
-        std::function<void()> onReject = {}
+        std::function<void()> onReject = {},
+        bool singleReference = false
     );
     ~TaskDlgAttacher() override;
 

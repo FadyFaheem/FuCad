@@ -640,7 +640,7 @@ private:
         auto* vps = dynamic_cast<SketcherGui::ViewProviderSketch*>(
             Gui::Application::Instance->getViewProvider(sketch)
         );
-        vps->showAttachmentEditor(onAccept, onReject);
+        vps->showAttachmentEditor(onAccept, onReject, true);
     }
 
     static void resetOriginVisibility(PartDesign::Body* partDesignBody)

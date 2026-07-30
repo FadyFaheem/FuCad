@@ -600,8 +600,20 @@ void TaskAttacher::onSelectionChanged(const Gui::SelectionChanges& msg)
     }
 }
 
+void TaskAttacher::setSingleReferenceMode(bool on)
+{
+    singleReferenceMode = on;
+    if (on) {
+        autoNext = false;
+        iActiveRef = 0;
+    }
+}
+
 void TaskAttacher::addToReference(const std::vector<SubAndObjName>& pairs)
 {
+    if (singleReferenceMode) {
+        iActiveRef = 0;
+    }
     if (iActiveRef < 0) {
         return;
     }
@@ -631,6 +643,11 @@ void TaskAttacher::addToReference(const std::vector<SubAndObjName>& pairs)
             if ((refs[r] == selObj) && (refnames[r] == subname)) {
                 return;
             }
+        }
+
+        if (singleReferenceMode && refs.size() > 1) {
+            refs.resize(1);
+            refnames.resize(1);
         }
 
         if (autoNext && iActiveRef > 0 && iActiveRef == static_cast<int>(refnames.size())) {
@@ -1455,7 +1472,8 @@ TaskDlgAttacher::TaskDlgAttacher(
     Gui::ViewProviderDocumentObject* ViewProvider,
     bool createBox,
     std::function<void()> onAccept,
-    std::function<void()> onReject
+    std::function<void()> onReject,
+    bool singleReference
 )
     : TaskDialog()
     , ViewProvider(ViewProvider)
@@ -1469,6 +1487,7 @@ TaskDlgAttacher::TaskDlgAttacher(
 
     if (createBox) {
         parameter = new TaskAttacher(ViewProvider, nullptr, QString(), tr("Attachment"));
+        parameter->setSingleReferenceMode(singleReference);
         Content.push_back(parameter);
     }
 
