@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <App/DocumentObserver.h>
 #include <Gui/Selection/Selection.h>
 #include "ViewProvider.h"
 
@@ -38,9 +39,54 @@ class Property;
 class PropertyLinkSubList;
 }  // namespace App
 
+namespace PartDesign
+{
+class ProfileBased;
+}
+
+class QLabel;
+class QToolButton;
+
 namespace PartDesignGui
 {
 
+/** Fusion style profile row.
+ *
+ * Closed regions bounded by the sketch curves are precomputed by
+ * Sketcher::SketchObject as InternalFace1..N. This widget lets the user pick those
+ * regions directly in the 3D view and writes them into the feature's Profile link.
+ */
+class ProfileSelectionWidget: public QWidget, public Gui::SelectionObserver
+{
+    Q_OBJECT
+
+public:
+    explicit ProfileSelectionWidget(PartDesign::ProfileBased* feature, QWidget* parent = nullptr);
+    ~ProfileSelectionWidget() override;
+
+    /// Number of closed regions the profile provides, 0 if it is not a sketch with regions.
+    static int countRegions(App::DocumentObject* profile);
+
+    bool isPickingActive() const;
+    void updateSummary();
+
+public Q_SLOTS:
+    void setPickingActive(bool active);
+
+Q_SIGNALS:
+    void profileChanged();
+
+private:
+    void onSelectionChanged(const Gui::SelectionChanges& msg) override;
+    void toggleRegion(const std::string& subName);
+    PartDesign::ProfileBased* getFeature() const;
+    Gui::ViewProvider* getProfileViewProvider() const;
+
+    App::DocumentObjectWeakPtrT feature;
+    QLabel* summaryLabel;
+    QToolButton* pickButton;
+    bool profileWasVisible {false};
+};
 
 /// Convenience class to collect common methods for all SketchBased features
 class TaskSketchBasedParameters: public PartDesignGui::TaskFeatureParameters,
@@ -80,8 +126,15 @@ protected:
     /// or the subelement's name if the object is a solid.
     QString make2DLabel(const App::DocumentObject* section, const std::vector<std::string>& subValues);
 
+    ProfileSelectionWidget* getProfileSelectionWidget() const
+    {
+        return profileWidget;
+    }
+
 private:
     Gui::ViewProvider* previouslyVisibleViewProvider {nullptr};
+    ProfileSelectionWidget* profileWidget {nullptr};
+    const App::DocumentObject* profileRowOwner {nullptr};
 };
 
 class TaskDlgSketchBasedParameters: public PartDesignGui::TaskDlgFeatureParameters

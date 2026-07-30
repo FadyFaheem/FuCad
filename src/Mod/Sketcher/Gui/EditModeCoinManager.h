@@ -29,6 +29,8 @@
 #include <optional>
 #include <vector>
 
+#include <TopoDS_Shape.hxx>
+
 #include <App/Application.h>
 #include <Base/Vector3D.h>
 #include <Mod/Sketcher/App/GeoList.h>
@@ -188,7 +190,8 @@ public:
             Point = 0,
             Edge = 1,
             Axis = 2,
-            Constraint = 3
+            Constraint = 3,
+            Face = 4
         };
 
         enum class ConstraintHitKind : std::uint8_t
@@ -202,6 +205,7 @@ public:
         {
             InvalidPoint = -1,
             InvalidCurve = -1,
+            InvalidFace = 0,
             ExternalCurve = -3
         };
 
@@ -217,6 +221,7 @@ public:
         int PointIndex = InvalidPoint;
         int GeoIndex = InvalidCurve;  // valid values are 0,1,2,... for normal geometry and
                                       // -3,-4,-5,... for external geometry
+        int FaceIndex = InvalidFace;  // one-based index into InternalShape, InternalFaceN
         Axes Cross = Axes::None;
         std::set<int> ConstrIndices;
         ConstraintHitKind ConstraintKind = ConstraintHitKind::None;
@@ -245,6 +250,7 @@ public:
             Kind = HitKind::None;
             PointIndex = InvalidPoint;
             GeoIndex = InvalidCurve;
+            FaceIndex = InvalidFace;
             Cross = Axes::None;
             ConstrIndices.clear();
             ConstraintKind = ConstraintHitKind::None;
@@ -305,6 +311,22 @@ public:
 
     /** @name coin node access*/
     SoSeparator* getRootEditNode();
+    /// Rebuilds the internal face geometry from the sketch InternalShape property.
+    void updateInternalFaces();
+    /** Turns picking of the internal faces on for the duration of a pick.
+     *
+     * The regions are unpickable by default: they lie in the sketch plane and would otherwise
+     * shadow the faces of the attached solid in the scene wide pick pass, which is what
+     * external geometry selection relies on (see issue #28639).
+     */
+    void setInternalFacesPickable(bool pickable);
+    /** Highlights a single internal face, or clears the highlight when faceIndex is not valid.
+     *
+     * The edit mode scenegraph lives under the viewer editing root rather than under the view
+     * provider root, so Gui::ViewProvider::getDetailPath() cannot reach it and the usual
+     * preselection highlight never arrives. The action is applied directly instead.
+     */
+    void highlightInternalFace(int faceIndex);
     //@}
 
     /** @name update coin colors*/
@@ -341,6 +363,8 @@ private:
     bool detectPointPreselection(const SoPickedPoint* point, int layerIndex, PreselectionResult& result);
     bool detectCurvePreselection(const SoPickedPoint* point, int layerIndex, PreselectionResult& result);
     bool detectAxisPreselection(const SoPickedPoint* point, PreselectionResult& result);
+    bool detectFacePreselection(const SoPickedPointList& points, PreselectionResult& result);
+    bool detectFacePreselection(const SoPickedPoint* point, PreselectionResult& result);
     PreselectionCandidates collectPreselectionCandidates(
         const SoPickedPointList& points,
         const SbVec2s& cursorPos,
@@ -401,6 +425,9 @@ private:
 
     /// Mapping between external and internal indices
     CoinMapping coinMapping;
+
+    /// Last InternalShape fed to the coin nodes, so redraws do not retriangulate it
+    TopoDS_Shape internalFacesShape;
 
     // Coin Helpers
     std::unique_ptr<EditModeConstraintCoinManager> pEditModeConstraintCoinManager;

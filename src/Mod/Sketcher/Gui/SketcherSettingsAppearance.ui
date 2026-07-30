@@ -1072,10 +1072,10 @@
          <string>Color of internal faces formed by intersecting geometry or closed loops in the sketch</string>
         </property>
         <property name="color" stdset="0">
-         <color alpha="64">
-          <red>245</red>
-          <green>159</green>
-          <blue>0</blue>
+         <color alpha="77">
+          <red>166</red>
+          <green>201</green>
+          <blue>236</blue>
          </color>
         </property>
         <property name="prefEntry" stdset="0">

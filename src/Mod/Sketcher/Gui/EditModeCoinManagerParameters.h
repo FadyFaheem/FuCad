@@ -57,6 +57,8 @@ class Geometry;
 namespace SketcherGui
 {
 
+class SoSketchFaces;
+
 /** @brief      Struct for storing local drawing parameters
  *
  * Parameters based on user preferenced are auto loaded by EditCoinManager observer nested class.
@@ -69,6 +71,7 @@ struct DrawingParameters
     /** @name Rendering Heights - virtual height introduced in the scenegraph to determine what is
      * drawn on top of what*/
     //@{
+    const float zFaces = 0.001f;       // Height used by the internal faces, below everything else
     const float zEdit = 0.002f;        // Height used by temporal edit curves
     const float zCross = 0.002f;       // Height used by the Axes
     const float zInfo = 0.004f;        // Height used by the Overlay information layer
@@ -516,6 +519,14 @@ struct EditModeScenegraphNodes
     //@{
     SoGroup* infoGroup;
     SoDrawStyle* InformationDrawStyle;
+    //@}
+
+    /** @name Internal face nodes - the closed regions bounded by the sketch curves*/
+    //@{
+    SoSeparator* InternalFacesRoot {nullptr};
+    SoPickStyle* InternalFacesPickStyle {nullptr};
+    SoTranslation* InternalFacesTranslation {nullptr};
+    SoSketchFaces* InternalFaces {nullptr};
     //@}
 };
 

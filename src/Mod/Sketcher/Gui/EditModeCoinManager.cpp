@@ -31,9 +31,11 @@
 
 #include <Inventor/SbVec2f.h>
 #include <Inventor/SbVec3f.h>
+#include <Inventor/SoPath.h>
 #include <Inventor/SoPickedPoint.h>
 #include <Inventor/lists/SoPickedPointList.h>
 #include <Inventor/details/SoDetail.h>
+#include <Inventor/details/SoFaceDetail.h>
 #include <Inventor/details/SoLineDetail.h>
 #include <Inventor/details/SoPointDetail.h>
 #include <Inventor/nodes/SoCoordinate3.h>
@@ -53,10 +55,14 @@
 #include <Base/Exception.h>
 #include <Gui/Inventor/MarkerBitmaps.h>
 #include <Gui/Inventor/SoFCBoundingBox.h>
+#include <Gui/Selection/SoFCUnifiedSelection.h>
 #include <Gui/Utilities.h>
 #include <Mod/Part/App/Geometry.h>
+#include <Mod/Part/Gui/SoBrepFaceSet.h>
+#include <Mod/Part/Gui/ViewProviderExt.h>
 #include <Mod/Sketcher/App/Constraint.h>
 #include <Mod/Sketcher/App/GeoList.h>
+#include <Mod/Sketcher/App/SketchObject.h>
 
 #include "EditModeCoinManager.h"
 #include "EditModeConstraintCoinManager.h"
@@ -84,6 +90,7 @@ struct PreselectionPriority
 {
     static constexpr int None = 0;
     static constexpr int ConstraintDatumLabel = 100;
+    static constexpr int Face = 200;
     static constexpr int Axis = 300;
     static constexpr int ConstraintFallback = 350;
     static constexpr int Edge = 400;
@@ -110,11 +117,13 @@ int preselectionPriority(const EditModeCoinManager::PreselectionResult& result)
             return PreselectionPriority::Edge;
         case Result::HitKind::Axis:
             return PreselectionPriority::Axis;
+        case Result::HitKind::Face:
+            return PreselectionPriority::Face;
         case Result::HitKind::None:
             return PreselectionPriority::None;
+        default:
+            return PreselectionPriority::None;
     }
-
-    return PreselectionPriority::None;
 }
 
 float distanceSquaredToSegment(const SbVec2f& point, const SbVec2f& segmentStart, const SbVec2f& segmentEnd)
@@ -1534,6 +1543,48 @@ bool EditModeCoinManager::detectAxisPreselection(
     return false;
 }
 
+bool EditModeCoinManager::detectFacePreselection(const SoPickedPoint* point, PreselectionResult& result)
+{
+    if (!editModeScenegraphNodes.InternalFaces) {
+        return false;
+    }
+
+    PartGui::SoBrepFaceSet* faceset = editModeScenegraphNodes.InternalFaces->faceset;
+    SoPath* path = point->getPath();
+    if (path->getTail() != faceset) {
+        return false;
+    }
+
+    const SoDetail* faceDetail = point->getDetail(faceset);
+    if (!faceDetail || faceDetail->getTypeId() != SoFaceDetail::getClassTypeId()) {
+        return false;
+    }
+
+    result.FaceIndex = static_cast<const SoFaceDetail*>(faceDetail)->getPartIndex() + 1;
+    result.Kind = PreselectionResult::HitKind::Face;
+    result.setPickedPoint(point);
+    return true;
+}
+
+bool EditModeCoinManager::detectFacePreselection(
+    const SoPickedPointList& points,
+    PreselectionResult& result
+)
+{
+    for (int i = 0; i < points.getLength(); ++i) {
+        SoPickedPoint* point = points[i];
+        if (!point) {
+            continue;
+        }
+
+        if (detectFacePreselection(point, result)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 EditModeCoinManager::PreselectionCandidates EditModeCoinManager::collectPreselectionCandidates(
     const SoPickedPointList& points,
     const SbVec2s& cursorPos,
@@ -1556,6 +1607,10 @@ EditModeCoinManager::PreselectionCandidates EditModeCoinManager::collectPreselec
     PreselectionResult axis;
     detectAxisPreselection(points, axis);
     addCandidate(axis);
+
+    PreselectionResult face;
+    detectFacePreselection(points, face);
+    addCandidate(face);
 
     return candidates;
 }
@@ -1612,6 +1667,8 @@ void EditModeCoinManager::processGeometryConstraintsInformationOverlay(
 )
 {
     overlayParameters.rebuildInformationLayer = rebuildinformationlayer;
+
+    updateInternalFaces();
 
     pEditModeGeometryCoinManager->processGeometry(geolistfacade);
 
@@ -1732,6 +1789,35 @@ void EditModeCoinManager::createEditModeInventorNodes()
     editModeScenegraphNodes.EditRoot->setName("Sketch_EditRoot");
     ViewProviderSketchCoinAttorney::addNodeToRoot(viewProvider, editModeScenegraphNodes.EditRoot);
     editModeScenegraphNodes.EditRoot->renderCaching = SoSeparator::OFF;
+
+    // The closed regions bounded by the sketch curves +++++++++++++++++++
+    // Added first and kept below every rendering height so it never covers the edit geometry.
+    // A depth buffer node here would leak depth state into the highlight pass (see issue #28639).
+    editModeScenegraphNodes.InternalFacesRoot = new SoSeparator;
+    editModeScenegraphNodes.InternalFacesRoot->setName("InternalFacesRoot");
+    editModeScenegraphNodes.InternalFacesRoot->renderCaching = SoSeparator::OFF;
+    editModeScenegraphNodes.EditRoot->addChild(editModeScenegraphNodes.InternalFacesRoot);
+
+    // Kept unpickable so the regions never shadow external geometry in the scene wide pick pass.
+    // Only the sketch own preselection pick turns it on, see setInternalFacesPickable().
+    editModeScenegraphNodes.InternalFacesPickStyle = new SoPickStyle;
+    editModeScenegraphNodes.InternalFacesPickStyle->setName("InternalFacesPickStyle");
+    editModeScenegraphNodes.InternalFacesPickStyle->style = SoPickStyle::UNPICKABLE;
+    editModeScenegraphNodes.InternalFacesRoot->addChild(
+        editModeScenegraphNodes.InternalFacesPickStyle
+    );
+
+    editModeScenegraphNodes.InternalFacesTranslation = new SoTranslation;
+    editModeScenegraphNodes.InternalFacesTranslation->setName("InternalFacesTranslation");
+    editModeScenegraphNodes.InternalFacesRoot->addChild(
+        editModeScenegraphNodes.InternalFacesTranslation
+    );
+
+    editModeScenegraphNodes.InternalFaces = new SoSketchFaces;
+    editModeScenegraphNodes.InternalFaces->setName("InternalFaces");
+    editModeScenegraphNodes.InternalFacesRoot->addChild(editModeScenegraphNodes.InternalFaces);
+
+    updateInternalFaces();
 
     // Create Geometry Coin nodes ++++++++++++++++++++++++++++++++++++++
     pEditModeGeometryCoinManager->createEditModeInventorNodes();
@@ -2293,4 +2379,76 @@ void EditModeCoinManager::updateInventorColors()
 SoSeparator* EditModeCoinManager::getRootEditNode()
 {
     return editModeScenegraphNodes.EditRoot;
+}
+
+void EditModeCoinManager::updateInternalFaces()
+{
+    if (!editModeScenegraphNodes.InternalFaces) {
+        return;
+    }
+
+    // The view orientation factor flips when the sketch plane is looked at from behind, so the
+    // offset has to be reapplied on every redraw and not only when the shape changes.
+    const float offset = static_cast<float>(
+                             ViewProviderSketchCoinAttorney::getViewOrientationFactor(viewProvider)
+                         )
+        * drawingParameters.zFaces;
+    editModeScenegraphNodes.InternalFacesTranslation->translation.setValue(0.0F, 0.0F, offset);
+
+    const Base::Color diffuse = viewProvider.ShapeAppearance.getDiffuseColor();
+    editModeScenegraphNodes.InternalFaces->color.setValue(diffuse.r, diffuse.g, diffuse.b);
+    editModeScenegraphNodes.InternalFaces->transparency.setValue(
+        viewProvider.ShapeAppearance.getTransparency()
+    );
+
+    Sketcher::SketchObject* sketch = viewProvider.getSketchObject();
+    if (!sketch) {
+        return;
+    }
+
+    const TopoDS_Shape& shape = sketch->InternalShape.getValue();
+    if (shape.IsEqual(internalFacesShape)) {
+        return;
+    }
+
+    internalFacesShape = shape;
+
+    PartGui::ViewProviderPartExt::setupCoinGeometry(
+        shape,
+        editModeScenegraphNodes.InternalFaces,
+        viewProvider.Deviation.getValue(),
+        viewProvider.AngularDeflection.getValue()
+    );
+}
+
+void EditModeCoinManager::setInternalFacesPickable(bool pickable)
+{
+    if (!editModeScenegraphNodes.InternalFacesPickStyle) {
+        return;
+    }
+
+    editModeScenegraphNodes.InternalFacesPickStyle->style
+        = pickable ? SoPickStyle::SHAPE : SoPickStyle::UNPICKABLE;
+}
+
+void EditModeCoinManager::highlightInternalFace(int faceIndex)
+{
+    if (!editModeScenegraphNodes.InternalFaces) {
+        return;
+    }
+
+    Gui::SoHighlightElementAction action;
+    SoFaceDetail detail;
+
+    if (faceIndex > 0) {
+        detail.setPartIndex(faceIndex - 1);
+        action.setHighlighted(true);
+        action.setColor(drawingParameters.PreselectColor);
+        action.setElement(&detail);
+    }
+    else {
+        action.setHighlighted(false);
+    }
+
+    action.apply(editModeScenegraphNodes.InternalFaces->faceset);
 }

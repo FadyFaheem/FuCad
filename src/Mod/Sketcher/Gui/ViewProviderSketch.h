@@ -355,6 +355,7 @@ private:
         {
             InvalidPoint = -1,
             InvalidCurve = -1,
+            InvalidFace = 0,
             ExternalCurve = -3
         };
 
@@ -375,6 +376,7 @@ private:
         {
             PreselectPoint = InvalidPoint;
             PreselectCurve = InvalidCurve;
+            PreselectFace = InvalidFace;
             PreselectCross = Axes::None;
             PreselectConstraintSet.clear();
             blockedPreselection = false;
@@ -391,6 +393,10 @@ private:
         bool isCrossPreselected() const
         {
             return PreselectCross != Axes::None;
+        }
+        bool isFacePreselected() const
+        {
+            return PreselectFace > InvalidFace;
         }
         bool isEdge() const
         {
@@ -418,6 +424,7 @@ private:
                               // (NOTE -1 is NOT the root point)
         int PreselectCurve;   // EdgeN, with N = PreselectCurve + 1 for positive values ;
                               // ExternalEdgeN, with N = -PreselectCurve - 2
+        int PreselectFace;    // InternalFaceN, with N = PreselectFace, 0 meaning none
         Axes PreselectCross;  // 0 => rootPoint, 1 => HAxis, 2 => VAxis
         std::set<int> PreselectConstraintSet;  // ConstraintN, N = index + 1
         bool blockedPreselection;
@@ -580,6 +587,7 @@ public:
         STATUS_NONE,                   /**< enum value View provider is in neutral. */
         STATUS_SELECT_Point,           /**< enum value a point was selected. */
         STATUS_SELECT_Edge,            /**< enum value an edge was selected. */
+        STATUS_SELECT_Face,            /**< enum value an internal face was selected. */
         STATUS_SELECT_Constraint,      /**< enum value a constraint was selected. */
         STATUS_SELECT_Cross,           /**< enum value the base coordinate system was selected. */
         STATUS_SELECT_Wire,            /**< enum value and edge was double clicked. */

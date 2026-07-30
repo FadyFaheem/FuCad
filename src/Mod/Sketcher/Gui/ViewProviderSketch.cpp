@@ -199,7 +199,7 @@ void ViewProviderSketch::ParameterObserver::updateShapeAppearanceProperty(const 
     auto matProp = static_cast<App::PropertyMaterialList*>(property);
 
     ParameterGrp::handle hGrp = App::GetApplication().GetParameterGroupByPath("User parameter:BaseApp/Preferences/Mod/Sketcher/General");
-    unsigned long shcol = hGrp->GetUnsigned(string.c_str(), 0xf59f0040);
+    unsigned long shcol = hGrp->GetUnsigned(string.c_str(), 0xa6c9ec4d);
     float r = ((shcol >> 24) & 0xff) / 255.0;
     float g = ((shcol >> 16) & 0xff) / 255.0;
     float b = ((shcol >> 8) & 0xff) / 255.0;
@@ -312,7 +312,7 @@ void ViewProviderSketch::ParameterObserver::initParameters()
     parameterMap = {
         {"HideDependent",
          {[this](const std::string& string, App::Property* property) {
-              updateBoolProperty(string, property, true);
+              updateBoolProperty(string, property, false);
           },
           &Client.HideDependent}},
         {"ShowLinks",
@@ -541,8 +541,8 @@ SO_NODE_SOURCE(SoSketchFaces);
 SoSketchFaces::SoSketchFaces(){
     SO_NODE_CONSTRUCTOR(SoSketchFaces);
 
-    SO_NODE_ADD_FIELD(color, (SbColor(1.0f, 1.0f, 1.0f)));
-    SO_NODE_ADD_FIELD(transparency, (0.8));
+    SO_NODE_ADD_FIELD(color, (SbColor(0.65f, 0.79f, 0.93f)));
+    SO_NODE_ADD_FIELD(transparency, (0.7));
     //
     auto* material = new SoMaterial;
     material->diffuseColor.connectFrom(&color);
@@ -616,7 +616,7 @@ ViewProviderSketch::ViewProviderSketch()
         "Object that handles hiding and showing other objects when entering/leaving sketch.");
     ADD_PROPERTY_TYPE(
         HideDependent,
-        (true),
+        (false),
         "Visibility automation",
         (App::PropertyType)(App::Prop_ReadOnly),
         "If true, all objects that depend on the sketch are hidden when opening editing.");
@@ -910,7 +910,10 @@ SoPickedPointList ViewProviderSketch::getPickedPointsOnRay(
     rp.setPickAll(true);
     rp.setPoint(pos);
     rp.setRadius(viewer->getPickRadius());
+
+    editCoinManager->setInternalFacesPickable(true);
     rp.apply(root);
+    editCoinManager->setInternalFacesPickable(false);
 
     const SoPickedPointList& pickedPoints = rp.getPickedPointList();
     for (int i = 0; i < pickedPoints.getLength(); ++i) {
@@ -1029,7 +1032,14 @@ bool ViewProviderSketch::getPreselectionAtViewportPos(
                 );
             }
             return true;
+        case EditModeCoinManager::PreselectionResult::HitKind::Face:
+            subElementNames.emplace_back(
+                SketchObject::internalPrefix() + "Face" + std::to_string(result.FaceIndex)
+            );
+            return true;
         case EditModeCoinManager::PreselectionResult::HitKind::None:
+            break;
+        default:
             break;
     }
 
@@ -1286,7 +1296,13 @@ bool ViewProviderSketch::mouseButtonPressed(int Button, bool pressed, const SbVe
                             setSketchMode(STATUS_SELECT_Constraint);
                             done = true;
                             break;
+                        case EditModeCoinManager::PreselectionResult::HitKind::Face:
+                            setSketchMode(STATUS_SELECT_Face);
+                            done = true;
+                            break;
                         case EditModeCoinManager::PreselectionResult::HitKind::None:
+                            break;
+                        default:
                             break;
                     }
 
@@ -1349,6 +1365,15 @@ bool ViewProviderSketch::mouseButtonPressed(int Button, bool pressed, const SbVe
                             ss << "Edge" << preselection.getPreselectionEdgeIndex();
                         else// external geometry
                             ss << "ExternalEdge" << preselection.getPreselectionExternalEdgeIndex();
+
+                        preselectToSelection(ss, selectionPoint, true);
+                    }
+                    setSketchMode(STATUS_NONE);
+                    return true;
+                case STATUS_SELECT_Face:
+                    if (hasSelectionPoint && preselection.isFacePreselected()) {
+                        std::stringstream ss;
+                        ss << SketchObject::internalPrefix() << "Face" << preselection.PreselectFace;
 
                         preselectToSelection(ss, selectionPoint, true);
                     }
@@ -1490,7 +1515,12 @@ bool ViewProviderSketch::mouseButtonPressed(int Button, bool pressed, const SbVe
                         case EditModeCoinManager::PreselectionResult::HitKind::Constraint:
                             setSketchMode(STATUS_SELECT_Constraint);
                             break;
+                        case EditModeCoinManager::PreselectionResult::HitKind::Face:
+                            setSketchMode(STATUS_SELECT_Face);
+                            break;
                         case EditModeCoinManager::PreselectionResult::HitKind::None:
+                            break;
+                        default:
                             break;
                     }
                     break;
@@ -1544,6 +1574,16 @@ bool ViewProviderSketch::mouseButtonPressed(int Button, bool pressed, const SbVe
                     setSketchMode(STATUS_NONE);
                     generateContextMenu();
                     return true;
+                case STATUS_SELECT_Face:
+                    if (hasSelectionPoint && preselection.isFacePreselected()) {
+                        std::stringstream ss;
+                        ss << SketchObject::internalPrefix() << "Face" << preselection.PreselectFace;
+
+                        preselectToSelection(ss, selectionPoint, false);
+                    }
+                    setSketchMode(STATUS_NONE);
+                    generateContextMenu();
+                    return true;
                 case STATUS_SELECT_Cross:
                     if (hasSelectionPoint) {
                         std::stringstream ss;
@@ -1585,6 +1625,8 @@ bool ViewProviderSketch::mouseButtonPressed(int Button, bool pressed, const SbVe
                 case STATUS_SKETCH_StartRubberBand:
                 case STATUS_SKETCH_UseRubberBand:
                 case STATUS_SELECT_Wire:
+                    break;
+                default:
                     break;
             }
         }
@@ -1794,6 +1836,7 @@ bool ViewProviderSketch::mouseMove(const SbVec2s& cursorPos, Gui::View3DInventor
     switch (Mode) {
         case STATUS_SELECT_Point:
         case STATUS_SELECT_Edge:
+        case STATUS_SELECT_Face:
         case STATUS_SELECT_Constraint:
         case STATUS_SKETCH_StartRubberBand:
             short dx, dy;
@@ -1819,7 +1862,7 @@ bool ViewProviderSketch::mouseMove(const SbVec2s& cursorPos, Gui::View3DInventor
     snapHandle = std::make_unique<SnapManager::SnapHandle>(snapManager.get(), Base::Vector2d(x, y));
 
     bool preselectChanged = false;
-    if (Mode != STATUS_SELECT_Point && Mode != STATUS_SELECT_Edge
+    if (Mode != STATUS_SELECT_Point && Mode != STATUS_SELECT_Edge && Mode != STATUS_SELECT_Face
         && Mode != STATUS_SELECT_Constraint && Mode != STATUS_SKETCH_Drag
         && Mode != STATUS_SKETCH_DragConstraint && Mode != STATUS_SKETCH_UseRubberBand) {
         auto result = getPreselectionResultAtViewportPos(cursorPos, viewer);
@@ -3069,6 +3112,28 @@ bool ViewProviderSketch::detectAndShowPreselection(
                 return true;// Preselection changed
             }
         }
+        else if (result.Kind == EditModeCoinManager::PreselectionResult::HitKind::Face
+                 && result.FaceIndex != preselection.PreselectFace) {// if a new region is hit
+            const auto& pickedPoint = result.pickedPoint();
+            std::stringstream ss;
+            ss << SketchObject::internalPrefix() << "Face" << result.FaceIndex;
+            bool accepted =
+                setPreselect(
+                    ss.str(),
+                    pickedPoint.x,
+                    pickedPoint.y,
+                    pickedPoint.z)
+                != 0;
+            preselection.blockedPreselection = !accepted;
+            if (accepted) {
+                resetPreselectPoint();
+                preselection.PreselectFace = result.FaceIndex;
+                editCoinManager->highlightInternalFace(result.FaceIndex);
+                updateToolTip(); // Clear tooltip on region selection
+
+                return true;
+            }
+        }
         if (result.hasPickedPoint()) {
             const auto& pickedPoint = result.pickedPoint();
             Gui::Selection().setPreselectCoord(
@@ -3077,7 +3142,7 @@ bool ViewProviderSketch::detectAndShowPreselection(
     }
     else if (preselection.isPreselectCurveValid() || preselection.isPreselectPointValid()
              || !preselection.PreselectConstraintSet.empty() || preselection.isCrossPreselected()
-             || preselection.blockedPreselection) {
+             || preselection.isFacePreselected() || preselection.blockedPreselection) {
         resetPreselectPoint();
         preselection.blockedPreselection = false;
         updateToolTip(); // Clear tooltip when no point picked
@@ -3843,6 +3908,10 @@ void ViewProviderSketch::updateData(const App::Property* prop) {
                 pcSketchFaces,
                 Deviation.getValue(),
                 AngularDeflection.getValue());
+
+        if (isInEditMode()) {
+            editCoinManager->updateInternalFaces();
+        }
     }
 
     if (prop != &getSketchObject()->Constraints) {
@@ -5057,6 +5126,13 @@ void ViewProviderSketch::resetPreselectPoint()
     preselection.PreselectCross = Preselection::Axes::None;
     ;
     preselection.PreselectConstraintSet.clear();
+
+    if (preselection.isFacePreselected()) {
+        preselection.PreselectFace = Preselection::InvalidFace;
+        if (editCoinManager) {
+            editCoinManager->highlightInternalFace(Preselection::InvalidFace);
+        }
+    }
 }
 
 void ViewProviderSketch::addSelectPoint(int SelectPoint)
