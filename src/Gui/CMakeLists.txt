@@ -1322,6 +1322,17 @@ SET(Ribbon_SRCS
 )
 SOURCE_GROUP("Ribbon" FILES ${Ribbon_SRCS})
 
+SET(Timeline_CPP_SRCS
+    Timeline/TimelineMarker.cpp
+    Timeline/TimelineWidget.cpp
+)
+SET(Timeline_SRCS
+    ${Timeline_CPP_SRCS}
+    Timeline/TimelineMarker.h
+    Timeline/TimelineWidget.h
+)
+SOURCE_GROUP("Timeline" FILES ${Timeline_SRCS})
+
 SET(Selection_SRCS
     Selection/BoxSelection.cpp
     Selection/BoxSelection.h
@@ -1469,6 +1480,7 @@ SET(FreeCADGui_SRCS
     ${View_SRCS}
     ${Workbench_SRCS}
     ${Ribbon_SRCS}
+    ${Timeline_SRCS}
     ${Selection_SRCS}
     ${FreeCADGui_SRCS}
 )
@@ -1500,6 +1512,7 @@ if(MSVC)
         ${Widget_CPP_SRCS}
         ${Workbench_CPP_SRCS}
         ${Ribbon_CPP_SRCS}
+        ${Timeline_CPP_SRCS}
         ${FreeCADGui_CPP_SRCS}
     )
 endif(MSVC)

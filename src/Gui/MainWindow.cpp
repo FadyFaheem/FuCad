@@ -114,6 +114,7 @@
 #include "SelectionView.h"
 #include "SplashScreen.h"
 #include "StatusBarLabel.h"
+#include "Timeline/TimelineWidget.h"
 #include "ToolBarManager.h"
 #include "ToolBoxManager.h"
 #include "Utilities.h"
@@ -760,6 +761,7 @@ void MainWindow::setupDockWindows()
     setupPythonConsole();
     setupSelectionView();
     setupTaskView();
+    setupTimelineView();
 
     initDockWindows(false);
 
@@ -849,6 +851,44 @@ bool MainWindow::setupPythonConsole()
     }
 
     return false;
+}
+
+bool MainWindow::setupTimelineView()
+{
+    if (d->hiddenDockWindows.find("Std_TimelineView") != std::string::npos) {
+        return false;
+    }
+
+    ParameterGrp::handle group = App::GetApplication()
+                                     .GetUserParameter()
+                                     .GetGroup("BaseApp")
+                                     ->GetGroup("Preferences")
+                                     ->GetGroup("DockWindows")
+                                     ->GetGroup("Timeline");
+    if (!group->GetBool("Enabled", true)) {
+        return false;
+    }
+
+    auto* timeline = new Gui::Timeline::TimelineWidget(this);
+    timeline->setObjectName(QStringLiteral("Timeline"));
+    timeline->setWindowTitle(QDockWidget::tr("Timeline"));
+
+    DockWindowManager* pDockMgr = DockWindowManager::instance();
+    pDockMgr->registerDockWindow("Std_TimelineView", timeline);
+
+    // No workbench lists the timeline in its dock window set, so it is docked
+    // here rather than by DockWindowManager::setup(). That also keeps it out of
+    // the Report View and Python Console tab group sharing the bottom area.
+    QDockWidget* dock = pDockMgr->addDockWindow("Timeline", timeline, Qt::BottomDockWidgetArea);
+    if (!dock) {
+        return false;
+    }
+
+    dock->toggleViewAction()->setData(QStringLiteral("Std_TimelineView"));
+    dock->setVisible(true);
+    OverlayManager::instance()->refresh(dock);
+
+    return true;
 }
 
 bool MainWindow::updateTreeView(bool show)
@@ -2277,6 +2317,18 @@ void MainWindow::loadWindowSettings()
     std::clog << "Toolbars restored" << std::endl;
 
     OverlayManager::instance()->restore();
+
+    // No workbench lists the timeline, so DockWindowManager::setup() never
+    // re-applies its visibility the way it does for the other docks. Read the
+    // same preference it writes from the toggle action.
+    if (QDockWidget* timeline = DockWindowManager::instance()->getDockContainer("Timeline")) {
+        ParameterGrp::handle dockGroup = App::GetApplication()
+                                             .GetUserParameter()
+                                             .GetGroup("BaseApp")
+                                             ->GetGroup("MainWindow")
+                                             ->GetGroup("DockWindows");
+        timeline->setVisible(dockGroup->GetBool("Std_TimelineView", true));
+    }
 }
 
 bool MainWindow::isRestoringWindowState() const

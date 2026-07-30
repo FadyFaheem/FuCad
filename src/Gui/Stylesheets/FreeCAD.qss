@@ -2941,3 +2941,87 @@ QToolButton#RibbonPrimaryButton:disabled {
   border: 1px solid transparent;
   color: @TextDisabledColor;
 }
+
+/*==================================================================================================
+Fusion style timeline, see src/Gui/Timeline
+==================================================================================================*/
+QWidget#Timeline {
+  background-color: @PrimaryColorDarken4;
+  border-top: 1px solid @GeneralBorderColor;
+}
+
+QWidget#TimelineControls,
+QWidget#TimelineStrip,
+QScrollArea#TimelineScroll {
+  background-color: transparent;
+  border: none;
+}
+
+QToolButton#TimelineStepButton {
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: @InputFieldBorderRadius;
+  padding: 2px 4px 2px 4px;
+}
+
+QToolButton#TimelineStepButton:hover {
+  background-color: @AccentHoverColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolButton#TimelineStepButton:pressed {
+  background-color: @AccentBackgroundColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolButton#TimelineStepButton:disabled {
+  background-color: transparent;
+  border: 1px solid transparent;
+}
+
+QLabel#TimelineEmptyLabel {
+  background-color: transparent;
+  color: @TextDisabledColor;
+  padding: 0px 8px 0px 8px;
+}
+
+/* One feature of the history. The state properties are set from C++ whenever
+   the selection or the tip of the body moves. */
+QWidget#TimelineMarker {
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: @InputFieldBorderRadius;
+  color: @TextForegroundColor;
+}
+
+QWidget#TimelineMarker:hover {
+  background-color: @AccentHoverColor;
+  border: 1px solid @AccentColor;
+}
+
+QWidget#TimelineMarker[timelineState="selected"] {
+  background-color: @AccentBackgroundColor;
+  border: 1px solid @AccentColor;
+  color: @TextForegroundColor;
+}
+
+/* Behind the playhead: the feature is rolled back and not part of the shape. */
+QWidget#TimelineMarker[timelineState="rolledBack"] {
+  background-color: transparent;
+  border: 1px dashed @GeneralBorderColor;
+  color: @TextDisabledColor;
+}
+
+QWidget#TimelineMarker[timelineTip="true"] {
+  border-bottom: 2px solid @AccentColor;
+}
+
+QWidget#TimelineMarker[timelineError="true"] {
+  color: #d93025;
+}
+
+QWidget#TimelinePlayhead {
+  background-color: @AccentColor;
+  border-radius: 2px;
+  margin: 1px 0px 1px 0px;
+}
