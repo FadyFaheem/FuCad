@@ -29,9 +29,13 @@
 #include <FCGlobal.h>
 
 class QAction;
+class QMenu;
 
 namespace Gui
 {
+
+class ActionGroup;
+
 namespace Ribbon
 {
 
@@ -88,6 +92,14 @@ public:
      * or nullptr when the command is not registered.
      */
     static QAction* resolveAction(const QString& command);
+
+    /**
+     * Tells \a group when \a menu opens and closes. Gui::Action only wires this
+     * up for the drop-downs it builds itself, and a group command whose
+     * variants are widgets rather than plain entries fills them from those
+     * signals, so a menu the ribbon builds would show stale values without it.
+     */
+    static void followGroupMenu(ActionGroup* group, QMenu* menu);
 
 private:
     void applySize(ButtonSize size);

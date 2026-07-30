@@ -772,8 +772,10 @@ QMenu* RibbonManager::createPanelMenu(const PanelDefinition& panel, QWidget* par
 
         // A group command already carries its variants, which is how a single
         // FreeCAD command stands in for a row of Fusion entries.
+        Gui::ActionGroup* group = nullptr;
         if (children.isEmpty()) {
-            if (auto* group = qobject_cast<Gui::ActionGroup*>(guiAction)) {
+            group = qobject_cast<Gui::ActionGroup*>(guiAction);
+            if (group) {
                 children = group->actions();
             }
         }
@@ -789,6 +791,7 @@ QMenu* RibbonManager::createPanelMenu(const PanelDefinition& panel, QWidget* par
                 submenu->setIcon(action->icon());
             }
             submenu->addActions(children);
+            RibbonButton::followGroupMenu(group, submenu);
             continue;
         }
 

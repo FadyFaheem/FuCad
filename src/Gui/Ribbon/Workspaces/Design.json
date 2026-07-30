@@ -266,7 +266,53 @@
             ]
         },
         {
-            "id": "TOOLS",
+            "id": "MESH",
+            "workbench": "MeshWorkbench",
+            "optional": true,
+            "panels": [
+                {
+                    "caption": "CREATE",
+                    "initWorkbench": "MeshWorkbench",
+                    "items": [
+                        { "command": "Mesh_Import", "label": "Insert Mesh" },
+                        { "command": "Mesh_Export", "label": "Export Mesh" }
+                    ],
+                    "menu": [
+                        { "command": "Mesh_Import", "label": "Insert Mesh" },
+                        { "command": "Mesh_Export", "label": "Export Mesh" },
+                        { "command": "Mesh_FromPartShape", "label": "Mesh from Solid", "optional": true }
+                    ]
+                },
+                {
+                    "caption": "MODIFY",
+                    "initWorkbench": "MeshWorkbench",
+                    "items": [
+                        { "command": "Mesh_RemoveComponents", "label": "Delete Faces" },
+                        { "command": "Mesh_FillupHoles", "label": "Close Holes" },
+                        { "command": "Mesh_HarmonizeNormals", "label": "Harmonize Normals" }
+                    ],
+                    "menu": [
+                        { "command": "Mesh_RemoveComponents", "label": "Delete Faces" },
+                        { "command": "Mesh_FillupHoles", "label": "Close Holes" },
+                        { "command": "Mesh_HarmonizeNormals", "label": "Harmonize Normals" },
+                        { "command": "Mesh_FlipNormals", "label": "Flip Normals", "optional": true }
+                    ]
+                },
+                {
+                    "caption": "INSPECT",
+                    "initWorkbench": "MeshWorkbench",
+                    "items": [
+                        { "command": "Mesh_Evaluation", "label": "Analyze Mesh" }
+                    ],
+                    "menu": [
+                        { "command": "Mesh_Evaluation", "label": "Analyze Mesh" },
+                        { "command": "Mesh_EvaluateSolid", "label": "Check Solid", "optional": true }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "UTILITIES",
             "workbench": null,
             "panels": [
                 {
@@ -305,41 +351,343 @@
                     "caption": "CREATE",
                     "items": [
                         { "command": "Sketcher_CreateLine", "label": "Line" },
-                        { "command": "Sketcher_CreateRectangle", "label": "Rectangle" },
-                        { "command": "Sketcher_CreateCircle", "label": "Circle" },
-                        { "command": "Sketcher_CreateArc", "label": "Arc" },
-                        { "command": "Sketcher_CreatePolyline", "label": "Polyline" },
-                        { "command": "Sketcher_CreatePoint", "label": "Point" },
-                        { "command": "Sketcher_CreateSlot", "label": "Slot" },
-                        { "command": "Sketcher_CreateFillet", "label": "Fillet" },
-                        { "command": "Sketcher_Trimming", "label": "Trim" },
-                        { "command": "Sketcher_Extend", "label": "Extend" },
+                        { "command": "Sketcher_CompCreateRectangles", "label": "Rectangle" },
+                        {
+                            "command": "Sketcher_CreateCircle",
+                            "label": "Circle",
+                            "commands": [
+                                "Sketcher_CreateCircle",
+                                "Sketcher_Create3PointCircle"
+                            ]
+                        },
+                        {
+                            "command": "Sketcher_CreateArc",
+                            "label": "Arc",
+                            "commands": [
+                                "Sketcher_CreateArc",
+                                "Sketcher_Create3PointArc"
+                            ]
+                        },
+                        { "command": "Sketcher_CompCreateRegularPolygon", "label": "Polygon" },
+                        { "command": "Sketcher_CompSlot", "label": "Slot" },
+                        { "command": "Sketcher_CompCreateBSpline", "label": "Spline" },
                         { "command": "Sketcher_CompExternal", "label": "Project" }
-                    ]
-                },
-                {
-                    "caption": "CONSTRAIN",
-                    "items": [
-                        { "command": "Sketcher_ConstrainCoincidentUnified", "label": "Coincident" },
-                        { "command": "Sketcher_ConstrainDistance", "label": "Distance" },
-                        { "command": "Sketcher_ConstrainHorVer", "label": "Horizontal Vertical" },
-                        { "command": "Sketcher_ConstrainParallel", "label": "Parallel" },
-                        { "command": "Sketcher_ConstrainPerpendicular", "label": "Perpendicular" },
-                        { "command": "Sketcher_ConstrainTangent", "label": "Tangent" },
-                        { "command": "Sketcher_ConstrainEqual", "label": "Equal" },
-                        { "command": "Sketcher_ConstrainSymmetric", "label": "Symmetry" }
+                    ],
+                    "menu": [
+                        { "command": "Sketcher_CreateLine", "label": "Line" },
+                        { "command": "Sketcher_CreatePolyline", "label": "Polyline" },
+                        { "command": "Sketcher_CompCreateRectangles", "label": "Rectangle" },
+                        {
+                            "command": "Sketcher_CreateCircle",
+                            "label": "Circle",
+                            "commands": [
+                                "Sketcher_CreateCircle",
+                                "Sketcher_Create3PointCircle"
+                            ]
+                        },
+                        {
+                            "command": "Sketcher_CreateArc",
+                            "label": "Arc",
+                            "commands": [
+                                "Sketcher_CreateArc",
+                                "Sketcher_Create3PointArc"
+                            ]
+                        },
+                        { "command": "Sketcher_CompCreateRegularPolygon", "label": "Polygon" },
+                        {
+                            "command": "Sketcher_CreateEllipseByCenter",
+                            "label": "Ellipse",
+                            "commands": [
+                                "Sketcher_CreateEllipseByCenter",
+                                "Sketcher_CreateEllipseBy3Points"
+                            ]
+                        },
+                        { "command": "Sketcher_CompSlot", "label": "Slot" },
+                        { "command": "Sketcher_CompCreateBSpline", "label": "Spline" },
+                        {
+                            "command": "Sketcher_CreateArcOfEllipse",
+                            "label": "Conic Curve",
+                            "commands": [
+                                "Sketcher_CreateArcOfEllipse",
+                                "Sketcher_CreateArcOfHyperbola",
+                                "Sketcher_CreateArcOfParabola"
+                            ]
+                        },
+                        { "command": "Sketcher_CreatePoint", "label": "Point" },
+                        { "command": "Sketcher_CreateText", "label": "Text" },
+                        { "command": "Sketcher_Symmetry", "label": "Mirror" },
+                        { "command": "Sketcher_Rotate", "label": "Circular Pattern" },
+                        { "command": "Sketcher_RectangularArray", "label": "Rectangular Pattern" },
+                        {
+                            "command": "Sketcher_CompExternal",
+                            "label": "Project / Include",
+                            "commands": [
+                                "Sketcher_Projection",
+                                "Sketcher_Intersection",
+                                "Sketcher_CarbonCopy"
+                            ]
+                        },
+                        { "command": "Sketcher_Dimension", "label": "Sketch Dimension" }
                     ]
                 },
                 {
                     "caption": "MODIFY",
                     "items": [
-                        { "command": "Sketcher_Move" },
-                        { "command": "Sketcher_Clone" },
-                        { "command": "Sketcher_RectangularArray", "label": "Rectangular Pattern" }
+                        { "command": "Sketcher_CreateFillet", "label": "Fillet" },
+                        { "command": "Sketcher_CreateChamfer", "label": "Chamfer" },
+                        { "command": "Sketcher_Offset", "label": "Offset" },
+                        { "command": "Sketcher_Trimming", "label": "Trim" },
+                        { "command": "Sketcher_Extend", "label": "Extend" },
+                        { "command": "Sketcher_Split", "label": "Break" },
+                        { "command": "Sketcher_Scale", "label": "Sketch Scale" },
+                        { "command": "Sketcher_Translate", "label": "Move / Copy" }
+                    ],
+                    "menu": [
+                        { "command": "Sketcher_CreateFillet", "label": "Fillet" },
+                        { "command": "Sketcher_CreateChamfer", "label": "Chamfer" },
+                        { "command": "Sketcher_Offset", "label": "Offset" },
+                        { "command": "Sketcher_Trimming", "label": "Trim" },
+                        { "command": "Sketcher_Extend", "label": "Extend" },
+                        { "command": "Sketcher_Split", "label": "Break" },
+                        { "command": "Sketcher_Scale", "label": "Sketch Scale" },
+                        {
+                            "command": "Sketcher_Translate",
+                            "label": "Move / Copy",
+                            "commands": [
+                                "Sketcher_Translate",
+                                "Sketcher_Move",
+                                "Sketcher_Copy",
+                                "Sketcher_Clone"
+                            ]
+                        },
+                        { "command": "Sketcher_JoinCurves", "label": "Join Curves" },
+                        {
+                            "command": "Sketcher_RemoveAxesAlignment",
+                            "label": "Remove Axes Alignment"
+                        }
                     ]
                 },
                 {
-                    "caption": "FINISH",
+                    "caption": "CONSTRAINTS",
+                    "items": [
+                        { "command": "Sketcher_Dimension", "label": "Sketch Dimension" },
+                        { "command": "Sketcher_ConstrainCoincidentUnified", "label": "Coincident" },
+                        { "command": "Sketcher_ConstrainHorVer", "label": "Horizontal / Vertical" },
+                        { "command": "Sketcher_ConstrainTangent", "label": "Tangent" },
+                        { "command": "Sketcher_ConstrainEqual", "label": "Equal" },
+                        { "command": "Sketcher_ConstrainParallel", "label": "Parallel" },
+                        { "command": "Sketcher_ConstrainPerpendicular", "label": "Perpendicular" },
+                        { "command": "Sketcher_ConstrainSymmetric", "label": "Symmetry" }
+                    ],
+                    "menu": [
+                        { "command": "Sketcher_CompHorVer", "label": "Horizontal / Vertical" },
+                        { "command": "Sketcher_ConstrainCoincidentUnified", "label": "Coincident" },
+                        {
+                            "command": "Sketcher_ConstrainPointOnObject",
+                            "label": "Point On Object"
+                        },
+                        { "command": "Sketcher_ConstrainTangent", "label": "Tangent" },
+                        { "command": "Sketcher_ConstrainEqual", "label": "Equal" },
+                        { "command": "Sketcher_ConstrainParallel", "label": "Parallel" },
+                        { "command": "Sketcher_ConstrainPerpendicular", "label": "Perpendicular" },
+                        {
+                            "label": "Fix / UnFix",
+                            "commands": [
+                                "Sketcher_ConstrainBlock",
+                                "Sketcher_ConstrainLock"
+                            ]
+                        },
+                        { "command": "Sketcher_ConstrainSymmetric", "label": "Symmetry" },
+                        { "command": "Sketcher_ConstrainGroup", "label": "Group" },
+                        { "command": "Sketcher_ConstrainSnellsLaw", "label": "Refraction" },
+                        { "command": "Sketcher_CompDimensionTools", "label": "Sketch Dimension" },
+                        {
+                            "command": "Sketcher_ChangeDimensionConstraint",
+                            "label": "Change Value"
+                        },
+                        {
+                            "command": "Sketcher_CompToggleConstraints",
+                            "label": "Toggle Constraint"
+                        }
+                    ]
+                },
+                {
+                    "caption": "CONFIGURE",
+                    "items": [
+                        {
+                            "command": "Sketcher_ToggleConstruction",
+                            "label": "Construction Geometry"
+                        },
+                        { "command": "Sketcher_Grid", "label": "Grid" },
+                        { "command": "Sketcher_Snap", "label": "Snap" },
+                        { "command": "Sketcher_ViewSection", "label": "Section View" },
+                        { "command": "Sketcher_ViewSketch", "label": "Look At Sketch" }
+                    ],
+                    "menu": [
+                        {
+                            "command": "Sketcher_ToggleConstruction",
+                            "label": "Construction Geometry"
+                        },
+                        { "command": "Sketcher_ViewSection", "label": "Section View" },
+                        { "command": "Sketcher_ViewSketch", "label": "Look At Sketch" },
+                        { "command": "Sketcher_ArcOverlay", "label": "Arc Overlay" },
+                        { "command": "Sketcher_RenderingOrder", "label": "Rendering Order" },
+                        { "command": "Sketcher_SwitchVirtualSpace", "label": "Virtual Space" },
+                        {
+                            "command": "Sketcher_RestoreInternalAlignmentGeometry",
+                            "label": "Restore Internal Geometry"
+                        }
+                    ]
+                },
+                {
+                    "caption": "INSPECT",
+                    "items": [
+                        { "command": "Std_Measure", "label": "Measure" },
+                        { "command": "Sketcher_BSplineComb", "label": "Curvature Comb Analysis" }
+                    ],
+                    "menu": [
+                        { "command": "Std_Measure", "label": "Measure" },
+                        { "command": "Sketcher_BSplineComb", "label": "Curvature Comb Analysis" },
+                        {
+                            "command": "Sketcher_CompBSplineShowHideGeometryInformation",
+                            "label": "Spline Information"
+                        },
+                        {
+                            "command": "Sketcher_SelectElementsWithDoFs",
+                            "label": "Degrees Of Freedom"
+                        },
+                        { "command": "Part_SectionCut", "label": "Section Analysis" }
+                    ]
+                },
+                {
+                    "caption": "INSERT",
+                    "items": [
+                        { "command": "Std_Import", "label": "Insert" }
+                    ],
+                    "menu": [
+                        { "command": "Std_Import", "label": "Insert" },
+                        { "command": "Part_Import", "label": "Insert CAD File" },
+                        { "command": "Std_LinkMake", "label": "Insert Derive" },
+                        { "command": "Mesh_Import", "label": "Insert Mesh", "optional": true }
+                    ]
+                },
+                {
+                    "caption": "ASSEMBLE",
+                    "initWorkbench": "AssemblyWorkbench",
+                    "items": [
+                        {
+                            "command": "Assembly_CreateAssembly",
+                            "label": "New Assembly",
+                            "optional": true
+                        },
+                        {
+                            "command": "Assembly_InsertLink",
+                            "label": "Insert Component",
+                            "optional": true
+                        },
+                        {
+                            "command": "Assembly_CreateJointFixed",
+                            "label": "Joint",
+                            "optional": true,
+                            "commands": [
+                                "Assembly_CreateJointRevolute",
+                                "Assembly_CreateJointCylindrical",
+                                "Assembly_CreateJointSlider",
+                                "Assembly_CreateJointBall"
+                            ]
+                        },
+                        {
+                            "command": "Assembly_ToggleGrounded",
+                            "label": "Ground",
+                            "optional": true
+                        }
+                    ],
+                    "menu": [
+                        {
+                            "command": "Assembly_CreateAssembly",
+                            "label": "New Assembly",
+                            "optional": true
+                        },
+                        {
+                            "command": "Assembly_ActivateAssembly",
+                            "label": "Activate Assembly",
+                            "optional": true
+                        },
+                        {
+                            "command": "Assembly_InsertLink",
+                            "label": "Insert Component",
+                            "optional": true
+                        },
+                        {
+                            "command": "Assembly_InsertNewPart",
+                            "label": "New Component",
+                            "optional": true
+                        },
+                        {
+                            "command": "Assembly_ToggleGrounded",
+                            "label": "Ground",
+                            "optional": true
+                        },
+                        {
+                            "label": "Joint",
+                            "optional": true,
+                            "commands": [
+                                "Assembly_CreateJointFixed",
+                                "Assembly_CreateJointRevolute",
+                                "Assembly_CreateJointCylindrical",
+                                "Assembly_CreateJointSlider",
+                                "Assembly_CreateJointBall",
+                                "Assembly_CreateJointDistance",
+                                "Assembly_CreateJointParallel",
+                                "Assembly_CreateJointPerpendicular",
+                                "Assembly_CreateJointAngle",
+                                "Assembly_CreateJointRackPinion",
+                                "Assembly_CreateJointScrew"
+                            ]
+                        },
+                        {
+                            "command": "Assembly_SolveAssembly",
+                            "label": "Solve Assembly",
+                            "optional": true
+                        }
+                    ]
+                },
+                {
+                    "caption": "SELECT",
+                    "items": [
+                        { "command": "Std_BoxSelection", "label": "Window Selection" }
+                    ],
+                    "menu": [
+                        { "command": "Std_BoxSelection", "label": "Window Selection" },
+                        {
+                            "command": "Std_BoxElementSelection",
+                            "label": "Window Selection (Elements)"
+                        },
+                        { "command": "Std_SelectAll", "label": "Select All" },
+                        {
+                            "label": "Sketch Elements",
+                            "commands": [
+                                "Sketcher_SelectElementsWithDoFs",
+                                "Sketcher_SelectConstraints",
+                                "Sketcher_SelectElementsAssociatedWithConstraints",
+                                "Sketcher_SelectRedundantConstraints",
+                                "Sketcher_SelectPartiallyRedundantConstraints",
+                                "Sketcher_SelectConflictingConstraints",
+                                "Sketcher_SelectMalformedConstraints"
+                            ]
+                        },
+                        {
+                            "label": "Sketch Axes",
+                            "commands": [
+                                "Sketcher_SelectOrigin",
+                                "Sketcher_SelectHorizontalAxis",
+                                "Sketcher_SelectVerticalAxis"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "caption": "FINISH SKETCH",
                     "align": "right",
                     "items": [
                         {

@@ -88,6 +88,20 @@ QAction* RibbonButton::resolveAction(const QString& command)
     return action ? action->action() : nullptr;
 }
 
+void RibbonButton::followGroupMenu(ActionGroup* group, QMenu* menu)
+{
+    if (!group || !menu) {
+        return;
+    }
+
+    QObject::connect(menu, &QMenu::aboutToShow, group, [group, menu]() {
+        Q_EMIT group->aboutToShow(menu);
+    });
+    QObject::connect(menu, &QMenu::aboutToHide, group, [group, menu]() {
+        Q_EMIT group->aboutToHide(menu);
+    });
+}
+
 bool RibbonButton::setCommand(
     const QString& command,
     const QString& label,
@@ -176,8 +190,10 @@ bool RibbonButton::setCommand(
         }
     }
 
+    ActionGroup* group = nullptr;
     if (children.isEmpty()) {
-        if (auto* group = qobject_cast<Gui::ActionGroup*>(guiAction)) {
+        group = qobject_cast<ActionGroup*>(guiAction);
+        if (group) {
             children = group->actions();
         }
     }
@@ -185,6 +201,7 @@ bool RibbonButton::setCommand(
     if (!children.isEmpty()) {
         auto* menu = new QMenu(this);
         menu->addActions(children);
+        followGroupMenu(group, menu);
         setMenu(menu);
         setPopupMode(QToolButton::MenuButtonPopup);
 
