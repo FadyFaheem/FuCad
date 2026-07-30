@@ -49,7 +49,6 @@ public:
     //@}
 
 protected:
-    TopoShape makeShape(const TopoShape& base, const TopoShape& revolve) const override;
     bool suggestReversedAngle(double angle) const override;
 
 private:

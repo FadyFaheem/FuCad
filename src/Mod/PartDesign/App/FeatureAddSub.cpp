@@ -27,6 +27,7 @@
 
 
 #include <App/FeaturePythonPyImp.h>
+#include <Base/Exception.h>
 #include <Mod/Part/App/modelRefine.h>
 #include <Mod/Part/App/TopoShapeOpCode.h>
 #include <GProp_GProps.hxx>
@@ -47,24 +48,93 @@ extern bool getPDRefineModelParameter();
 
 PROPERTY_SOURCE(PartDesign::FeatureAddSub, PartDesign::FeatureRefine)
 
+const char* FeatureAddSub::OperationEnums[] = {"Join", "Cut", "Intersect", "NewBody", nullptr};
+
 FeatureAddSub::FeatureAddSub()
 {
     ADD_PROPERTY(AddSubShape, (TopoDS_Shape()));
+    ADD_PROPERTY_TYPE(
+        Operation,
+        (0L),
+        "Base",
+        App::Prop_None,
+        "Boolean operation used to combine this feature with the preceding solid"
+    );
+    Operation.setEnums(OperationEnums);
 }
 
 void FeatureAddSub::onChanged(const App::Property* property)
 {
+    if (property == &Operation) {
+        operationInitialized = true;
+    }
     Feature::onChanged(property);
+}
+
+void FeatureAddSub::setupObject()
+{
+    FeatureRefine::setupObject();
+
+    Operation.setValue(
+        static_cast<long>(addSubType == Subtractive ? OperationType::Cut : OperationType::Join)
+    );
+}
+
+void FeatureAddSub::onDocumentRestored()
+{
+    // Documents written before the Operation property existed have to derive it from the
+    // add/sub nature the concrete feature class was hardcoded to.
+    if (!operationInitialized) {
+        Operation.setValue(
+            static_cast<long>(addSubType == Subtractive ? OperationType::Cut : OperationType::Join)
+        );
+    }
+
+    FeatureRefine::onDocumentRestored();
+}
+
+FeatureAddSub::OperationType FeatureAddSub::getOperationType() const
+{
+    return static_cast<OperationType>(Operation.getValue());
+}
+
+bool FeatureAddSub::combinesWithBase() const
+{
+    return getOperationType() != OperationType::NewBody;
+}
+
+const char* FeatureAddSub::getBooleanOpCode() const
+{
+    switch (getOperationType()) {
+        case OperationType::Join:
+            return Part::OpCodes::Fuse;
+        case OperationType::Cut:
+            return Part::OpCodes::Cut;
+        case OperationType::Intersect:
+            return Part::OpCodes::Common;
+        case OperationType::NewBody:
+        default:
+            throw Base::ValueError("Unhandled value of the Operation property");
+    }
 }
 
 FeatureAddSub::Type FeatureAddSub::getAddSubType()
 {
-    return addSubType;
+    switch (getOperationType()) {
+        case OperationType::Join:
+        case OperationType::NewBody:
+            return Additive;
+        case OperationType::Cut:
+        case OperationType::Intersect:
+            return Subtractive;
+        default:
+            throw Base::ValueError("Unhandled value of the Operation property");
+    }
 }
 
 short FeatureAddSub::mustExecute() const
 {
-    if (Refine.isTouched()) {
+    if (Refine.isTouched() || Operation.isTouched()) {
         return 1;
     }
     return PartDesign::Feature::mustExecute();
@@ -72,10 +142,10 @@ short FeatureAddSub::mustExecute() const
 
 void FeatureAddSub::getAddSubShape(Part::TopoShape& addShape, Part::TopoShape& subShape)
 {
-    if (addSubType == Additive) {
+    if (getAddSubType() == Additive) {
         addShape = AddSubShape.getShape();
     }
-    else if (addSubType == Subtractive) {
+    else {
         subShape = AddSubShape.getShape();
     }
 }
@@ -89,7 +159,7 @@ void FeatureAddSub::updatePreviewShape()
     };
 
     // for subtractive shapes we want to also showcase removed volume, not only the tool
-    if (addSubType == Subtractive) {
+    if (getAddSubType() == Subtractive) {
         TopoShape base = getBaseTopoShape(true).moved(getLocation().Inverted());
         const TopoShape& tool = AddSubShape.getShape();
 

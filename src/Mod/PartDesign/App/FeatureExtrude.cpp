@@ -737,19 +737,29 @@ App::DocumentObjectExecReturn* FeatureExtrude::buildExtrusion(ExtrudeOptions opt
         // set the additive shape property for later usage in e.g. pattern
         this->AddSubShape.setValue(prism);
 
-        if (base.shapeType(true) <= TopAbs_SOLID && fuse) {
+        // NewBody keeps only the extrusion itself, mirroring Fusion's "New Body" operation
+        const bool combineWithBase = getOperationType() != OperationType::NewBody;
+
+        if (base.shapeType(true) <= TopAbs_SOLID && fuse && combineWithBase) {
             prism.Tag = -this->getID();
 
             // Let's call algorithm computing a fuse operation:
             TopoShape result(0, getDocument()->getStringHasher());
             try {
-                const char* maker;
-                switch (getAddSubType()) {
-                    case Subtractive:
+                const char* maker = nullptr;
+                switch (getOperationType()) {
+                    case OperationType::Join:
+                        maker = Part::OpCodes::Fuse;
+                        break;
+                    case OperationType::Cut:
                         maker = Part::OpCodes::Cut;
                         break;
+                    case OperationType::Intersect:
+                        maker = Part::OpCodes::Common;
+                        break;
+                    case OperationType::NewBody:
                     default:
-                        maker = Part::OpCodes::Fuse;
+                        throw Base::ValueError("Unhandled value of the Operation property");
                 }
                 result.makeElementBoolean(maker, {base, prism}, nullptr, FuzzyTolerance.getValue());
             }

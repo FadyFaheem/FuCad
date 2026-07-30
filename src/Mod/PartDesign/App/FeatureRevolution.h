@@ -62,7 +62,7 @@ public:
     };
 
 protected:
-    TopoShape makeShape(const TopoShape& base, const TopoShape& revolve) const override;
+    TopoShape makeFused(const TopoShape& base, const TopoShape& revolve) const override;
     bool suggestReversedAngle(double angle) const override;
     void Restore(Base::XMLReader& reader) override;
 

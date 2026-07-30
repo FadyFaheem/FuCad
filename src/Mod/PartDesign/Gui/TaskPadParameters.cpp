@@ -67,17 +67,6 @@ TaskPadParameters::TaskPadParameters(ViewProviderPad* PadView, QWidget* parent, 
 
 TaskPadParameters::~TaskPadParameters() = default;
 
-void TaskPadParameters::translateModeList(QComboBox* box, int index)
-{
-    box->clear();
-    box->addItem(tr("Dimension"));
-    box->addItem(tr("To last"));
-    box->addItem(tr("To first"));
-    box->addItem(tr("Up to face"));
-    box->addItem(tr("Up to shape"));
-    box->setCurrentIndex(index);
-}
-
 void TaskPadParameters::updateUI(Side side)
 {
     // update direction combobox

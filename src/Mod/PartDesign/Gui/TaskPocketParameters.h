@@ -59,7 +59,6 @@ public:
 
 private:
     void onModeChanged(int index, Side side) override;
-    void translateModeList(QComboBox* box, int index) override;
     void updateUI(Side side) override;
 };
 

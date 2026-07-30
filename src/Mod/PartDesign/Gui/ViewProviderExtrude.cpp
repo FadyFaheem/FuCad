@@ -28,6 +28,7 @@
 
 #include <App/Document.h>
 #include <Gui/Application.h>
+#include <Gui/BitmapFactory.h>
 #include <Mod/PartDesign/App/FeatureExtrude.h>
 #include <Mod/Part/Gui/ReferenceHighlighter.h>
 
@@ -38,6 +39,44 @@
 using namespace PartDesignGui;
 
 PROPERTY_SOURCE(PartDesignGui::ViewProviderExtrude, PartDesignGui::ViewProviderSketchBased)
+
+QIcon ViewProviderExtrude::getIcon() const
+{
+    auto extrude = getObject<PartDesign::FeatureExtrude>();
+    if (!extrude) {
+        return ViewProviderSketchBased::getIcon();
+    }
+
+    const char* pixmap = nullptr;
+    switch (extrude->getOperationType()) {
+        case PartDesign::FeatureAddSub::OperationType::Join:
+            pixmap = "PartDesign_Pad.svg";
+            break;
+        case PartDesign::FeatureAddSub::OperationType::Cut:
+            pixmap = "PartDesign_Pocket.svg";
+            break;
+        case PartDesign::FeatureAddSub::OperationType::Intersect:
+            pixmap = "PartDesign_Boolean.svg";
+            break;
+        case PartDesign::FeatureAddSub::OperationType::NewBody:
+            pixmap = "PartDesign_Body.svg";
+            break;
+        default:
+            return ViewProviderSketchBased::getIcon();
+    }
+
+    return mergeGreyableOverlayIcons(Gui::BitmapFactory().pixmap(pixmap));
+}
+
+void ViewProviderExtrude::updateData(const App::Property* prop)
+{
+    ViewProviderSketchBased::updateData(prop);
+
+    auto extrude = getObject<PartDesign::FeatureExtrude>();
+    if (extrude && prop == &extrude->Operation) {
+        signalChangeIcon();
+    }
+}
 
 void PartDesignGui::ViewProviderExtrude::highlightShapeFaces(const std::vector<std::string>& faces)
 {

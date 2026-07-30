@@ -105,6 +105,8 @@ void TaskExtrudeParameters::setupDialog()
 
     ui->checkBoxReversed->setChecked(extrude->Reversed.getValue());
 
+    translateOperationList(extrude->Operation.getValue());
+
     // --- Per-Side Setup using the Helper ---
     setupSideDialog(m_side1);
     setupSideDialog(m_side2);
@@ -315,6 +317,8 @@ void TaskExtrudeParameters::connectSlots()
     connectSideSlots(m_side2, Side::Second, &TaskExtrudeParameters::onModeChanged_Side2);
 
     // clang-format off
+    connect(ui->operationMode, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &TaskExtrudeParameters::onOperationChanged);
     connect(ui->directionCB, qOverload<int>(&QComboBox::activated),
             this, &TaskExtrudeParameters::onDirectionCBChanged);
     connect(ui->checkBoxAlongDirection, &QCheckBox::toggled,
@@ -863,6 +867,19 @@ void TaskExtrudeParameters::updateSideUI(
     s.upToShapeList->setVisible(isParentVisible && isShapeVisible);
 }
 
+void TaskExtrudeParameters::onOperationChanged(int index)
+{
+    auto extrude = getObject<PartDesign::FeatureExtrude>();
+    if (!extrude) {
+        return;
+    }
+
+    extrude->Operation.setValue(index);
+    tryRecomputeFeature();
+
+    setGizmoPositions();
+}
+
 void TaskExtrudeParameters::onDirectionCBChanged(int num)
 {
     if (axesInList.empty()) {
@@ -1211,6 +1228,11 @@ int TaskExtrudeParameters::getSidesMode() const
     return ui->sidesMode->currentIndex();
 }
 
+int TaskExtrudeParameters::getOperation() const
+{
+    return ui->operationMode->currentIndex();
+}
+
 QString TaskExtrudeParameters::getFaceName(QLineEdit* lineEdit) const
 {
     QVariant featureName = lineEdit->property("FeatureName");
@@ -1241,6 +1263,7 @@ void TaskExtrudeParameters::changeEvent(QEvent* e)
         QSignalBlocker mode(ui->changeMode);
         QSignalBlocker mode2(ui->changeMode2);
         QSignalBlocker sidesMode(ui->sidesMode);
+        QSignalBlocker operationMode(ui->operationMode);
 
         // Save all items
         QStringList items;
@@ -1263,6 +1286,7 @@ void TaskExtrudeParameters::changeEvent(QEvent* e)
         translateModeList(ui->changeMode, ui->changeMode->currentIndex());
         translateModeList(ui->changeMode2, ui->changeMode2->currentIndex());
         translateSidesList(ui->sidesMode->currentIndex());
+        translateOperationList(ui->operationMode->currentIndex());
 
         translateFaceName(ui->lineFaceName);
         translateFaceName(ui->lineFaceName2);
@@ -1314,6 +1338,7 @@ void TaskExtrudeParameters::applyParameters()
     );
     FCMD_OBJ_CMD(obj, "ReferenceAxis = " << getReferenceAxis());
     FCMD_OBJ_CMD(obj, "AlongSketchNormal = " << (getAlongSketchNormal() ? 1 : 0));
+    FCMD_OBJ_CMD(obj, "Operation = " << getOperation());
     FCMD_OBJ_CMD(obj, "SideType = " << getSidesMode());
     FCMD_OBJ_CMD(obj, "Type = " << type1);
     FCMD_OBJ_CMD(obj, "Type2 = " << type2);
@@ -1350,9 +1375,15 @@ void TaskExtrudeParameters::updateUI(Side)
     // implement in sub-class
 }
 
-void TaskExtrudeParameters::translateModeList(QComboBox*, int)
+void TaskExtrudeParameters::translateModeList(QComboBox* box, int index)
 {
-    // implement in sub-class
+    box->clear();
+    box->addItem(tr("Distance"));
+    box->addItem(tr("All"));
+    box->addItem(tr("To first"));
+    box->addItem(tr("To Object"));
+    box->addItem(tr("To Objects"));
+    box->setCurrentIndex(index);
 }
 
 void TaskExtrudeParameters::translateSidesList(int index)
@@ -1362,6 +1393,16 @@ void TaskExtrudeParameters::translateSidesList(int index)
     ui->sidesMode->addItem(tr("Two sided"));
     ui->sidesMode->addItem(tr("Symmetric"));
     ui->sidesMode->setCurrentIndex(index);
+}
+
+void TaskExtrudeParameters::translateOperationList(int index)
+{
+    ui->operationMode->clear();
+    ui->operationMode->addItem(tr("Join"));
+    ui->operationMode->addItem(tr("Cut"));
+    ui->operationMode->addItem(tr("Intersect"));
+    ui->operationMode->addItem(tr("New body"));
+    ui->operationMode->setCurrentIndex(index);
 }
 
 void TaskExtrudeParameters::handleLineFaceNameClick(QLineEdit* lineEdit)

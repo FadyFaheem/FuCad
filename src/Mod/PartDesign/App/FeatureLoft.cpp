@@ -329,7 +329,7 @@ App::DocumentObjectExecReturn* Loft::execute()
             result = shapes.front();
         }
 
-        if (base.isNull()) {
+        if (base.isNull() || !combinesWithBase()) {
             if (!isSingleSolidRuleSatisfied(result.getShape())) {
                 return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP(
                     "Exception",
@@ -343,25 +343,22 @@ App::DocumentObjectExecReturn* Loft::execute()
         result.Tag = -getID();
         TopoShape boolOp(0, getDocument()->getStringHasher());
 
-        const char* maker;
-        switch (getAddSubType()) {
-            case Additive:
-                maker = Part::OpCodes::Fuse;
-                break;
-            case Subtractive:
-                maker = Part::OpCodes::Cut;
-                break;
-            default:
-                return new App::DocumentObjectExecReturn(
-                    QT_TRANSLATE_NOOP("Exception", "Unknown operation type")
-                );
-        }
         try {
-            boolOp.makeElementBoolean(maker, {base, result}, nullptr, FuzzyTolerance.getValue());
+            boolOp.makeElementBoolean(
+                getBooleanOpCode(),
+                {base, result},
+                nullptr,
+                FuzzyTolerance.getValue()
+            );
         }
         catch (Standard_Failure&) {
             return new App::DocumentObjectExecReturn(
                 QT_TRANSLATE_NOOP("Exception", "Failed to perform boolean operation")
+            );
+        }
+        if (boolOp.countSubShapes(TopAbs_SOLID) == 0) {
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP("Exception", "Resulting shape is empty")
             );
         }
         TopoShape solid = getSolid(boolOp);

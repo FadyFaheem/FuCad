@@ -33,6 +33,24 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayoutOperation">
+     <item>
+      <widget class="QLabel" name="operationLabel">
+       <property name="text">
+        <string>Operation</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="operationMode">
+       <property name="toolTip">
+        <string>How the coil is combined with the existing solid</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="labelAxis">
@@ -303,6 +321,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>operationMode</tabstop>
   <tabstop>axis</tabstop>
   <tabstop>inputMode</tabstop>
   <tabstop>pitch</tabstop>

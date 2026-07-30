@@ -110,27 +110,30 @@ App::DocumentObjectExecReturn* FeaturePrimitive::execute(const TopoDS_Shape& pri
         }
         AddSubShape.setValue(primitiveShape);
 
+        if (!combinesWithBase()) {
+            Shape.setValue(getSolid(primitiveShape));
+            return App::DocumentObject::StdReturn;
+        }
+
         TopoShape boolOp(0);
 
-        const char* maker;
-        switch (getAddSubType()) {
-            case Additive:
-                maker = Part::OpCodes::Fuse;
-                break;
-            case Subtractive:
-                maker = Part::OpCodes::Cut;
-                break;
-            default:
-                return new App::DocumentObjectExecReturn(
-                    QT_TRANSLATE_NOOP("Exception", "Unknown operation type")
-                );
-        }
         try {
-            boolOp.makeElementBoolean(maker, {base, primitiveShape}, nullptr, FuzzyTolerance.getValue());
+            boolOp.makeElementBoolean(
+                getBooleanOpCode(),
+                {base, primitiveShape},
+                nullptr,
+                FuzzyTolerance.getValue()
+            );
         }
         catch (Standard_Failure&) {
             return new App::DocumentObjectExecReturn(
                 QT_TRANSLATE_NOOP("Exception", "Failed to perform boolean operation")
+            );
+        }
+
+        if (boolOp.countSubShapes(TopAbs_SOLID) == 0) {
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP("Exception", "Resulting shape is empty")
             );
         }
 

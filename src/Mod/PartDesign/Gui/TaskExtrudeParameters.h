@@ -182,6 +182,7 @@ protected Q_SLOTS:
     virtual void onModeChanged(int index, Side side) = 0;
 
 private Q_SLOTS:
+    void onOperationChanged(int);
     void onDirectionCBChanged(int);
     void onAlongSketchNormalChanged(bool);
     void onXDirectionEditChanged(double);
@@ -230,9 +231,11 @@ protected:
     int getMode() const;
     int getMode2() const;
     int getSidesMode() const;
+    int getOperation() const;
     QString getFaceName(QLineEdit*) const;
     void onSelectionChanged(const Gui::SelectionChanges& msg) override;
     void translateSidesList(int index);
+    void translateOperationList(int index);
     virtual void translateModeList(QComboBox* box, int index);
     virtual void updateUI(Side side);
     void updateDirectionEdits();

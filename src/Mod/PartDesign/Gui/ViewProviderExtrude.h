@@ -40,6 +40,10 @@ public:
     ~ViewProviderExtrude() override = default;
 
     void highlightShapeFaces(const std::vector<std::string>& faces);
+
+protected:
+    QIcon getIcon() const override;
+    void updateData(const App::Property* prop) override;
 };
 
 

@@ -408,7 +408,7 @@ App::DocumentObjectExecReturn* Helix::execute()
 
         AddSubShape.setValue(result);
 
-        if (base.isNull()) {
+        if (base.isNull() || !combinesWithBase()) {
 
             if (getAddSubType() == FeatureAddSub::Subtractive) {
                 return new App::DocumentObjectExecReturn(
@@ -429,82 +429,82 @@ App::DocumentObjectExecReturn* Helix::execute()
             return App::DocumentObject::StdReturn;
         }
 
-        if (getAddSubType() == FeatureAddSub::Additive) {
-
-            FCBRepAlgoAPI_Fuse mkFuse(base.getShape(), result);
-            if (!mkFuse.IsDone()) {
-                return new App::DocumentObjectExecReturn(
-                    QT_TRANSLATE_NOOP("Exception", "Error: Adding the helix failed")
-                );
+        TopoDS_Shape rawBoolOp;
+        switch (getOperationType()) {
+            case OperationType::Join: {
+                FCBRepAlgoAPI_Fuse mkFuse(base.getShape(), result);
+                if (!mkFuse.IsDone()) {
+                    return new App::DocumentObjectExecReturn(
+                        QT_TRANSLATE_NOOP("Exception", "Error: Adding the helix failed")
+                    );
+                }
+                rawBoolOp = mkFuse.Shape();
+                break;
             }
-
-            if (!isSingleSolidRuleSatisfied(mkFuse.Shape())) {
-                return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP(
-                    "Exception",
-                    "Result has multiple solids: enable 'Allow Compound' in the active body."
-                ));
+            case OperationType::Cut: {
+                // Outside tells whether the inside or the outside of the profile is removed
+                if (Outside.getValue()) {
+                    FCBRepAlgoAPI_Common mkCom(result, base.getShape());
+                    if (!mkCom.IsDone()) {
+                        return new App::DocumentObjectExecReturn(
+                            QT_TRANSLATE_NOOP("Exception", "Error: Intersecting the helix failed")
+                        );
+                    }
+                    rawBoolOp = mkCom.Shape();
+                }
+                else {
+                    FCBRepAlgoAPI_Cut mkCut(base.getShape(), result);
+                    if (!mkCut.IsDone()) {
+                        return new App::DocumentObjectExecReturn(
+                            QT_TRANSLATE_NOOP("Exception", "Error: Subtracting the helix failed")
+                        );
+                    }
+                    rawBoolOp = mkCut.Shape();
+                }
+                break;
             }
-
-            // we have to get the solids (fuse sometimes creates compounds)
-            TopoShape boolOp = this->getSolid(mkFuse.Shape());
-
-            // lets check if the result is a solid
-            if (boolOp.isNull()) {
-                return new App::DocumentObjectExecReturn(
-                    QT_TRANSLATE_NOOP("Exception", "Error: Result is not a solid")
-                );
-            }
-
-            // store shape before refinement
-            this->rawShape = boolOp;
-            boolOp = refineShapeIfActive(boolOp, RefineErrorPolicy::Warn);
-            Shape.setValue(getSolid(boolOp));
-        }
-        else if (getAddSubType() == FeatureAddSub::Subtractive) {
-
-            TopoShape boolOp;
-
-            TopoDS_Shape rawBoolOp;
-            if (Outside.getValue()) {  // are we subtracting the inside or the outside of the profile.
-                FCBRepAlgoAPI_Common mkCom(result, base.getShape());
+            case OperationType::Intersect: {
+                FCBRepAlgoAPI_Common mkCom(base.getShape(), result);
                 if (!mkCom.IsDone()) {
                     return new App::DocumentObjectExecReturn(
                         QT_TRANSLATE_NOOP("Exception", "Error: Intersecting the helix failed")
                     );
                 }
                 rawBoolOp = mkCom.Shape();
+                break;
             }
-            else {
-                FCBRepAlgoAPI_Cut mkCut(base.getShape(), result);
-                if (!mkCut.IsDone()) {
-                    return new App::DocumentObjectExecReturn(
-                        QT_TRANSLATE_NOOP("Exception", "Error: Subtracting the helix failed")
-                    );
-                }
-                rawBoolOp = mkCut.Shape();
-            }
-
-            if (!isSingleSolidRuleSatisfied(rawBoolOp)) {
-                return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP(
-                    "Exception",
-                    "Result has multiple solids: enable 'Allow Compound' in the active body."
-                ));
-            }
-
-            boolOp = this->getSolid(rawBoolOp);
-
-            // lets check if the result is a solid
-            if (boolOp.isNull()) {
-                return new App::DocumentObjectExecReturn(
-                    QT_TRANSLATE_NOOP("Exception", "Error: Result is not a solid")
-                );
-            }
-
-            // store shape before refinement
-            this->rawShape = boolOp;
-            boolOp = refineShapeIfActive(boolOp, RefineErrorPolicy::Warn);
-            Shape.setValue(getSolid(boolOp));
+            case OperationType::NewBody:
+            default:
+                throw Base::ValueError("Unhandled value of the Operation property");
         }
+
+        if (countSolids(rawBoolOp) == 0) {
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP("Exception", "Error: Resulting shape is empty")
+            );
+        }
+
+        if (!isSingleSolidRuleSatisfied(rawBoolOp)) {
+            return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP(
+                "Exception",
+                "Result has multiple solids: enable 'Allow Compound' in the active body."
+            ));
+        }
+
+        // we have to get the solids (fuse sometimes creates compounds)
+        TopoShape boolOp = this->getSolid(rawBoolOp);
+
+        // lets check if the result is a solid
+        if (boolOp.isNull()) {
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP("Exception", "Error: Result is not a solid")
+            );
+        }
+
+        // store shape before refinement
+        this->rawShape = boolOp;
+        boolOp = refineShapeIfActive(boolOp, RefineErrorPolicy::Warn);
+        Shape.setValue(getSolid(boolOp));
 
         return App::DocumentObject::StdReturn;
     }

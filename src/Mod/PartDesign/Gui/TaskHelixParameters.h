@@ -85,6 +85,7 @@ private Q_SLOTS:
     void onLeftHandedChanged(bool);
     void onReversedChanged(bool);
     void onModeChanged(int);
+    void onOperationChanged(int);
     void onOutsideChanged(bool);
 
 
@@ -106,6 +107,7 @@ protected:
     App::PropertyAngle* propAngle;
     App::PropertyDistance* propGrowth;
     App::PropertyEnumeration* propMode;
+    App::PropertyEnumeration* propOperation;
     App::PropertyBool* propOutside;
 
 
@@ -113,6 +115,7 @@ private:
     void initializeHelix();
     void connectSlots();
     void updateUI();
+    void translateOperationList(int index);
     void updateStatus();
     void assignProperties();
     void setValuesFromProperties();

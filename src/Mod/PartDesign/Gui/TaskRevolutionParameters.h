@@ -85,6 +85,7 @@ private Q_SLOTS:
     void onMidplane(bool);
     void onReversed(bool);
     void onModeChanged(int);
+    void onOperationChanged(int);
     void onButtonFace(bool pressed = true);
     void onFaceName(const QString& text);
 
@@ -112,6 +113,7 @@ private:
     void connectSignals();
     void updateUI(int index);
     void translateModeList(int index);
+    void translateOperationList(int index);
     // TODO: This is common with extrude. Maybe send to superclass.
     void translateFaceName();
     void clearFaceName();

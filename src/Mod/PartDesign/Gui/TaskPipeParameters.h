@@ -102,6 +102,7 @@ public:
 private Q_SLOTS:
     void onTangentChanged(bool checked);
     void onTransitionChanged(int);
+    void onOperationChanged(int);
     void onProfileButton(bool checked);
     void onDeleteEdge();
 
@@ -112,6 +113,7 @@ protected:
 private:
     void onSelectionChanged(const Gui::SelectionChanges& msg) override;
     void updateUI();
+    void translateOperationList(int index);
     void clearButtons();
     void exitSelectionMode();
     void setVisibilityOfSpineAndProfile();

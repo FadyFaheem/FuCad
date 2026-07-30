@@ -86,6 +86,8 @@ TaskLoftParameters::TaskLoftParameters(ViewProviderLoft* LoftView, bool /*newObj
             this, &TaskLoftParameters::onRuled);
     connect(ui->checkBoxClosed, &QCheckBox::toggled,
             this, &TaskLoftParameters::onClosed);
+    connect(ui->operationMode, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &TaskLoftParameters::onOperationChanged);
     connect(ui->checkBoxUpdateView, &QCheckBox::toggled,
             this, &TaskLoftParameters::onUpdateView);
     // clang-format on
@@ -140,6 +142,7 @@ TaskLoftParameters::TaskLoftParameters(ViewProviderLoft* LoftView, bool /*newObj
     // get options
     ui->checkBoxRuled->setChecked(loft->Ruled.getValue());
     ui->checkBoxClosed->setChecked(loft->Closed.getValue());
+    translateOperationList(loft->Operation.getValue());
 
     // activate and de-activate dialog elements as appropriate
     for (QWidget* child : childs) {
@@ -159,6 +162,24 @@ void TaskLoftParameters::updateUI()
     if (loft) {
         auto view = getViewObject();
         view->makeTemporaryVisible(!loft->Sections.getValues().empty());
+    }
+}
+
+void TaskLoftParameters::translateOperationList(int index)
+{
+    ui->operationMode->clear();
+    ui->operationMode->addItem(tr("Join"));
+    ui->operationMode->addItem(tr("Cut"));
+    ui->operationMode->addItem(tr("Intersect"));
+    ui->operationMode->addItem(tr("New body"));
+    ui->operationMode->setCurrentIndex(index);
+}
+
+void TaskLoftParameters::onOperationChanged(int index)
+{
+    if (auto loft = getObject<PartDesign::Loft>()) {
+        loft->Operation.setValue(index);
+        recomputeFeature();
     }
 }
 

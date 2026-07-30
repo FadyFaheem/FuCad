@@ -98,10 +98,10 @@ short Revolution::mustExecute() const
 
 App::DocumentObjectExecReturn* Revolution::execute()
 {
-    return executeRevolved(Part::RevolMode::FuseWithBase);
+    return executeRevolved();
 }
 
-TopoShape Revolution::makeShape(const TopoShape& base, const TopoShape& revolve) const
+TopoShape Revolution::makeFused(const TopoShape& base, const TopoShape& revolve) const
 {
     // In 1.0 there was a bug that caused the order of operations to be reversed.
     // Changing the order may impact geometry order and the results of refine operation,

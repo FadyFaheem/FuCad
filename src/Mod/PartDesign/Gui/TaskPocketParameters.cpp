@@ -71,17 +71,6 @@ TaskPocketParameters::TaskPocketParameters(ViewProviderPocket* PocketView, QWidg
 
 TaskPocketParameters::~TaskPocketParameters() = default;
 
-void TaskPocketParameters::translateModeList(QComboBox* box, int index)
-{
-    box->clear();
-    box->addItem(tr("Dimension"));
-    box->addItem(tr("Through all"));
-    box->addItem(tr("To first"));
-    box->addItem(tr("Up to face"));
-    box->addItem(tr("Up to shape"));
-    box->setCurrentIndex(index);
-}
-
 void TaskPocketParameters::updateUI(Side side)
 {
     // update direction combobox

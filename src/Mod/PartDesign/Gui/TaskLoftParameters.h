@@ -63,6 +63,7 @@ private Q_SLOTS:
     void onRefButtonRemove(bool);
     void onClosed(bool);
     void onRuled(bool);
+    void onOperationChanged(int);
     void onDeleteSection();
     void indexesMoved();
 
@@ -80,6 +81,7 @@ protected:
 private:
     void onSelectionChanged(const Gui::SelectionChanges& msg) override;
     void updateUI();
+    void translateOperationList(int index);
     bool referenceSelected(const Gui::SelectionChanges& msg) const;
     void removeFromListWidget(QListWidget* w, QString name);
     void clearButtons(const selectionModes notThis = none);

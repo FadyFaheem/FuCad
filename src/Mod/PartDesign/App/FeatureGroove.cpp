@@ -66,12 +66,7 @@ Groove::Groove()
 
 App::DocumentObjectExecReturn* Groove::execute()
 {
-    return executeRevolved(Part::RevolMode::CutFromBase);
-}
-
-TopoShape Groove::makeShape(const TopoShape& base, const TopoShape& revolve) const
-{
-    return base.makeElementCut(revolve);
+    return executeRevolved();
 }
 
 bool Groove::suggestReversedAngle(double angle) const

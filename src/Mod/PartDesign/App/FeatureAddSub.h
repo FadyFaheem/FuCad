@@ -27,6 +27,8 @@
 
 #include "FeatureRefine.h"
 
+#include <App/PropertyStandard.h>
+
 #include <QCoreApplication>
 
 /// Base class of all additive features in PartDesign
@@ -45,10 +47,25 @@ public:
         Subtractive
     };
 
+    /// Values of the Operation property, must stay in sync with OperationEnums
+    enum class OperationType
+    {
+        Join = 0,
+        Cut,
+        Intersect,
+        NewBody
+    };
+
     FeatureAddSub();
 
     void onChanged(const App::Property*) override;
     Type getAddSubType();
+    OperationType getOperationType() const;
+
+    /// Whether the feature shape has to be combined with the preceding solid at all
+    bool combinesWithBase() const;
+    /// Part::OpCodes maker matching Operation; throws for operations without a boolean
+    const char* getBooleanOpCode() const;
 
     short mustExecute() const override;
 
@@ -56,11 +73,22 @@ public:
 
     void updatePreviewShape() override;
 
+    void setupObject() override;
+
+    App::PropertyEnumeration Operation;
     Part::PropertyPartShape AddSubShape;
 
+    static const char* OperationEnums[];
 
 protected:
+    void onDocumentRestored() override;
+
     Type addSubType {Additive};
+
+private:
+    /// False until something outside the constructor assigns Operation, which for a document
+    /// being loaded means the property was present in the file.
+    bool operationInitialized {false};
 };
 
 using FeatureAddSubPython = App::FeaturePythonT<FeatureAddSub>;

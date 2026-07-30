@@ -185,6 +185,15 @@ TaskPipeParameters::TaskPipeParameters(ViewProviderPipe* PipeView, bool /*newObj
 
     ui->comboBoxTransition->setCurrentIndex(pipe->Transition.getValue());
 
+    // connected only after filling so that populating the combo does not touch the property
+    translateOperationList(pipe->Operation.getValue());
+    connect(
+        ui->operationMode,
+        qOverload<int>(&QComboBox::currentIndexChanged),
+        this,
+        &TaskPipeParameters::onOperationChanged
+    );
+
     updateUI();
     this->blockSelection(false);
 }
@@ -214,6 +223,24 @@ TaskPipeParameters::~TaskPipeParameters()
 
 void TaskPipeParameters::updateUI()
 {}
+
+void TaskPipeParameters::translateOperationList(int index)
+{
+    ui->operationMode->clear();
+    ui->operationMode->addItem(tr("Join"));
+    ui->operationMode->addItem(tr("Cut"));
+    ui->operationMode->addItem(tr("Intersect"));
+    ui->operationMode->addItem(tr("New body"));
+    ui->operationMode->setCurrentIndex(index);
+}
+
+void TaskPipeParameters::onOperationChanged(int index)
+{
+    if (auto pipe = getObject<PartDesign::Pipe>()) {
+        pipe->Operation.setValue(index);
+        recomputeFeature();
+    }
+}
 
 void TaskPipeParameters::onSelectionChanged(const Gui::SelectionChanges& msg)
 {

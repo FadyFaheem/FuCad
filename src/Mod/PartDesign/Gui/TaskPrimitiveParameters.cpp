@@ -336,6 +336,11 @@ TaskBoxPrimitives::TaskBoxPrimitives(ViewProviderPrimitive* vp, QWidget* parent)
             ui->widgetStack->widget(i)->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored));
     }
 
+    // filled before connecting so that populating the combo does not touch the property
+    translateOperationList(getObject<PartDesign::FeaturePrimitive>()->Operation.getValue());
+    connect(ui->operationMode, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &TaskBoxPrimitives::onOperationChanged);
+
     Gui::Document* doc = vp->getDocument();
     this->attachDocument(doc);
 
@@ -900,6 +905,24 @@ void TaskBoxPrimitives::onPlacementChanged()
     setGizmoPositions();
 }
 
+void TaskBoxPrimitives::translateOperationList(int index)
+{
+    ui->operationMode->clear();
+    ui->operationMode->addItem(tr("Join"));
+    ui->operationMode->addItem(tr("Cut"));
+    ui->operationMode->addItem(tr("Intersect"));
+    ui->operationMode->addItem(tr("New body"));
+    ui->operationMode->setCurrentIndex(index);
+}
+
+void TaskBoxPrimitives::onOperationChanged(int index)
+{
+    if (auto primitive = getObject<PartDesign::FeaturePrimitive>()) {
+        primitive->Operation.setValue(index);
+        primitive->recomputeFeature();
+    }
+}
+
 
 bool TaskBoxPrimitives::setPrimitive(App::DocumentObject* obj)
 {
@@ -1070,6 +1093,8 @@ bool TaskBoxPrimitives::setPrimitive(App::DocumentObject* obj)
             default:
                 break;
         }
+
+        cmd += fmt::format("{0}.Operation={1}\n", name, ui->operationMode->currentIndex());
 
         // Execute the Python block
         // No need to open a transaction because this is already done in the command

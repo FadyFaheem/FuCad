@@ -27,6 +27,7 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 
+#include <App/Document.h>
 #include <Base/Exception.h>
 #include <Base/Tools.h>
 #include <Mod/Part/App/TopoShapeOpCode.h>
@@ -59,10 +60,10 @@ short Revolved::mustExecute() const
     return ProfileBased::mustExecute();
 }
 
-App::DocumentObjectExecReturn* Revolved::executeRevolved(Part::RevolMode revolMode)
+App::DocumentObjectExecReturn* Revolved::executeRevolved()
 {
     try {
-        return tryExecuteRevolved(revolMode);
+        return tryExecuteRevolved();
     }
     catch (const Standard_Failure& e) {
         if (std::string(e.GetMessageString()) == "TopoDS::Face") {
@@ -80,7 +81,7 @@ App::DocumentObjectExecReturn* Revolved::executeRevolved(Part::RevolMode revolMo
     }
 }
 
-App::DocumentObjectExecReturn* Revolved::tryExecuteRevolved(Part::RevolMode revolMode)
+App::DocumentObjectExecReturn* Revolved::tryExecuteRevolved()
 {
     if (onlyHaveRefined()) {
         return App::DocumentObject::StdReturn;
@@ -160,27 +161,56 @@ App::DocumentObjectExecReturn* Revolved::tryExecuteRevolved(Part::RevolMode revo
 
     supportface.move(invObjLoc);
 
-    if (method == RevolMethod::ToFirst
-        || (method == RevolMethod::ToLast && revolMode == Part::RevolMode::FuseWithBase)) {
-        TopoShape upToFace;
-        gp_Ax1 axis(pnt, dir);
-        if (Reversed.getValue()) {
-            axis.Reverse();
+    const OperationType operation = getOperationType();
+    const bool joining = operation == OperationType::Join;
+
+    // The "up to" methods are built with BRepFeat, which can only add to or remove from the base
+    const bool limitedByFace = method == RevolMethod::ToFirst || method == RevolMethod::ToFace
+        || (method == RevolMethod::ToLast && joining);
+
+    // BRepFeat already applies the boolean itself. Fusing a second time does not change the
+    // geometry and is kept so that element names of documents predating Operation do not shift.
+    bool combineWithBase = true;
+
+    if (limitedByFace) {
+        Part::RevolMode revolMode {};
+        switch (operation) {
+            case OperationType::Join:
+                revolMode = Part::RevolMode::FuseWithBase;
+                break;
+            case OperationType::Cut:
+                revolMode = Part::RevolMode::CutFromBase;
+                break;
+            case OperationType::Intersect:
+            case OperationType::NewBody:
+                return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "The Intersect and New body operations require an angle-based revolution type."
+                ));
+            default:
+                throw Base::ValueError("Unhandled value of the Operation property");
         }
-        getUpToFace(
-            upToFace,
-            base,
-            sketchshape,
-            method == RevolMethod::ToFirst ? "UpToFirst" : "UpToLast",
-            axis
-        );
-        result = tryToRevolveToFace(upToFace, pnt, dir, base, supportface, sketchshape, revolMode);
-    }
-    else if (method == RevolMethod::ToFace) {
+
         TopoShape upToFace;
-        getUpToFaceFromLinkSub(upToFace, UpToFace);
-        upToFace.move(invObjLoc);
+        if (method == RevolMethod::ToFace) {
+            getUpToFaceFromLinkSub(upToFace, UpToFace);
+            upToFace.move(invObjLoc);
+        }
+        else {
+            gp_Ax1 axis(pnt, dir);
+            if (Reversed.getValue()) {
+                axis.Reverse();
+            }
+            getUpToFace(
+                upToFace,
+                base,
+                sketchshape,
+                method == RevolMethod::ToFirst ? "UpToFirst" : "UpToLast",
+                axis
+            );
+        }
         result = tryToRevolveToFace(upToFace, pnt, dir, base, supportface, sketchshape, revolMode);
+        combineWithBase = joining;
     }
     else {
         bool midplane = Midplane.getValue();
@@ -188,7 +218,7 @@ App::DocumentObjectExecReturn* Revolved::tryExecuteRevolved(Part::RevolMode revo
         generateRevolution(result, sketchshape, gp_Ax1(pnt, dir), angle, angle2, midplane, reversed, method);
     }
 
-    setResult(base, result);
+    setResult(base, result, combineWithBase);
 
     // eventually disable some settings that are not valid for the current method
     updateProperties(method);
@@ -196,7 +226,30 @@ App::DocumentObjectExecReturn* Revolved::tryExecuteRevolved(Part::RevolMode revo
     return App::DocumentObject::StdReturn;
 }
 
-void Revolved::setResult(const TopoShape& base, const TopoShape& revolved)
+TopoShape Revolved::makeFused(const TopoShape& base, const TopoShape& revolve) const
+{
+    return base.makeElementFuse(revolve);
+}
+
+TopoShape Revolved::combineShapes(const TopoShape& base, const TopoShape& revolved) const
+{
+    switch (getOperationType()) {
+        case OperationType::Join:
+            return makeFused(base, revolved);
+        case OperationType::Cut:
+            return base.makeElementCut(revolved);
+        case OperationType::Intersect: {
+            TopoShape result(0, getDocument()->getStringHasher());
+            result.makeElementBoolean(Part::OpCodes::Common, {base, revolved});
+            return result;
+        }
+        case OperationType::NewBody:
+        default:
+            throw Base::ValueError("Unhandled value of the Operation property");
+    }
+}
+
+void Revolved::setResult(const TopoShape& base, const TopoShape& revolved, bool combineWithBase)
 {
     if (revolved.isNull()) {
         throw Base::RuntimeError(QT_TRANSLATE_NOOP("Exception", "Could not revolve the sketch!"));
@@ -207,8 +260,13 @@ void Revolved::setResult(const TopoShape& base, const TopoShape& revolved)
     // set the additive shape property for later usage in e.g. pattern
     this->AddSubShape.setValue(result);
 
-    if (!base.isNull()) {
-        result = makeShape(base, result);
+    if (!base.isNull() && combineWithBase && combinesWithBase()) {
+        result = combineShapes(base, result);
+        if (result.countSubShapes(TopAbs_SOLID) == 0) {
+            throw Base::RuntimeError(
+                QT_TRANSLATE_NOOP("Exception", "Resulting shape is empty")
+            );
+        }
         // store shape before refinement
         this->rawShape = result;
         result = refineShapeIfActive(result);

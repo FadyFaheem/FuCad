@@ -69,24 +69,13 @@ static const char* primitiveIntToName(int id)
     };
 }
 
-CmdPrimtiveCompAdditive::CmdPrimtiveCompAdditive()
-    : Command("PartDesign_CompPrimitiveAdditive")
+/// Creates the additive flavour of a primitive; the Operation property drives the boolean
+static void makePrimitive(Gui::Command* cmd, int iMsg)
 {
-    sAppModule = "PartDesign";
-    sGroup = QT_TR_NOOP("PartDesign");
-    sMenuText = QT_TR_NOOP("Additive Primitive");
-    sToolTipText = QT_TR_NOOP("Creates an additive primitive");
-    sWhatsThis = "PartDesign_CompPrimitiveAdditive";
-    sStatusTip = sToolTipText;
-    eType = ForEdit;
-}
-
-void CmdPrimtiveCompAdditive::activated(int iMsg)
-{
-    App::Document* doc = getDocument();
+    App::Document* doc = cmd->getDocument();
 
     // We need either an active Body, or for there to be no Body objects
-    // (in which case, just make one) to make a new additive shape.
+    // (in which case, just make one) to make a new primitive.
 
     PartDesign::Body* pcActiveBody = PartDesignGui::getBody(/* messageIfNot = */ false);
 
@@ -106,12 +95,9 @@ void CmdPrimtiveCompAdditive::activated(int iMsg)
         }
     }
 
-    Gui::ActionGroup* pcAction = qobject_cast<Gui::ActionGroup*>(_pcAction);
-    pcAction->setIcon(pcAction->actions().at(iMsg)->icon());
-
     std::string shapeType(primitiveIntToName(iMsg));
 
-    openCommand("Make additive " + shapeType);
+    cmd->openCommand("Make " + shapeType);
     if (shouldMakeBody) {
         pcActiveBody = PartDesignGui::makeBody(doc);
     }
@@ -120,7 +106,7 @@ void CmdPrimtiveCompAdditive::activated(int iMsg)
         return;
     }
 
-    auto FeatName(getUniqueObjectName(shapeType.c_str(), pcActiveBody));
+    auto FeatName(cmd->getUniqueObjectName(shapeType.c_str(), pcActiveBody));
 
     FCMD_OBJ_DOC_CMD(
         pcActiveBody,
@@ -134,7 +120,7 @@ void CmdPrimtiveCompAdditive::activated(int iMsg)
     if (!prm) {
         return;
     }
-    FCMD_OBJ_CMD(pcActiveBody, "addObject(" << getObjectCmd(prm) << ")");
+    FCMD_OBJ_CMD(pcActiveBody, "addObject(" << Gui::Command::getObjectCmd(prm) << ")");
     Gui::Command::updateActive();
 
     auto base = prm->BaseFeature.getValue();
@@ -143,13 +129,33 @@ void CmdPrimtiveCompAdditive::activated(int iMsg)
     if (!base) {
         base = pcActiveBody;
     }
-    copyVisual(prm, "ShapeAppearance", base);
-    copyVisual(prm, "LineColor", base);
-    copyVisual(prm, "PointColor", base);
-    copyVisual(prm, "Transparency", base);
-    copyVisual(prm, "DisplayMode", base);
+    Gui::Command::copyVisual(prm, "ShapeAppearance", base);
+    Gui::Command::copyVisual(prm, "LineColor", base);
+    Gui::Command::copyVisual(prm, "PointColor", base);
+    Gui::Command::copyVisual(prm, "Transparency", base);
+    Gui::Command::copyVisual(prm, "DisplayMode", base);
 
     PartDesignGui::setEdit(prm, pcActiveBody);
+}
+
+CmdPrimtiveCompAdditive::CmdPrimtiveCompAdditive()
+    : Command("PartDesign_CompPrimitiveAdditive")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Additive Primitive");
+    sToolTipText = QT_TR_NOOP("Creates an additive primitive");
+    sWhatsThis = "PartDesign_CompPrimitiveAdditive";
+    sStatusTip = sToolTipText;
+    eType = ForEdit;
+}
+
+void CmdPrimtiveCompAdditive::activated(int iMsg)
+{
+    Gui::ActionGroup* pcAction = qobject_cast<Gui::ActionGroup*>(_pcAction);
+    pcAction->setIcon(pcAction->actions().at(iMsg)->icon());
+
+    makePrimitive(this, iMsg);
 }
 
 Gui::Action* CmdPrimtiveCompAdditive::createAction()
@@ -460,6 +466,143 @@ bool CmdPrimtiveCompSubtractive::isActive()
     return (hasActiveDocument() && !Gui::Control().activeDialog());
 }
 
+DEF_STD_CMD_ACL(CmdPartDesignCompPrimitive)
+
+CmdPartDesignCompPrimitive::CmdPartDesignCompPrimitive()
+    : Command("PartDesign_CompPrimitive")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Primitive");
+    sToolTipText
+        = QT_TR_NOOP("Creates a primitive and joins, cuts or intersects it with the body");
+    sWhatsThis = "PartDesign_CompPrimitive";
+    sStatusTip = sToolTipText;
+    eType = ForEdit;
+}
+
+void CmdPartDesignCompPrimitive::activated(int iMsg)
+{
+    Gui::ActionGroup* pcAction = qobject_cast<Gui::ActionGroup*>(_pcAction);
+    pcAction->setIcon(pcAction->actions().at(iMsg)->icon());
+
+    // Backed by the additive primitives so that the Operation property drives the boolean
+    makePrimitive(this, iMsg);
+}
+
+Gui::Action* CmdPartDesignCompPrimitive::createAction()
+{
+    Gui::ActionGroup* pcAction = new Gui::ActionGroup(this, Gui::getMainWindow());
+    pcAction->setDropDownMenu(true);
+    applyCommandData(this->className(), pcAction);
+
+    QAction* p1 = pcAction->addAction(QString());
+    p1->setIcon(Gui::BitmapFactory().iconFromTheme("PartDesign_AdditiveBox"));
+    p1->setObjectName(QStringLiteral("PartDesign_Box"));
+    p1->setWhatsThis(QStringLiteral("PartDesign_CompPrimitive"));
+    QAction* p2 = pcAction->addAction(QString());
+    p2->setIcon(Gui::BitmapFactory().iconFromTheme("PartDesign_AdditiveCylinder"));
+    p2->setObjectName(QStringLiteral("PartDesign_Cylinder"));
+    p2->setWhatsThis(QStringLiteral("PartDesign_CompPrimitive"));
+    QAction* p3 = pcAction->addAction(QString());
+    p3->setIcon(Gui::BitmapFactory().iconFromTheme("PartDesign_AdditiveSphere"));
+    p3->setObjectName(QStringLiteral("PartDesign_Sphere"));
+    p3->setWhatsThis(QStringLiteral("PartDesign_CompPrimitive"));
+    QAction* p4 = pcAction->addAction(QString());
+    p4->setIcon(Gui::BitmapFactory().iconFromTheme("PartDesign_AdditiveCone"));
+    p4->setObjectName(QStringLiteral("PartDesign_Cone"));
+    p4->setWhatsThis(QStringLiteral("PartDesign_CompPrimitive"));
+    QAction* p5 = pcAction->addAction(QString());
+    p5->setIcon(Gui::BitmapFactory().iconFromTheme("PartDesign_AdditiveEllipsoid"));
+    p5->setObjectName(QStringLiteral("PartDesign_Ellipsoid"));
+    p5->setWhatsThis(QStringLiteral("PartDesign_CompPrimitive"));
+    QAction* p6 = pcAction->addAction(QString());
+    p6->setIcon(Gui::BitmapFactory().iconFromTheme("PartDesign_AdditiveTorus"));
+    p6->setObjectName(QStringLiteral("PartDesign_Torus"));
+    p6->setWhatsThis(QStringLiteral("PartDesign_CompPrimitive"));
+    QAction* p7 = pcAction->addAction(QString());
+    p7->setIcon(Gui::BitmapFactory().iconFromTheme("PartDesign_AdditivePrism"));
+    p7->setObjectName(QStringLiteral("PartDesign_Prism"));
+    p7->setWhatsThis(QStringLiteral("PartDesign_CompPrimitive"));
+    QAction* p8 = pcAction->addAction(QString());
+    p8->setIcon(Gui::BitmapFactory().iconFromTheme("PartDesign_AdditiveWedge"));
+    p8->setObjectName(QStringLiteral("PartDesign_Wedge"));
+    p8->setWhatsThis(QStringLiteral("PartDesign_CompPrimitive"));
+
+    _pcAction = pcAction;
+    languageChange();
+
+    pcAction->setIcon(p1->icon());
+    int defaultId = 0;
+    pcAction->setProperty("defaultAction", QVariant(defaultId));
+
+    return pcAction;
+}
+
+void CmdPartDesignCompPrimitive::languageChange()
+{
+    Command::languageChange();
+
+    if (!_pcAction) {
+        return;
+    }
+    Gui::ActionGroup* pcAction = qobject_cast<Gui::ActionGroup*>(_pcAction);
+    QList<QAction*> a = pcAction->actions();
+
+    QAction* arc1 = a[0];
+    arc1->setText(QApplication::translate("CmdPartDesignCompPrimitive", "Box"));
+    arc1->setToolTip(
+        QApplication::translate(
+            "PartDesign_CompPrimitive",
+            "Creates a box by its width, height, and length"
+        )
+    );
+    arc1->setStatusTip(arc1->toolTip());
+    QAction* arc2 = a[1];
+    arc2->setText(QApplication::translate("CmdPartDesignCompPrimitive", "Cylinder"));
+    arc2->setToolTip(
+        QApplication::translate(
+            "PartDesign_CompPrimitive",
+            "Creates a cylinder by its radius, height, and angle"
+        )
+    );
+    arc2->setStatusTip(arc2->toolTip());
+    QAction* arc3 = a[2];
+    arc3->setText(QApplication::translate("CmdPartDesignCompPrimitive", "Sphere"));
+    arc3->setToolTip(
+        QApplication::translate(
+            "PartDesign_CompPrimitive",
+            "Creates a sphere by its radius and various angles"
+        )
+    );
+    arc3->setStatusTip(arc3->toolTip());
+    QAction* arc4 = a[3];
+    arc4->setText(QApplication::translate("CmdPartDesignCompPrimitive", "Cone"));
+    arc4->setToolTip(QApplication::translate("PartDesign_CompPrimitive", "Creates a cone"));
+    arc4->setStatusTip(arc4->toolTip());
+    QAction* arc5 = a[4];
+    arc5->setText(QApplication::translate("CmdPartDesignCompPrimitive", "Ellipsoid"));
+    arc5->setToolTip(QApplication::translate("PartDesign_CompPrimitive", "Creates an ellipsoid"));
+    arc5->setStatusTip(arc5->toolTip());
+    QAction* arc6 = a[5];
+    arc6->setText(QApplication::translate("CmdPartDesignCompPrimitive", "Torus"));
+    arc6->setToolTip(QApplication::translate("PartDesign_CompPrimitive", "Creates a torus"));
+    arc6->setStatusTip(arc6->toolTip());
+    QAction* arc7 = a[6];
+    arc7->setText(QApplication::translate("CmdPartDesignCompPrimitive", "Prism"));
+    arc7->setToolTip(QApplication::translate("PartDesign_CompPrimitive", "Creates a prism"));
+    arc7->setStatusTip(arc7->toolTip());
+    QAction* arc8 = a[7];
+    arc8->setText(QApplication::translate("CmdPartDesignCompPrimitive", "Wedge"));
+    arc8->setToolTip(QApplication::translate("PartDesign_CompPrimitive", "Creates a wedge"));
+    arc8->setStatusTip(arc8->toolTip());
+}
+
+bool CmdPartDesignCompPrimitive::isActive()
+{
+    return (hasActiveDocument() && !Gui::Control().activeDialog());
+}
+
 //===========================================================================
 // Initialization
 //===========================================================================
@@ -468,6 +611,7 @@ void CreatePartDesignPrimitiveCommands()
 {
     Gui::CommandManager& rcCmdMgr = Gui::Application::Instance->commandManager();
 
+    rcCmdMgr.addCommand(new CmdPartDesignCompPrimitive);
     rcCmdMgr.addCommand(new CmdPrimtiveCompAdditive);
     rcCmdMgr.addCommand(new CmdPrimtiveCompSubtractive);
 }

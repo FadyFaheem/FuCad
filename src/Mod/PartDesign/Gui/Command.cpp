@@ -866,6 +866,37 @@ bool importExternalElements(App::PropertyLinkSub& prop, std::vector<App::SubObje
 }
 
 
+/**
+ * The closed regions bounded by the sketch curves are precomputed as InternalFace1..N.
+ * Returns the single region when the sketch bounds exactly one, otherwise an empty list:
+ * an ambiguous sketch is resolved by picking regions in the 3D view from the feature dialog.
+ */
+std::vector<std::string> unambiguousProfileRegion(App::DocumentObject* profile)
+{
+    auto* sketch = freecad_cast<Sketcher::SketchObject*>(profile);
+    if (!sketch) {
+        return {};
+    }
+
+    const TopoDS_Shape& internalShape = sketch->InternalShape.getValue();
+    if (internalShape.IsNull()) {
+        return {};
+    }
+
+    int faceCount = 0;
+    for (TopExp_Explorer explorer(internalShape, TopAbs_FACE); explorer.More(); explorer.Next()) {
+        if (++faceCount > 1) {
+            return {};
+        }
+    }
+
+    if (faceCount != 1) {
+        return {};
+    }
+
+    return {Sketcher::SketchObject::internalPrefix() + "Face1"};
+}
+
 void prepareProfileBased(
     PartDesign::Body* pcActiveBody,
     Gui::Command* cmd,
@@ -1083,8 +1114,22 @@ void prepareProfileBased(
         return true;
     };
 
-    auto sketch_worker = [&, base_worker](std::vector<App::DocumentObject*> features) {
-        base_worker(features.front(), {});
+    // The dialog may run this asynchronously, so anything it needs has to be captured by value.
+    auto sketch_worker = [base_worker, pcActiveBody](std::vector<App::DocumentObject*> features) {
+        if (features.empty()) {
+            return;
+        }
+
+        App::DocumentObject* sketch = features.front();
+
+        // A sketch from outside the active body still has to go through importExternalElements(),
+        // which base_worker only runs for an empty sub list.
+        std::vector<std::string> subs;
+        if (PartDesign::Body::findBodyOf(sketch) == pcActiveBody) {
+            subs = unambiguousProfileRegion(sketch);
+        }
+
+        base_worker(sketch, subs);
     };
 
     // if there is a sketch selected which is from another body or part we need to bring up the
@@ -1198,7 +1243,12 @@ void finishProfileBased(const Gui::Command* cmd, const Part::Feature* sketch, Ap
     finishFeature(cmd, Feat);
 }
 
-void prepareProfileBased(Gui::Command* cmd, const std::string& which, double length)
+void prepareProfileBased(
+    Gui::Command* cmd,
+    const std::string& which,
+    double length,
+    const char* label = nullptr
+)
 {
     PartDesign::Body* pcActiveBody = PartDesignGui::getBody(true);
 
@@ -1206,13 +1256,16 @@ void prepareProfileBased(Gui::Command* cmd, const std::string& which, double len
         return;
     }
 
-    auto worker = [cmd, length](Part::Feature* profile, App::DocumentObject* Feat) {
+    auto worker = [cmd, length, label](Part::Feature* profile, App::DocumentObject* Feat) {
         if (!Feat) {
             return;
         }
 
         // specific parameters for Pad/Pocket
         FCMD_OBJ_CMD(Feat, "Length = " << length);
+        if (label) {
+            FCMD_OBJ_CMD(Feat, "Label = '" << label << "'");
+        }
         Gui::Command::updateActive();
 
         Part::Part2DObject* sketch = dynamic_cast<Part::Part2DObject*>(profile);
@@ -1229,6 +1282,37 @@ void prepareProfileBased(Gui::Command* cmd, const std::string& which, double len
     };
 
     prepareProfileBased(pcActiveBody, cmd, which, worker);
+}
+
+//===========================================================================
+// PartDesign_Extrude
+//===========================================================================
+DEF_STD_CMD_A(CmdPartDesignExtrude)
+
+CmdPartDesignExtrude::CmdPartDesignExtrude()
+    : Command("PartDesign_Extrude")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Extrude");
+    sToolTipText
+        = QT_TR_NOOP("Extrudes the selected sketch or profile and joins, cuts or intersects it with the body");
+    sWhatsThis = "PartDesign_Extrude";
+    sStatusTip = sToolTipText;
+    sPixmap = "PartDesign_Pad";
+}
+
+void CmdPartDesignExtrude::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+
+    // Backed by Pad so that the extrusion direction never depends on the chosen operation
+    prepareProfileBased(this, "Pad", 10.0, "Extrude");
+}
+
+bool CmdPartDesignExtrude::isActive()
+{
+    return hasActiveDocument();
 }
 
 //===========================================================================
@@ -1330,6 +1414,69 @@ void CmdPartDesignHole::activated(int iMsg)
 }
 
 bool CmdPartDesignHole::isActive()
+{
+    return hasActiveDocument();
+}
+
+//===========================================================================
+// PartDesign_Revolve
+//===========================================================================
+DEF_STD_CMD_A(CmdPartDesignRevolve)
+
+CmdPartDesignRevolve::CmdPartDesignRevolve()
+    : Command("PartDesign_Revolve")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Revolve");
+    sToolTipText
+        = QT_TR_NOOP("Revolves the selected sketch or profile around an axis and joins, cuts or intersects it with the body");
+    sWhatsThis = "PartDesign_Revolve";
+    sStatusTip = sToolTipText;
+    sPixmap = "PartDesign_Revolution";
+}
+
+void CmdPartDesignRevolve::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+
+    PartDesign::Body* pcActiveBody = PartDesignGui::getBody(true);
+
+    if (!pcActiveBody) {
+        return;
+    }
+
+    Gui::Command* cmd = this;
+    auto worker = [cmd, pcActiveBody](Part::Feature* sketch, App::DocumentObject* Feat) {
+        if (!Feat) {
+            return;
+        }
+
+        if (sketch->isDerivedFrom<Part::Part2DObject>()) {
+            FCMD_OBJ_CMD(Feat, "ReferenceAxis = (" << getObjectCmd(sketch) << ",['V_Axis'])");
+        }
+        else {
+            FCMD_OBJ_CMD(
+                Feat,
+                "ReferenceAxis = (" << getObjectCmd(pcActiveBody->getOrigin()->getY()) << ",[''])"
+            );
+        }
+
+        FCMD_OBJ_CMD(Feat, "Angle = 360.0");
+        FCMD_OBJ_CMD(Feat, "Label = 'Revolve'");
+        PartDesign::Revolution* pcRevolution = dynamic_cast<PartDesign::Revolution*>(Feat);
+        if (pcRevolution && pcRevolution->suggestReversed()) {
+            FCMD_OBJ_CMD(Feat, "Reversed = 1");
+        }
+
+        finishProfileBased(cmd, sketch, Feat);
+    };
+
+    // Backed by Revolution so that the revolve direction never depends on the chosen operation
+    prepareProfileBased(pcActiveBody, this, "Revolution", worker);
+}
+
+bool CmdPartDesignRevolve::isActive()
 {
     return hasActiveDocument();
 }
@@ -1467,6 +1614,55 @@ bool CmdPartDesignGroove::isActive()
 }
 
 //===========================================================================
+// PartDesign_Sweep
+//===========================================================================
+DEF_STD_CMD_A(CmdPartDesignSweep)
+
+CmdPartDesignSweep::CmdPartDesignSweep()
+    : Command("PartDesign_Sweep")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Sweep");
+    sToolTipText
+        = QT_TR_NOOP("Sweeps the selected sketch or profile along a path and joins, cuts or intersects it with the body");
+    sWhatsThis = "PartDesign_Sweep";
+    sStatusTip = sToolTipText;
+    sPixmap = "PartDesign_AdditivePipe";
+}
+
+void CmdPartDesignSweep::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+
+    PartDesign::Body* pcActiveBody = PartDesignGui::getBody(true);
+
+    if (!pcActiveBody) {
+        return;
+    }
+
+    Gui::Command* cmd = this;
+    auto worker = [cmd](Part::Feature* sketch, App::DocumentObject* Feat) {
+        if (!Feat) {
+            return;
+        }
+
+        FCMD_OBJ_CMD(Feat, "Label = 'Sweep'");
+        Gui::Command::updateActive();
+
+        finishProfileBased(cmd, sketch, Feat);
+    };
+
+    // Backed by AdditivePipe so that the sweep never depends on the chosen operation
+    prepareProfileBased(pcActiveBody, this, "AdditivePipe", worker);
+}
+
+bool CmdPartDesignSweep::isActive()
+{
+    return hasActiveDocument();
+}
+
+//===========================================================================
 // PartDesign_AdditivePipe
 //===========================================================================
 DEF_STD_CMD_A(CmdPartDesignAdditivePipe)
@@ -1567,6 +1763,55 @@ bool CmdPartDesignSubtractivePipe::isActive()
 
 
 //===========================================================================
+// PartDesign_Loft
+//===========================================================================
+DEF_STD_CMD_A(CmdPartDesignLoft)
+
+CmdPartDesignLoft::CmdPartDesignLoft()
+    : Command("PartDesign_Loft")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Loft");
+    sToolTipText
+        = QT_TR_NOOP("Lofts the selected sketch or profile through sections and joins, cuts or intersects it with the body");
+    sWhatsThis = "PartDesign_Loft";
+    sStatusTip = sToolTipText;
+    sPixmap = "PartDesign_AdditiveLoft";
+}
+
+void CmdPartDesignLoft::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+
+    PartDesign::Body* pcActiveBody = PartDesignGui::getBody(true);
+
+    if (!pcActiveBody) {
+        return;
+    }
+
+    Gui::Command* cmd = this;
+    auto worker = [cmd](Part::Feature* sketch, App::DocumentObject* Feat) {
+        if (!Feat) {
+            return;
+        }
+
+        FCMD_OBJ_CMD(Feat, "Label = 'Loft'");
+        Gui::Command::updateActive();
+
+        finishProfileBased(cmd, sketch, Feat);
+    };
+
+    // Backed by AdditiveLoft so that the loft never depends on the chosen operation
+    prepareProfileBased(pcActiveBody, this, "AdditiveLoft", worker);
+}
+
+bool CmdPartDesignLoft::isActive()
+{
+    return hasActiveDocument();
+}
+
+//===========================================================================
 // PartDesign_AdditiveLoft
 //===========================================================================
 DEF_STD_CMD_A(CmdPartDesignAdditiveLoft)
@@ -1661,6 +1906,89 @@ void CmdPartDesignSubtractiveLoft::activated(int iMsg)
 }
 
 bool CmdPartDesignSubtractiveLoft::isActive()
+{
+    return hasActiveDocument();
+}
+
+//===========================================================================
+// PartDesign_Coil
+//===========================================================================
+DEF_STD_CMD_A(CmdPartDesignCoil)
+
+CmdPartDesignCoil::CmdPartDesignCoil()
+    : Command("PartDesign_Coil")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Coil");
+    sToolTipText
+        = QT_TR_NOOP("Sweeps the selected sketch or profile along a helix and joins, cuts or intersects it with the body");
+    sWhatsThis = "PartDesign_Coil";
+    sStatusTip = sToolTipText;
+    sPixmap = "PartDesign_AdditiveHelix";
+}
+
+void CmdPartDesignCoil::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+
+    PartDesign::Body* pcActiveBody = PartDesignGui::getBody(true);
+
+    if (!pcActiveBody) {
+        return;
+    }
+
+    Gui::Command* cmd = this;
+    auto worker = [cmd, pcActiveBody](Part::Feature* sketch, App::DocumentObject* Feat) {
+        if (!Feat) {
+            return;
+        }
+
+        // Creating a helix with default values isn't always valid but fixes
+        // itself when more values are set. So, this guard is used to suppress
+        // errors before the user is able to change the parameters.
+        Base::ObjectStatusLocker<App::Document::Status, App::Document> guard(
+            App::Document::IgnoreErrorOnRecompute,
+            Feat->getDocument(),
+            true
+        );
+
+        FCMD_OBJ_CMD(Feat, "Label = 'Coil'");
+        Gui::Command::updateActive();
+
+        if (sketch->isDerivedFrom<Part::Part2DObject>()) {
+            FCMD_OBJ_CMD(Feat, "ReferenceAxis = (" << getObjectCmd(sketch) << ",['V_Axis'])");
+        }
+        else {
+            FCMD_OBJ_CMD(
+                Feat,
+                "ReferenceAxis = (" << getObjectCmd(pcActiveBody->getOrigin()->getY()) << ",[''])"
+            );
+        }
+
+        finishProfileBased(cmd, sketch, Feat);
+
+        // If the initial helix creation fails then it leaves the base object invisible which makes
+        // things more difficult for the user. To avoid this the base object will be made tmp.
+        // visible again.
+        if (Feat->isError()) {
+            App::DocumentObject* base = static_cast<PartDesign::Feature*>(Feat)->BaseFeature.getValue();
+            if (base) {
+                PartDesignGui::ViewProvider* view = dynamic_cast<PartDesignGui::ViewProvider*>(
+                    Gui::Application::Instance->getViewProvider(base)
+                );
+                if (view) {
+                    view->makeTemporaryVisible(true);
+                }
+            }
+        }
+    };
+
+    // Backed by AdditiveHelix so that the coil direction never depends on the chosen operation
+    prepareProfileBased(pcActiveBody, this, "AdditiveHelix", worker);
+}
+
+bool CmdPartDesignCoil::isActive()
 {
     return hasActiveDocument();
 }
@@ -2742,6 +3070,11 @@ void CreatePartDesignCommands()
 
     rcCmdMgr.addCommand(new CmdPartDesignNewSketch());
 
+    rcCmdMgr.addCommand(new CmdPartDesignExtrude());
+    rcCmdMgr.addCommand(new CmdPartDesignRevolve());
+    rcCmdMgr.addCommand(new CmdPartDesignSweep());
+    rcCmdMgr.addCommand(new CmdPartDesignLoft());
+    rcCmdMgr.addCommand(new CmdPartDesignCoil());
     rcCmdMgr.addCommand(new CmdPartDesignPad());
     rcCmdMgr.addCommand(new CmdPartDesignPocket());
     rcCmdMgr.addCommand(new CmdPartDesignHole());

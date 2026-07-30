@@ -120,7 +120,18 @@ void TaskHelixParameters::assignProperties()
     propLeftHanded = &(helix->LeftHanded);
     propReversed = &(helix->Reversed);
     propMode = &(helix->Mode);
+    propOperation = &(helix->Operation);
     propOutside = &(helix->Outside);
+}
+
+void TaskHelixParameters::translateOperationList(int index)
+{
+    ui->operationMode->clear();
+    ui->operationMode->addItem(tr("Join"));
+    ui->operationMode->addItem(tr("Cut"));
+    ui->operationMode->addItem(tr("Intersect"));
+    ui->operationMode->addItem(tr("New body"));
+    ui->operationMode->setCurrentIndex(index);
 }
 
 void TaskHelixParameters::setValuesFromProperties()
@@ -146,6 +157,7 @@ void TaskHelixParameters::setValuesFromProperties()
     ui->checkBoxReversed->setChecked(reversed);
     ui->inputMode->setCurrentIndex(index);
     ui->checkBoxOutside->setChecked(outside);
+    translateOperationList(propOperation->getValue());
 }
 
 void TaskHelixParameters::bindProperties()
@@ -183,6 +195,8 @@ void TaskHelixParameters::connectSlots()
             this, &TaskHelixParameters::onUpdateView);
     connect(ui->inputMode, qOverload<int>(&QComboBox::activated),
             this, &TaskHelixParameters::onModeChanged);
+    connect(ui->operationMode, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &TaskHelixParameters::onOperationChanged);
     connect(ui->checkBoxOutside, &QCheckBox::toggled,
             this, &TaskHelixParameters::onOutsideChanged);
     // clang-format on
@@ -343,7 +357,7 @@ void TaskHelixParameters::adaptVisibilityToMode()
     bool isGrowthVisible = false;
 
     auto helix = getObject<PartDesign::Helix>();
-    if (helix->getAddSubType() == PartDesign::FeatureAddSub::Subtractive) {
+    if (helix->getOperationType() == PartDesign::FeatureAddSub::OperationType::Cut) {
         isOutsideVisible = true;
     }
 
@@ -606,6 +620,15 @@ void TaskHelixParameters::onOutsideChanged(bool on)
     }
 }
 
+void TaskHelixParameters::onOperationChanged(int index)
+{
+    if (getObject()) {
+        propOperation->setValue(index);
+        recomputeFeature();
+        updateUI();
+    }
+}
+
 
 TaskHelixParameters::~TaskHelixParameters()
 {
@@ -724,6 +747,7 @@ void TaskHelixParameters::apply()  // NOLINT
     std::string axis = buildLinkSingleSubPythonStr(obj, sub);
     auto tobj = getObject();
     FCMD_OBJ_CMD(tobj, "ReferenceAxis = " << axis);
+    FCMD_OBJ_CMD(tobj, "Operation = " << propOperation->getValue());
     FCMD_OBJ_CMD(tobj, "Mode = " << propMode->getValue());
     FCMD_OBJ_CMD(tobj, "Pitch = " << propPitch->getValue());
     FCMD_OBJ_CMD(tobj, "Height = " << propHeight->getValue());

@@ -526,7 +526,7 @@ App::DocumentObjectExecReturn* Pipe::execute()
             result = shapes.front();
         }
 
-        if (base.isNull()) {
+        if (base.isNull() || !combinesWithBase()) {
             if (getAddSubType() == FeatureAddSub::Subtractive) {
                 return new App::DocumentObjectExecReturn(
                     QT_TRANSLATE_NOOP("Exception", "Pipe: There is nothing to subtract from")
@@ -548,42 +548,38 @@ App::DocumentObjectExecReturn* Pipe::execute()
             return App::DocumentObject::StdReturn;
         }
 
-        std::string maker;
         Part::TopoShape boolOp = Part::TopoShape(base.Tag, getDocument()->getStringHasher());
 
-        if (getAddSubType() == FeatureAddSub::Additive) {
-            maker = Part::OpCodes::Fuse;
-        }
-        else if (getAddSubType() == FeatureAddSub::Subtractive) {
-            maker = Part::OpCodes::Cut;
-        }
+        result.Tag = -getID();  // invert tag to differentiate the pre-boolean pipe
+        //                        from the post-boolean pipe
+        //                        setting result to the negative tag is a bit confusing,
+        //                        because you would expect this to be set to the feature's shape,
+        //                        but boolOp is the topoShape that is actually being copied
 
-        if (!maker.empty()) {
-            result.Tag = -getID();  // invert tag to differentiate the pre-boolean pipe
-            //                        from the post-boolean pipe
-            //                        setting result to the negative tag is a bit confusing,
-            //                        because you would expect this to be set to the feature's shape,
-            //                        but boolOp is the topoShape that is actually being copied
+        boolOp.makeElementBoolean(
+            getBooleanOpCode(),
+            {base, result},
+            nullptr,
+            FuzzyTolerance.getValue()
+        );
 
-            boolOp.makeElementBoolean(maker.c_str(), {base, result}, nullptr, FuzzyTolerance.getValue());
-
-            if (!isSingleSolidRuleSatisfied(boolOp.getShape())) {
-                return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP(
-                    "Exception",
-                    "Result has multiple solids: enable 'Allow Compound' in the active body."
-                ));
-            }
-
-            // store shape before refinement
-            this->rawShape = boolOp;
-            boolOp = refineShapeIfActive(boolOp);
-            Shape.setValue(getSolid(boolOp));
-        }
-        else {
+        if (boolOp.countSubShapes(TopAbs_SOLID) == 0) {
             return new App::DocumentObjectExecReturn(
-                QT_TRANSLATE_NOOP("Exception", "Pipe: Invalid Boolean Type")
+                QT_TRANSLATE_NOOP("Exception", "Pipe: Resulting shape is empty")
             );
         }
+
+        if (!isSingleSolidRuleSatisfied(boolOp.getShape())) {
+            return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP(
+                "Exception",
+                "Result has multiple solids: enable 'Allow Compound' in the active body."
+            ));
+        }
+
+        // store shape before refinement
+        this->rawShape = boolOp;
+        boolOp = refineShapeIfActive(boolOp);
+        Shape.setValue(getSolid(boolOp));
 
         TopoShape solid = getSolid(boolOp);
         // lets check if the result is a solid

@@ -22,6 +22,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QSignalBlocker>
+
 #include <App/Document.h>
 #include <App/DocumentObject.h>
 #include <App/Origin.h>
@@ -69,7 +71,9 @@ TaskRevolutionParameters::TaskRevolutionParameters(
 
     // bind property mirrors
     if (auto rev = getObject<PartDesign::Revolved>()) {
-        isGroove = rev->getAddSubType() == PartDesign::Revolved::Subtractive;
+        // Keyed on the concrete class, not on Operation: the two classes expose different
+        // revolution types, so the mode list must not change when the operation does.
+        isGroove = rev->isDerivedFrom<PartDesign::Groove>();
         this->propAngle = &(rev->Angle);
         this->propAngle2 = &(rev->Angle2);
         this->propMidPlane = &(rev->Midplane);
@@ -167,6 +171,17 @@ void TaskRevolutionParameters::setupDialog()
     index = int(rev->Type.getValue());
 
     translateModeList(index);
+    translateOperationList(rev->Operation.getValue());
+}
+
+void TaskRevolutionParameters::translateOperationList(int index)
+{
+    ui->operationMode->clear();
+    ui->operationMode->addItem(tr("Join"));
+    ui->operationMode->addItem(tr("Cut"));
+    ui->operationMode->addItem(tr("Intersect"));
+    ui->operationMode->addItem(tr("New body"));
+    ui->operationMode->setCurrentIndex(index);
 }
 
 void TaskRevolutionParameters::translateModeList(int index)
@@ -352,6 +367,8 @@ void TaskRevolutionParameters::connectSignals()
             this, &TaskRevolutionParameters::onUpdateView);
     connect(ui->changeMode, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &TaskRevolutionParameters::onModeChanged);
+    connect(ui->operationMode, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &TaskRevolutionParameters::onOperationChanged);
     connect(ui->buttonFace, &QPushButton::toggled,
             this, &TaskRevolutionParameters::onButtonFace);
     connect(ui->lineFaceName, &QLineEdit::textEdited,
@@ -623,6 +640,14 @@ void TaskRevolutionParameters::onModeChanged(int index)
     setGizmoPositions();
 }
 
+void TaskRevolutionParameters::onOperationChanged(int index)
+{
+    if (auto rev = getObject<PartDesign::Revolved>()) {
+        rev->Operation.setValue(index);
+        recomputeFeature();
+    }
+}
+
 void TaskRevolutionParameters::getReferenceAxis(
     App::DocumentObject*& obj,
     std::vector<std::string>& sub
@@ -676,10 +701,12 @@ void TaskRevolutionParameters::changeEvent(QEvent* event)
 {
     TaskBox::changeEvent(event);
     if (event->type() == QEvent::LanguageChange) {
+        QSignalBlocker operationMode(ui->operationMode);
         ui->retranslateUi(proxy);
 
         // Translate mode items
         translateModeList(ui->changeMode->currentIndex());
+        translateOperationList(ui->operationMode->currentIndex());
     }
 }
 
@@ -694,6 +721,7 @@ void TaskRevolutionParameters::apply()
     std::string axis = buildLinkSingleSubPythonStr(obj, sub);
     auto tobj = getObject();
     FCMD_OBJ_CMD(tobj, "ReferenceAxis = " << axis);
+    FCMD_OBJ_CMD(tobj, "Operation = " << ui->operationMode->currentIndex());
     FCMD_OBJ_CMD(tobj, "Midplane = " << (getMidplane() ? 1 : 0));
     FCMD_OBJ_CMD(tobj, "Reversed = " << (getReversed() ? 1 : 0));
     int mode = ui->changeMode->currentIndex();

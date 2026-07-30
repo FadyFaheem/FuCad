@@ -15,6 +15,24 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayoutOperation">
+     <item>
+      <widget class="QLabel" name="operationLabel">
+       <property name="text">
+        <string>Operation</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="operationMode">
+       <property name="toolTip">
+        <string>How the revolution is combined with the existing solid</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayoutMode">
      <item>
       <widget class="QLabel" name="textLabelMode">

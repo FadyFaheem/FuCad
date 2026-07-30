@@ -77,12 +77,15 @@ protected:
      * The angle of the revolution is given by Angle.
      * If Midplane is true, then the revolution will extend for half of Angle on both sides of the
      * sketch plane. If Reversed is true then the direction of revolution will be reversed. The
-     * created material will be fused with the sketch support (if there is one)
+     * created material is combined with the preceding solid as told by the Operation property.
      */
-    App::DocumentObjectExecReturn* executeRevolved(Part::RevolMode revolMode);
+    App::DocumentObjectExecReturn* executeRevolved();
+
+    /// Fuses the revolution into the base; Revolution overrides it to honour its FuseOrder
+    virtual TopoShape makeFused(const TopoShape& base, const TopoShape& revolve) const;
 
 private:
-    App::DocumentObjectExecReturn* tryExecuteRevolved(Part::RevolMode revolMode);
+    App::DocumentObjectExecReturn* tryExecuteRevolved();
     TopoShape tryGetBaseShape() const;
     TopoShape tryGetSupportShape() const;
     TopoShape tryToRevolveToFace(
@@ -94,12 +97,14 @@ private:
         const TopoShape& sketchshape,
         Part::RevolMode revolMode
     ) const;
-    void setResult(const TopoShape& base, const TopoShape& revolved);
+    void setResult(const TopoShape& base, const TopoShape& revolved, bool combineWithBase);
+
+    /// Applies the boolean selected by the Operation property against the base
+    TopoShape combineShapes(const TopoShape& base, const TopoShape& revolved) const;
 
     /// updates Axis from ReferenceAxis
     void updateAxis();
 
-    virtual TopoShape makeShape(const TopoShape& base, const TopoShape& revolve) const = 0;
     virtual bool suggestReversedAngle(double angle) const = 0;
 
     /**
