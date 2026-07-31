@@ -70,6 +70,13 @@ public:
     bool isPickingActive() const;
     void updateSummary();
 
+    /// The feature is only standing on a region until one is deliberately picked, so the
+    /// first pick replaces it rather than adding to it.
+    void setProfileProvisional(bool value)
+    {
+        provisional = value;
+    }
+
 public Q_SLOTS:
     void setPickingActive(bool active);
 
@@ -85,6 +92,7 @@ private:
     App::DocumentObjectWeakPtrT feature;
     QLabel* summaryLabel;
     QToolButton* pickButton;
+    bool provisional {false};
     bool profileWasVisible {false};
 };
 

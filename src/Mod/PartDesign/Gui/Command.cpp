@@ -25,6 +25,7 @@
 
 #include <BRep_Tool.hxx>
 #include <BRepAdaptor_Surface.hxx>
+#include <BRepCheck_Analyzer.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <QMessageBox>
 #include <TopExp_Explorer.hxx>
@@ -866,16 +867,43 @@ bool importExternalElements(App::PropertyLinkSub& prop, std::vector<App::SubObje
 }
 
 
+/// Whether the sketch taken as a whole can be turned into the face a feature is built on.
+/// Curves that cross each other cannot: the wires are then interleaved rather than nested.
+bool wholeSketchMakesFace(const Part::Part2DObject* sketch)
+{
+    try {
+        Part::TopoShape shape = sketch->Shape.getShape();
+        if (!shape.hasSubShape(TopAbs_WIRE)) {
+            return false;
+        }
+
+        Part::TopoShape face = shape.makeElementFace();
+        if (face.isNull() || !face.hasSubShape(TopAbs_FACE)) {
+            return false;
+        }
+
+        return BRepCheck_Analyzer(face.getShape()).IsValid() == Standard_True;
+    }
+    catch (const Base::Exception&) {
+        return false;
+    }
+    catch (const Standard_Failure&) {
+        return false;
+    }
+}
+
 /**
- * The closed regions bounded by the sketch curves are precomputed as InternalFace1..N.
- * Returns the first region, so a sketch bounding several does not start out extruding
- * all of them at once. The feature dialog opens with region picking active, so the
- * choice can be changed straight away.
+ * The sub-elements a feature should start out being built from.
+ *
+ * Normally that is the whole sketch, so the profile is what was actually picked. A sketch
+ * whose curves cross cannot be faced as a whole, though, and would only produce a broken
+ * feature. The closed regions bounded by those curves are precomputed as InternalFace1..N,
+ * so one of them stands in until the region picker is used to choose a different one.
  */
-std::vector<std::string> firstProfileRegion(App::DocumentObject* profile)
+std::vector<std::string> defaultProfileRegion(App::DocumentObject* profile)
 {
     auto* sketch = freecad_cast<Sketcher::SketchObject*>(profile);
-    if (!sketch) {
+    if (!sketch || wholeSketchMakesFace(sketch)) {
         return {};
     }
 
@@ -928,6 +956,18 @@ void prepareProfileBased(
         if (subs.size() == 0) {
             importExternalElements(ProfileFeature->Profile, {feature});
             cmdSubs = ProfileFeature->Profile.getSubValues();
+        }
+
+        // No sub-elements means the whole sketch, which only works if its curves do not
+        // cross each other. One that cannot be faced as a whole starts on a single region
+        // instead, which the profile picker can then be used to change.
+        if (std::all_of(cmdSubs.begin(), cmdSubs.end(), [](const std::string& sub) {
+                return sub.empty();
+            })) {
+            if (std::vector<std::string> region = defaultProfileRegion(feature);
+                !region.empty()) {
+                cmdSubs = std::move(region);
+            }
         }
         // run the command in console to set the profile (without selected subelements)
         auto runProfileCmd = [=]() {
@@ -1069,24 +1109,7 @@ void prepareProfileBased(
             msgBox.exec();
         }
         else {
-            App::DocumentObject* selected = selection.front().getObject();
-            std::vector<std::string> subs = selection.front().getSubNames();
-
-            // Selecting a sketch in the tree yields no sub-element, which would take
-            // the whole sketch and extrude every one of its regions at once.
-            const bool wholeObject = std::all_of(
-                subs.begin(),
-                subs.end(),
-                [](const std::string& sub) { return sub.empty(); }
-            );
-            if (wholeObject) {
-                if (std::vector<std::string> region = firstProfileRegion(selected);
-                    !region.empty()) {
-                    subs = std::move(region);
-                }
-            }
-
-            base_worker(selected, subs);
+            base_worker(selection.front().getObject(), selection.front().getSubNames());
         }
         return;
     }
@@ -1126,22 +1149,8 @@ void prepareProfileBased(
         return true;
     };
 
-    // The dialog may run this asynchronously, so anything it needs has to be captured by value.
-    auto sketch_worker = [base_worker, pcActiveBody](std::vector<App::DocumentObject*> features) {
-        if (features.empty()) {
-            return;
-        }
-
-        App::DocumentObject* sketch = features.front();
-
-        // A sketch from outside the active body still has to go through importExternalElements(),
-        // which base_worker only runs for an empty sub list.
-        std::vector<std::string> subs;
-        if (PartDesign::Body::findBodyOf(sketch) == pcActiveBody) {
-            subs = firstProfileRegion(sketch);
-        }
-
-        base_worker(sketch, subs);
+    auto sketch_worker = [base_worker](std::vector<App::DocumentObject*> features) {
+        base_worker(features.front(), {});
     };
 
     // if there is a sketch selected which is from another body or part we need to bring up the
@@ -3107,3 +3116,4 @@ void CreatePartDesignCommands()
     rcCmdMgr.addCommand(new CmdPartDesignCompDatums());
     rcCmdMgr.addCommand(new CmdPartDesignCompSketches());
 }
+

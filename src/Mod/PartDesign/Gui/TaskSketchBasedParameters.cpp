@@ -269,8 +269,19 @@ void ProfileSelectionWidget::toggleRegion(const std::string& subName)
         subs.end()
     );
 
-    auto it = std::find(subs.begin(), subs.end(), subName);
-    if (it != subs.end()) {
+    if (provisional) {
+        // What the feature was standing on was never chosen, so it is replaced outright.
+        provisional = false;
+        subs = {subName};
+    }
+    else if (auto it = std::find(subs.begin(), subs.end(), subName); it != subs.end()) {
+        if (subs.size() == 1) {
+            // Dropping the last one leaves no sub-elements at all, which means the whole
+            // sketch. That cannot be faced when the curves cross, so the feature would go
+            // invalid and keep showing whatever it last built. Swapping regions is done by
+            // picking the new one first.
+            return;
+        }
         subs.erase(it);
     }
     else {
@@ -307,15 +318,16 @@ TaskSketchBasedParameters::TaskSketchBasedParameters(
     });
 
     const int regions = ProfileSelectionWidget::countRegions(sketchBased->Profile.getValue());
-    if (regions == 0) {
+    if (regions < 2) {
         profileWidget->hide();
         return;
     }
 
-    // Picking is not turned on by itself even when the sketch bounds several regions.
-    // Doing so has to reveal the sketch so the regions can be clicked, which puts the
-    // unchosen ones on screen next to the extrusion and reads as the feature previewing
-    // all of them. The Select button turns it on when the choice needs changing.
+    // A sketch bounding several regions opens ready to be picked from, since the one the
+    // feature starts on is only a stand-in. The regions themselves are not drawn, so the
+    // ones left unchosen do not clutter the view.
+    profileWidget->setProfileProvisional(true);
+    profileWidget->setPickingActive(true);
 }
 
 const QString TaskSketchBasedParameters::onAddSelection(
