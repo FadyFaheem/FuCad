@@ -1641,6 +1641,7 @@ CmdSketcherGrid::CmdSketcherGrid()
         QT_TR_NOOP("Toggles the grid display in the active sketch");
     sWhatsThis = "Sketcher_Grid";
     sStatusTip = sToolTipText;
+    sPixmap = "Sketcher_Grid";
     eType = 0;
 }
 
@@ -1663,6 +1664,9 @@ Gui::Action* CmdSketcherGrid::createAction()
     pcAction->setDropDownMenu(true);
     pcAction->setExclusive(false);
     applyCommandData(this->className(), pcAction);
+    // applyCommandData leaves the icon alone, and only the createAction this one
+    // replaces would otherwise have set it.
+    pcAction->setIcon(Gui::BitmapFactory().iconFromTheme(sPixmap));
 
     GridSpaceAction* gsa = new GridSpaceAction(pcAction);
     pcAction->addAction(gsa);
@@ -1841,6 +1845,7 @@ CmdSketcherSnap::CmdSketcherSnap()
         QT_TR_NOOP("Toggles snapping");
     sWhatsThis = "Sketcher_Snap";
     sStatusTip = sToolTipText;
+    sPixmap = "Sketcher_Snap";
     eType = 0;
 
     ParameterGrp::handle hGrp = this->getParameterPath();
@@ -1886,6 +1891,9 @@ Gui::Action* CmdSketcherSnap::createAction()
     pcAction->setDropDownMenu(true);
     pcAction->setExclusive(false);
     applyCommandData(this->className(), pcAction);
+    // applyCommandData leaves the icon alone, and only the createAction this one
+    // replaces would otherwise have set it.
+    pcAction->setIcon(Gui::BitmapFactory().iconFromTheme(sPixmap));
 
     SnapSpaceAction* ssa = new SnapSpaceAction(pcAction);
     pcAction->addAction(ssa);
