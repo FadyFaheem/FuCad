@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 
+#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <unordered_set>
@@ -130,7 +131,7 @@ void TimelineWidget::setupUi()
     stepBackButton->setFocusPolicy(Qt::NoFocus);
     stepBackButton->setIconSize(QSize(stepIconExtent, stepIconExtent));
     stepBackButton->setFixedSize(stepButtonExtent, stepButtonExtent);
-    stepBackButton->setToolTip(tr("Roll the model back one feature"));
+    stepBackButton->setToolTip(tr("Step the history back one feature"));
     connect(stepBackButton, &QToolButton::clicked, this, &TimelineWidget::stepBack);
 
     stepForwardButton = new QToolButton(controls);
@@ -140,7 +141,7 @@ void TimelineWidget::setupUi()
     stepForwardButton->setFocusPolicy(Qt::NoFocus);
     stepForwardButton->setIconSize(QSize(stepIconExtent, stepIconExtent));
     stepForwardButton->setFixedSize(stepButtonExtent, stepButtonExtent);
-    stepForwardButton->setToolTip(tr("Roll the model forward one feature"));
+    stepForwardButton->setToolTip(tr("Step the history forward one feature"));
     connect(stepForwardButton, &QToolButton::clicked, this, &TimelineWidget::stepForward);
 
     controlLayout->addWidget(stepBackButton);
@@ -295,6 +296,7 @@ void TimelineWidget::rebuild()
     markers.clear();
     featureNames.clear();
     solidIndices.clear();
+    const std::string previousDocument = documentName;
     documentName.clear();
     bodyName.clear();
     tipIndex = -1;
@@ -310,6 +312,15 @@ void TimelineWidget::rebuild()
     if (appDoc) {
         documentName = appDoc->getName();
         body = activeBody(guiDoc);
+    }
+
+    // Internal names are only unique within a document, so what the strip hid in the
+    // one it is leaving cannot be tracked any further.
+    if (documentName != previousDocument) {
+        rollbackHidden.clear();
+    }
+
+    if (appDoc) {
         if (body) {
             bodyName = body->getNameInDocument();
             collectBodyFeatures(body, features);
@@ -360,32 +371,23 @@ void TimelineWidget::rebuild()
         }
     }
 
-    // Without a body there is no tip to roll to, so nothing is ever behind the
-    // playhead and the playhead itself stays out of the strip.
+    // Outside a body there is no tip to roll to, so the whole strip counts as applied.
     if (!body) {
         tipIndex = static_cast<int>(features.size()) - 1;
     }
 
     const int count = static_cast<int>(markers.size());
 
-    playheadIndex = tipIndex;
+    playheadIndex = defaultPlayhead();
     if (requestedPlayhead >= -1 && requestedPlayhead < count
         && solidAtOrBefore(requestedPlayhead) == tipIndex) {
         playheadIndex = requestedPlayhead;
     }
-    requestedPlayhead = -1;
+    requestedPlayhead = noPlayheadRequest;
 
     for (int i = 0; i < count; ++i) {
-        if (body && i == playheadIndex + 1) {
-            stripLayout->addWidget(playhead);
-            playhead->show();
-        }
         stripLayout->addWidget(markers[i]);
         markers[i]->show();
-    }
-    if (body && playheadIndex + 1 >= count) {
-        stripLayout->addWidget(playhead);
-        playhead->show();
     }
 
     if (count == 0) {
@@ -395,7 +397,26 @@ void TimelineWidget::rebuild()
 
     stripLayout->addStretch(1);
 
+    positionPlayhead();
+    applyRollbackVisibility();
     applyStates();
+}
+
+void TimelineWidget::positionPlayhead()
+{
+    // Without a body there is no tip to roll to, so nothing is ever behind the playhead
+    // and the playhead itself stays out of the strip.
+    if (bodyName.empty()) {
+        stripLayout->removeWidget(playhead);
+        playhead->hide();
+        return;
+    }
+
+    // The markers occupy the first positions of the layout and the stretch trails them, so
+    // the slot in front of the marker after the playhead is the playhead's own.
+    stripLayout->removeWidget(playhead);
+    stripLayout->insertWidget(playheadIndex + 1, playhead);
+    playhead->show();
 }
 
 void TimelineWidget::refreshMarkers()
@@ -418,7 +439,7 @@ void TimelineWidget::applyStates()
         if (selected) {
             marker->setState(TimelineMarker::State::Selected);
         }
-        else if (i > tipIndex) {
+        else if (i > playheadIndex) {
             marker->setState(TimelineMarker::State::RolledBack);
         }
         else {
@@ -429,8 +450,8 @@ void TimelineWidget::applyStates()
     }
 
     const bool hasBody = !bodyName.empty();
-    stepBackButton->setEnabled(hasBody && tipIndex >= 0);
-    stepForwardButton->setEnabled(hasBody && nextSolid(tipIndex) != tipIndex);
+    stepBackButton->setEnabled(hasBody && playheadIndex >= 0);
+    stepForwardButton->setEnabled(hasBody && playheadIndex + 1 < count);
 }
 
 App::Document* TimelineWidget::currentDocument() const
@@ -598,6 +619,47 @@ int TimelineWidget::solidAtOrBefore(int index) const
     return result;
 }
 
+bool TimelineWidget::isSolidIndex(int index) const
+{
+    return std::find(solidIndices.begin(), solidIndices.end(), index) != solidIndices.end();
+}
+
+void TimelineWidget::applyRollbackVisibility()
+{
+    // Outside a body nothing is behind the playhead, so anything held back is let go.
+    const bool rolling = !bodyName.empty();
+
+    const int count = static_cast<int>(featureNames.size());
+    for (int i = 0; i < count; ++i) {
+        const std::string& name = featureNames[static_cast<std::size_t>(i)];
+        App::DocumentObject* obj = resolve(name);
+        if (!obj || !obj->isAttachedToDocument()) {
+            continue;
+        }
+
+        // The tip owns the solids: moving it already shows the one it lands on and
+        // hides the rest, and fighting that here would undo its work.
+        if (isSolidIndex(i)) {
+            continue;
+        }
+
+        if (rolling && i > playheadIndex) {
+            if (obj->Visibility.getValue()) {
+                rollbackHidden.insert(name);
+                obj->Visibility.setValue(false);
+            }
+        }
+        else if (rollbackHidden.erase(name) > 0) {
+            obj->Visibility.setValue(true);
+        }
+    }
+
+    // A feature that has gone from the strip can no longer be put back by it.
+    for (auto it = rollbackHidden.begin(); it != rollbackHidden.end();) {
+        it = indexOfFeature(*it) < 0 ? rollbackHidden.erase(it) : std::next(it);
+    }
+}
+
 bool TimelineWidget::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched != playhead) {
@@ -618,7 +680,7 @@ bool TimelineWidget::eventFilter(QObject* watched, QEvent* event)
                 return false;
             }
             draggingPlayhead = false;
-            rollTo(markerIndexAt(strip->mapFromGlobal(QCursor::pos())));
+            moveTo(markerIndexAt(strip->mapFromGlobal(QCursor::pos())));
             return true;
         }
         default:
@@ -678,7 +740,7 @@ void TimelineWidget::onMarkerMenu(const QString& feature, const QPoint& globalPo
         deleteFeature(name);
     }
     else if (chosen == rollAction) {
-        rollTo(index);
+        moveTo(index);
     }
 }
 
@@ -774,11 +836,37 @@ void TimelineWidget::deleteFeature(const std::string& name)
     app->commandManager().runCommandByName("Std_Delete");
 }
 
-void TimelineWidget::rollTo(int index)
+void TimelineWidget::moveTo(int index)
+{
+    const int count = static_cast<int>(markers.size());
+    index = std::clamp(index, -1, count - 1);
+    if (index == playheadIndex) {
+        return;
+    }
+
+    // Only a solid feature can carry the tip, so a step onto a sketch or a datum lands on
+    // the same model state and the document is left alone; the strip moves either way.
+    const bool tipMoves = solidAtOrBefore(index) != tipIndex;
+
+    // Moved before the roll rather than after it: the roll is answered by a rebuild a
+    // timer tick later, and until then a second click has to see where the first one left
+    // the playhead or it repeats the same step.
+    playheadIndex = index;
+    requestedPlayhead = index;
+    positionPlayhead();
+    applyRollbackVisibility();
+    applyStates();
+
+    if (tipMoves && !rollTo(index)) {
+        scheduleRebuild();
+    }
+}
+
+bool TimelineWidget::rollTo(int index)
 {
     App::DocumentObject* body = currentBody();
     if (!body) {
-        return;
+        return false;
     }
 
     // Only a solid feature can carry the tip, so a sketch or a datum rolls to
@@ -794,71 +882,67 @@ void TimelineWidget::rollTo(int index)
     }
 
     if (!target->isAttachedToDocument()) {
-        return;
+        return false;
     }
 
     Gui::Application* app = Gui::Application::Instance;
     if (!app || !app->commandManager().getCommandByName("PartDesign_MoveTip")) {
         Base::Console().warning("Timeline: PartDesign_MoveTip is not available\n");
-        return;
+        return false;
+    }
+
+    // The command works off the selection, which belongs to the user. Stepping through the
+    // history is not a selection change, so what was selected is put back afterwards.
+    struct Selected
+    {
+        std::string document;
+        std::string object;
+        std::string sub;
+    };
+    std::vector<Selected> restore;
+    for (const auto& sel : Gui::Selection().getCompleteSelection(Gui::ResolveMode::NoResolve)) {
+        restore.push_back({sel.DocName ? sel.DocName : "",
+                           sel.FeatName ? sel.FeatName : "",
+                           sel.SubName ? sel.SubName : ""});
     }
 
     const char* docName = target->getDocument()->getName();
     Gui::Selection().clearSelection();
     if (!Gui::Selection().addSelection(docName, target->getNameInDocument())) {
-        return;
+        return false;
     }
 
     app->commandManager().runCommandByName("PartDesign_MoveTip");
+
+    Gui::Selection().clearSelection();
+    for (const Selected& sel : restore) {
+        Gui::Selection().addSelection(sel.document.c_str(), sel.object.c_str(), sel.sub.c_str());
+    }
+
+    return true;
 }
 
 void TimelineWidget::stepBack()
 {
-    // Step between states the model can actually be in rather than between markers.
-    // Only a solid feature can carry the tip, so landing on a sketch would resolve
-    // back to the same solid and the click would change nothing on screen.
-    const int previous = previousSolid(tipIndex);
-    if (previous == tipIndex) {
-        return;
-    }
-
-    requestedPlayhead = previous;
-    rollTo(previous);
+    moveTo(playheadIndex - 1);
 }
 
 void TimelineWidget::stepForward()
 {
-    const int next = nextSolid(tipIndex);
-    if (next == tipIndex) {
-        return;
-    }
-
-    requestedPlayhead = next;
-    rollTo(next);
+    moveTo(playheadIndex + 1);
 }
 
-int TimelineWidget::previousSolid(int index) const
+int TimelineWidget::defaultPlayhead() const
 {
-    int result = -1;
+    // Everything up to the solid the tip does not yet include is part of the state the
+    // model is in, so a sketch made after the tip does not read as rolled back.
     for (int solid : solidIndices) {
-        if (solid >= index) {
-            break;
-        }
-        result = solid;
-    }
-
-    return result;
-}
-
-int TimelineWidget::nextSolid(int index) const
-{
-    for (int solid : solidIndices) {
-        if (solid > index) {
-            return solid;
+        if (solid > tipIndex) {
+            return solid - 1;
         }
     }
 
-    return index;
+    return static_cast<int>(markers.size()) - 1;
 }
 
 void TimelineWidget::onSelectionChanged(const Gui::SelectionChanges& msg)

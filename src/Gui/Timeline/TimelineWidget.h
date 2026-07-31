@@ -23,6 +23,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include <QList>
@@ -88,6 +89,9 @@ protected:
     void onSelectionChanged(const Gui::SelectionChanges& msg) override;
 
 private:
+    /// Not a playhead position, since -1 is the state before the first feature.
+    static constexpr int noPlayheadRequest = -2;
+
     void setupUi();
     void connectDocumentSignals();
     void trackDocument(Gui::Document* doc);
@@ -118,10 +122,13 @@ private:
     int markerIndexAt(const QPoint& stripPos) const;
     int indexOfFeature(const std::string& name) const;
     int solidAtOrBefore(int index) const;
-    /// The solid feature before \a index, or -1 for the state with nothing applied.
-    int previousSolid(int index) const;
-    /// The solid feature after \a index, or \a index when there is none.
-    int nextSolid(int index) const;
+    bool isSolidIndex(int index) const;
+    /// Hide the sketches and datums the playhead has not reached yet, and put back the
+    /// ones it has. Solids are left to the tip, which already hides what comes after it.
+    void applyRollbackVisibility();
+    /// The rightmost playhead position that still resolves to the current tip, which is
+    /// where the playhead belongs whenever it has not been put somewhere by hand.
+    int defaultPlayhead() const;
 
     void onMarkerSelect(const QString& feature);
     void onMarkerEdit(const QString& feature);
@@ -131,7 +138,9 @@ private:
     void renameFeature(const std::string& name);
     void deleteFeature(const std::string& name);
 
-    void rollTo(int index);
+    void positionPlayhead();
+    void moveTo(int index);
+    bool rollTo(int index);
     void stepBack();
     void stepForward();
 
@@ -150,14 +159,17 @@ private:
     std::string documentName;
     std::string bodyName;
     int tipIndex {-1};
-    /// Where the playhead sits, which the arrows move one marker at a time. Only a
-    /// solid feature can carry the tip, so stepping onto a sketch or datum leaves the
-    /// tip on the solid behind it while the playhead still advances; without this the
-    /// arrows could only jump between solids.
+    /// The last feature the playhead has passed, so -1 is the state before the first one.
+    /// The arrows move it one marker at a time. Only a solid feature can carry the tip, so
+    /// a step onto a sketch or a datum leaves the tip on the solid behind it and changes
+    /// nothing but the strip; without this the arrows could only jump between solids.
     int playheadIndex {-1};
-    /// Survives the rebuild that moving the tip triggers, so a step is not snapped
-    /// back onto the tip.
-    int requestedPlayhead {-1};
+    /// Survives the rebuild that moving the tip triggers, so a step is not snapped back
+    /// onto the tip. noPlayheadRequest when the playhead has not been put anywhere by hand.
+    int requestedPlayhead {noPlayheadRequest};
+    /// Features the rollback hid, by internal name. Stepping forward puts back only what
+    /// is in here, so a sketch the user hid themselves stays hidden.
+    std::unordered_set<std::string> rollbackHidden;
 
     Gui::Document* trackedDocument {nullptr};
     bool pendingRebuild {false};
