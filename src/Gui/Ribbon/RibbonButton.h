@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <QList>
 #include <QString>
 #include <QStringList>
 #include <QToolButton>
@@ -103,6 +104,12 @@ public:
 
 private:
     void applySize(ButtonSize size);
+
+    /**
+     * Whether \a children is a panel of settings widgets rather than a choice between
+     * commands, which decides if a plain click runs the command or opens the menu.
+     */
+    static bool isSettingsMenu(const QList<QAction*>& children);
 
     Q_DISABLE_COPY(RibbonButton)
 };

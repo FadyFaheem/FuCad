@@ -20,12 +20,15 @@
  ***************************************************************************/
 
 
+#include <algorithm>
+
 #include <QAction>
 #include <QList>
 #include <QMenu>
 #include <QSize>
 #include <QSizePolicy>
 #include <QStringList>
+#include <QWidgetAction>
 
 #include <Base/Console.h>
 #include <Base/Exception.h>
@@ -203,15 +206,32 @@ bool RibbonButton::setCommand(
         menu->addActions(children);
         followGroupMenu(group, menu);
         setMenu(menu);
-        setPopupMode(QToolButton::MenuButtonPopup);
 
-        // The drop-down arrow is carved out of the button, so the icon keeps its
-        // size only if the button grows by that much.
-        setMinimumWidth(minimumWidth() + menuIndicatorWidth);
-        setMaximumWidth(maximumWidth() + menuIndicatorWidth);
+        if (isSettingsMenu(children)) {
+            // Nothing in the menu is a command, so a plain click has nothing better to
+            // do than open it and the user is spared aiming at the arrow.
+            setPopupMode(QToolButton::InstantPopup);
+        }
+        else {
+            setPopupMode(QToolButton::MenuButtonPopup);
+
+            // The drop-down arrow is carved out of the button, so the icon keeps its
+            // size only if the button grows by that much.
+            setMinimumWidth(minimumWidth() + menuIndicatorWidth);
+            setMaximumWidth(maximumWidth() + menuIndicatorWidth);
+        }
     }
 
     return true;
+}
+
+bool RibbonButton::isSettingsMenu(const QList<QAction*>& children)
+{
+    // Grid, Snap and the like hang a panel of checkboxes and spin boxes off the button
+    // instead of a list of alternative commands to pick between.
+    return std::all_of(children.cbegin(), children.cend(), [](const QAction* action) {
+        return qobject_cast<const QWidgetAction*>(action) != nullptr;
+    });
 }
 
 void RibbonButton::applySize(ButtonSize size)

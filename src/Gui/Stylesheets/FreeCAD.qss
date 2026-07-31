@@ -2895,6 +2895,22 @@ QToolButton#RibbonButton::menu-arrow:open {
   image: url(qss:@IconsLocationFolderName/arrow-down-@StylesheetIconsColor.svg);
 }
 
+/* Buttons that only open a settings panel, as in the sketch Grid and Snap. The
+   whole button opens it, so the arrow tucks into the corner as a hint rather
+   than taking a slice of the button for itself. */
+QToolButton#RibbonButton::menu-indicator {
+  image: url(qss:@IconsLocationFolderName/arrow-down-lightgray.svg);
+  height: 8px;
+  width: 8px;
+  subcontrol-origin: padding;
+  subcontrol-position: bottom right;
+}
+
+QToolButton#RibbonButton::menu-indicator:hover,
+QToolButton#RibbonButton::menu-indicator:open {
+  image: url(qss:@IconsLocationFolderName/arrow-down-@StylesheetIconsColor.svg);
+}
+
 /* Contextual tab, as in the SKETCH tab that entering a sketch pushes. The bar
    sets the contextTab property while a context tab is on the strip, and a
    context tab is always the trailing one. */
