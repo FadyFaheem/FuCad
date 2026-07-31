@@ -231,8 +231,10 @@ void ViewProviderSketch::ParameterObserver::updateEscapeKeyBehaviour(const std::
 
     ParameterGrp::handle hSketch = App::GetApplication().GetParameterGroupByPath(
         "User parameter:BaseApp/Preferences/Mod/Sketcher");
+    // Off by default: Escape cancels the running tool, and a second one should do nothing
+    // rather than throw away the whole editing session. Leaving is the Close button's job.
     Client.viewProviderParameters.handleEscapeButton =
-        !hSketch->GetBool("LeaveSketchWithEscape", true);
+        !hSketch->GetBool("LeaveSketchWithEscape", false);
 }
 
 void ViewProviderSketch::ParameterObserver::updateAutoRecompute(const std::string& string,

@@ -54,7 +54,9 @@ TaskDlgEditSketch::TaskDlgEditSketch(ViewProviderSketch* sketchView)
     ParameterGrp::handle hGrp = App::GetApplication().GetParameterGroupByPath(
         "User parameter:BaseApp/Preferences/Mod/Sketcher"
     );
-    setEscapeButtonEnabled(hGrp->GetBool("LeaveSketchWithEscape", true));
+    // Escape reaching the task panel would reject the dialog and end the editing session,
+    // which is the one way out that has to stay behind a deliberate click on Close.
+    setEscapeButtonEnabled(hGrp->GetBool("LeaveSketchWithEscape", false));
     setAutoCloseOnResetEdit(true);
 
     Content.push_back(Messages);
