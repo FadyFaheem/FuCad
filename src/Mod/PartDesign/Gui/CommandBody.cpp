@@ -723,6 +723,15 @@ void CmdPartDesignMoveTip::activated(int iMsg)
 
     if (selFeature == body) {
         FCMD_OBJ_CMD(body, "Tip = None");
+
+        // A body with no tip builds nothing, so the solid that was on screen has to be taken
+        // off it by hand. Showing a feature is what normally hides the rest, and there is no
+        // feature left to show.
+        for (App::DocumentObject* feature : body->Group.getValues()) {
+            if (PartDesign::Body::isSolidFeature(feature) && feature->Visibility.getValue()) {
+                FCMD_OBJ_HIDE(feature);
+            }
+        }
     }
     else {
         FCMD_OBJ_CMD(body, "Tip = " << getObjectCmd(selFeature));
@@ -734,6 +743,7 @@ void CmdPartDesignMoveTip::activated(int iMsg)
     // TODO: Hide all datum features after the Tip feature? But the user might have already hidden
     // some and wants to see others, so we would have to remember their state somehow
     updateActive();
+    commitCommand();
 }
 
 bool CmdPartDesignMoveTip::isActive()

@@ -157,9 +157,24 @@ App::DocumentObject* Body::getNextSolidFeature(App::DocumentObject* start)
     return nullptr;
 }
 
+App::DocumentObject* Body::getInsertPoint()
+{
+    if (Tip.getValue()) {
+        return getNextSolidFeature();
+    }
+
+    // No Tip is the history rolled back in front of the first solid feature rather than a
+    // body with nothing in it. What gets built now belongs there, not on the end of the
+    // list, where it would silently stack onto the features it is meant to come before.
+    const std::vector<App::DocumentObject*>& features = Group.getValues();
+    auto it = std::find_if(features.begin(), features.end(), isSolidFeature);
+
+    return it != features.end() ? *it : nullptr;
+}
+
 bool Body::isAfterInsertPoint(App::DocumentObject* feature)
 {
-    App::DocumentObject* nextSolid = getNextSolidFeature();
+    App::DocumentObject* nextSolid = getInsertPoint();
     assert(feature);
 
     if (feature == nextSolid) {
@@ -242,7 +257,7 @@ std::vector<App::DocumentObject*> Body::addObject(App::DocumentObject* feature)
     }
 
 
-    insertObject(feature, getNextSolidFeature(), /*after = */ false);
+    insertObject(feature, getInsertPoint(), /*after = */ false);
     // Move the Tip if we added a solid
     if (isSolidFeature(feature)) {
         Tip.setValue(feature);

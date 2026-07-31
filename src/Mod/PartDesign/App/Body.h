@@ -145,6 +145,12 @@ public:
      */
     App::DocumentObject* getNextSolidFeature(App::DocumentObject* start = nullptr);
 
+    /**
+     * Return the feature that a newly added one is placed in front of, which is the first
+     * solid feature the Tip does not already include. Null means the end of the history.
+     */
+    App::DocumentObject* getInsertPoint();
+
     // a body is solid if it has features that are solid according to member isSolidFeature.
     bool isSolid();
 
