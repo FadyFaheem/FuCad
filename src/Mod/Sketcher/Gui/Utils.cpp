@@ -214,6 +214,47 @@ bool SketcherGui::ReleaseHandler(Gui::Document* doc)
     return false;
 }
 
+void SketcherGui::autoProjectSupportEdges(App::DocumentObject* sketchObject)
+{
+    auto* sketch = freecad_cast<Sketcher::SketchObject*>(sketchObject);
+    if (!sketch) {
+        return;
+    }
+
+    ParameterGrp::handle hGrp = App::GetApplication().GetParameterGroupByPath(
+        "User parameter:BaseApp/Preferences/Mod/Sketcher/General"
+    );
+    if (!hGrp->GetBool("AutoProjectSupportEdges", true)) {
+        return;
+    }
+
+    const std::vector<App::DocumentObject*>& supports = sketch->AttachmentSupport.getValues();
+    const std::vector<std::string>& subs = sketch->AttachmentSupport.getSubValues();
+    if (supports.size() != 1 || subs.size() != 1 || !supports.front()) {
+        return;
+    }
+
+    App::DocumentObject* support = supports.front();
+    const std::string& sub = subs.front();
+
+    // Only a face brings edges along. A datum or origin plane has none, and the Python
+    // call below resolves the support by name, which only works within one document.
+    if (sub.rfind("Face", 0) != 0 || support->getDocument() != sketch->getDocument()) {
+        return;
+    }
+
+    // Reference rather than defining: these edges are here to be measured and
+    // constrained against, not to become part of the profile the sketch draws.
+    // Issued as a command so that a recorded macro reproduces the projection, and so
+    // that a face the sketch cannot borrow from is reported rather than thrown.
+    Gui::cmdAppObjectArgs(
+        sketch,
+        "addExternal('%s', '%s', False, False)",
+        support->getNameInDocument(),
+        sub
+    );
+}
+
 void SketcherGui::getIdsFromName(
     const std::string& name,
     const Sketcher::SketchObject* Obj,

@@ -46,6 +46,7 @@
 #include <Mod/Part/App/Attacher.h>
 #include <Mod/Part/App/Part2DObject.h>
 #include <Mod/Part/App/TopoShape.h>
+#include <Mod/Sketcher/Gui/Utils.h>
 #include <Mod/Sketcher/Gui/ViewProviderSketch.h>
 
 #include <App/Document.h>
@@ -281,6 +282,9 @@ public:
             );
         }
         Gui::Command::updateActive();
+        // After the recompute, so that the sketch is on its plane before its face is
+        // projected onto it.
+        SketcherGui::autoProjectSupportEdges(Feat);
         PartDesignGui::setEdit(Feat, activeBody);
     }
 
@@ -628,6 +632,7 @@ private:
 
             Gui::Selection().clearSelection();
 
+            SketcherGui::autoProjectSupportEdges(sketch);
             PartDesignGui::setEdit(sketch, partDesignBody);
         };
         auto onReject = [partDesignBody]() {

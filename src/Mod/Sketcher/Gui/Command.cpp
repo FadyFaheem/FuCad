@@ -261,6 +261,9 @@ void CmdSketcherNewSketch::activated(int iMsg)
             Gui, "App.activeDocument().%s.AttachmentSupport = %s", FeatName.c_str(), supportString.c_str());
         doCommand(Gui, "App.activeDocument().recompute()");// recompute the sketch placement based
                                                            // on its support
+        // After the recompute, so that the sketch is on its plane before its face is
+        // projected onto it.
+        SketcherGui::autoProjectSupportEdges(getDocument()->getObject(FeatName.c_str()));
         doCommand(Gui, "Gui.activeDocument().setEdit('%s')", FeatName.c_str());
 
         Part::Feature* part = static_cast<Part::Feature*>(

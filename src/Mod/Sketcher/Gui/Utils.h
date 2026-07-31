@@ -104,6 +104,18 @@ void closeAndRecompute(int& tid, bool abort, Sketcher::SketchObject* Obj);
 /// Returns true if a handler was released, and false if not
 bool ReleaseHandler(Gui::Document* doc);
 
+/**
+ * Projects the edges of the face \a sketch is attached to into it as reference
+ * geometry, so that they can be snapped to and constrained against without the user
+ * having to project them one by one. This is Fusion's auto project on reference, and
+ * it is governed by the AutoProjectSupportEdges preference.
+ *
+ * Does nothing when the sketch hangs off anything other than a single face, since a
+ * datum or origin plane has no edges to offer. Exported so that the PartDesign sketch
+ * workflow, which is where most sketches on a face are born, can call it too.
+ */
+SketcherGuiExport void autoProjectSupportEdges(App::DocumentObject* sketch);
+
 std::string getStrippedPythonExceptionString(const Base::Exception&);
 
 void getIdsFromName(
