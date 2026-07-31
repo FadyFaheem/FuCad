@@ -178,6 +178,17 @@ public:
                                              const char* subname = nullptr) const;
     virtual bool getCameraAlignmentDirection(Base::Vector3d& directionZ,
                                              const std::vector<std::string>& subnames) const;
+
+    /**
+     * @brief Global position at the middle of a sub-element, e.g. the centre of a face
+     *
+     * Pairs with getCameraAlignmentDirection to describe where a sub-element sits as
+     * well as how it is oriented. Sub-element geometry is unknown at this level, so
+     * the base class only answers for the object as a whole.
+     *
+     * @return bool whether or not a position was found.
+     */
+    virtual bool getElementCenter(Base::Vector3d& center, const char* subname = nullptr) const;
     /** Search sub element using internal cached geometry
      *
      * @param element: element name

@@ -27,8 +27,10 @@
 
 class SoCoordinate3;
 class SoDrawStyle;
+class SoSeparator;
 class SoShapeHints;
 class SoTexture2;
+class SoTextureCoordinate2;
 class QImage;
 
 namespace Gui
@@ -52,7 +54,16 @@ public:
     bool doubleClicked() override;
     void onChanged(const App::Property* prop) override;
 
-private:
+    /// Size the image would have at its own resolution, in millimetres
+    QSizeF naturalSize() const;
+
+protected:
+    /**
+     * Hook for subclasses to prepend render state nodes to each display mode.
+     * Called once per display mask separator while building the scene graph.
+     */
+    virtual void addRenderStateNodes(SoSeparator* root);
+
     void resizePlane(float xsize, float ysize);
     void loadImage();
     void setPlaneSize(const QSizeF& size, const QImage& img);
@@ -67,10 +78,13 @@ private:
     void convertToSFImage(const QImage& img);
     void manipulateImage();
 
-private:
+protected:
     SoCoordinate3* pcCoords;
     SoTexture2* texture;
+    SoTextureCoordinate2* textureCoords;
     SoShapeHints* shapeHints;
+
+private:
     static const char* LightingEnums[];
 };
 

@@ -204,6 +204,8 @@ public:
         const std::vector<std::string>& subnames
     ) const override;
 
+    bool getElementCenter(Base::Vector3d& center, const char* subname) const override;
+
     static void guessNewLink(std::string& replacementName, DocumentObject* base, const char* oldLink);
 
     const std::vector<std::string>& searchElementCache(

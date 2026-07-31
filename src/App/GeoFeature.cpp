@@ -240,6 +240,16 @@ bool GeoFeature::getCameraAlignmentDirection(Base::Vector3d& directionZ,
     return true;
 }
 
+bool GeoFeature::getElementCenter(Base::Vector3d& center, const char* subname) const
+{
+    if (subname && *subname) {
+        return false;
+    }
+
+    center = globalPlacement().getPosition();
+    return true;
+}
+
 bool GeoFeature::hasMissingElement(const char* subname)
 {
     return Data::hasMissingElement(subname);

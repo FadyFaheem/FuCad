@@ -1903,6 +1903,21 @@ bool Feature::getCameraAlignmentDirection(
     return GeoFeature::getCameraAlignmentDirection(directionZ, directionX, subname);
 }
 
+bool Feature::getElementCenter(Base::Vector3d& center, const char* subname) const
+{
+    const auto topoShape = getTopoShape(
+        this,
+        ShapeOptions(ShapeOption::NeedSubElement | ShapeOption::ResolveLink | ShapeOption::Transform),
+        subname
+    );
+
+    if (topoShape.isNull()) {
+        return GeoFeature::getElementCenter(center, subname);
+    }
+
+    return topoShape.getCenterOfGravity(center);
+}
+
 bool Feature::getCameraAlignmentDirection(
     Base::Vector3d& directionZ,
     const std::vector<std::string>& subnames

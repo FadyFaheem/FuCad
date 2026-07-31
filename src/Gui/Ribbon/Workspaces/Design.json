@@ -193,9 +193,12 @@
                 {
                     "caption": "INSERT",
                     "items": [
+                        { "command": "Std_InsertCanvas", "label": "Canvas" },
                         { "command": "Std_Import", "label": "Insert" }
                     ],
                     "menu": [
+                        { "command": "Std_InsertCanvas", "label": "Canvas" },
+                        { "command": "Std_CalibrateCanvas", "label": "Calibrate Canvas" },
                         { "command": "Std_Import", "label": "Insert" },
                         { "command": "Part_Import", "label": "Insert CAD File" },
                         { "command": "Std_LinkMake", "label": "Insert Derive" },
@@ -562,9 +565,12 @@
                 {
                     "caption": "INSERT",
                     "items": [
+                        { "command": "Std_InsertCanvas", "label": "Canvas" },
                         { "command": "Std_Import", "label": "Insert" }
                     ],
                     "menu": [
+                        { "command": "Std_InsertCanvas", "label": "Canvas" },
+                        { "command": "Std_CalibrateCanvas", "label": "Calibrate Canvas" },
                         { "command": "Std_Import", "label": "Insert" },
                         { "command": "Part_Import", "label": "Insert CAD File" },
                         { "command": "Std_LinkMake", "label": "Insert Derive" },

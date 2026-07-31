@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Gui::TaskCanvas</class>
+ <widget class="QWidget" name="Gui::TaskCanvas">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>320</width>
+    <height>520</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Canvas</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelImage">
+     <property name="text">
+      <string>Image</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="buttonSelectImage">
+     <property name="toolTip">
+      <string>Choose the image file to lay on the face</string>
+     </property>
+     <property name="text">
+      <string>Select Image</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="labelImageFile">
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelFace">
+     <property name="text">
+      <string>Face</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="buttonSelectFace">
+     <property name="toolTip">
+      <string>Pick a planar face or a datum plane in the 3D view</string>
+     </property>
+     <property name="text">
+      <string>Select</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QLabel" name="labelFaceRef">
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="labelOpacity">
+     <property name="text">
+      <string>Opacity</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <layout class="QHBoxLayout" name="opacityLayout">
+     <item>
+      <widget class="QSlider" name="sliderOpacity">
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>100</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="spinBoxOpacity">
+       <property name="suffix">
+        <string notr="true">%</string>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QCheckBox" name="checkBoxDisplayThrough">
+     <property name="toolTip">
+      <string>Keep the canvas visible even where the model would hide it</string>
+     </property>
+     <property name="text">
+      <string>Display Through</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <widget class="QCheckBox" name="checkBoxSelectable">
+     <property name="toolTip">
+      <string>Allow the canvas to be picked in the 3D view</string>
+     </property>
+     <property name="text">
+      <string>Selectable</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="labelXDistance">
+     <property name="text">
+      <string>X Distance</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="Gui::QuantitySpinBox" name="spinBoxXDistance">
+     <property name="unit" stdset="0">
+      <string notr="true">mm</string>
+     </property>
+     <property name="minimum" stdset="0">
+      <double>-999999999.000000000000000</double>
+     </property>
+     <property name="maximum" stdset="0">
+      <double>999999999.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="labelYDistance">
+     <property name="text">
+      <string>Y Distance</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="Gui::QuantitySpinBox" name="spinBoxYDistance">
+     <property name="unit" stdset="0">
+      <string notr="true">mm</string>
+     </property>
+     <property name="minimum" stdset="0">
+      <double>-999999999.000000000000000</double>
+     </property>
+     <property name="maximum" stdset="0">
+      <double>999999999.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="labelZAngle">
+     <property name="text">
+      <string>Z Angle</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="Gui::QuantitySpinBox" name="spinBoxZAngle">
+     <property name="unit" stdset="0">
+      <string notr="true">deg</string>
+     </property>
+     <property name="minimum" stdset="0">
+      <double>-360.000000000000000</double>
+     </property>
+     <property name="maximum" stdset="0">
+      <double>360.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="labelOffset">
+     <property name="text">
+      <string>Offset</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="Gui::QuantitySpinBox" name="spinBoxOffset">
+     <property name="toolTip">
+      <string>Lift the canvas off the face along its normal</string>
+     </property>
+     <property name="unit" stdset="0">
+      <string notr="true">mm</string>
+     </property>
+     <property name="minimum" stdset="0">
+      <double>-999999999.000000000000000</double>
+     </property>
+     <property name="maximum" stdset="0">
+      <double>999999999.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="labelScaleX">
+     <property name="text">
+      <string>Scale X</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <widget class="QDoubleSpinBox" name="spinBoxScaleX">
+     <property name="decimals">
+      <number>4</number>
+     </property>
+     <property name="minimum">
+      <double>0.000100000000000</double>
+     </property>
+     <property name="maximum">
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="labelScaleY">
+     <property name="text">
+      <string>Scale Y</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="QDoubleSpinBox" name="spinBoxScaleY">
+     <property name="decimals">
+      <number>4</number>
+     </property>
+     <property name="minimum">
+      <double>0.000100000000000</double>
+     </property>
+     <property name="maximum">
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0" colspan="2">
+    <widget class="QCheckBox" name="checkBoxScalePlanar">
+     <property name="toolTip">
+      <string>Keep the X and Y scale equal</string>
+     </property>
+     <property name="text">
+      <string>Scale Planar</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0" colspan="2">
+    <widget class="QCheckBox" name="checkBoxFlipHorizontal">
+     <property name="text">
+      <string>Horizontal Flip</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="0" colspan="2">
+    <widget class="QCheckBox" name="checkBoxFlipVertical">
+     <property name="text">
+      <string>Vertical Flip</string>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="0" colspan="2">
+    <widget class="QPushButton" name="pushButtonCalibrate">
+     <property name="toolTip">
+      <string>Scale the canvas by picking two points on it and entering the real distance between them</string>
+     </property>
+     <property name="text">
+      <string>Calibrate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="17" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBoxCalibration">
+     <property name="title">
+      <string>Calibration</string>
+     </property>
+     <layout class="QVBoxLayout" name="calibrationLayout">
+      <item>
+       <widget class="QCheckBox" name="checkBoxOrient">
+        <property name="toolTip">
+         <string>Rotate the canvas to align the drawn line to the nearest 45 degree angle</string>
+        </property>
+        <property name="text">
+         <string>Snap rotation to line</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBoxCenterMidpoint">
+        <property name="toolTip">
+         <string>Center the canvas on the midpoint of the drawn line</string>
+        </property>
+        <property name="text">
+         <string>Center on midpoint</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="calibrationButtonLayout">
+        <item>
+         <widget class="QPushButton" name="pushButtonApply">
+          <property name="text">
+           <string>Apply</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonCancel">
+          <property name="text">
+           <string>Cancel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Gui::QuantitySpinBox</class>
+   <extends>QWidget</extends>
+   <header>Gui/QuantitySpinBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

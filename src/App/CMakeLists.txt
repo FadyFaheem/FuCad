@@ -188,6 +188,7 @@ SET(Document_CPP_SRCS
     GeoFeatureGroupExtensionPyImp.cpp
     GeoFeatureGroupExtension.cpp
     ImagePlane.cpp
+    Canvas.cpp
     OriginGroupExtensionPyImp.cpp
     OriginGroupExtension.cpp
     SuppressibleExtensionPyImp.cpp
@@ -241,6 +242,7 @@ SET(Document_HPP_SRCS
     GeoFeature.h
     GeoFeatureGroupExtension.h
     ImagePlane.h
+    Canvas.h
     OriginGroupExtension.h
     SuppressibleExtension.h
     Part.h

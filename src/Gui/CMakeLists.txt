@@ -480,6 +480,7 @@ SET(Command_CPP_SRCS
     CommandView.cpp
     CommandStructure.cpp
     CommandLink.cpp
+    CommandCanvas.cpp
     CommandPyImp.cpp
     ShortcutManager.cpp
     CommandCompleter.cpp
@@ -848,6 +849,9 @@ SET(Task_View_SRCS
     TaskView/TaskImage.cpp
     TaskView/TaskImage.h
     TaskView/TaskImage.ui
+    TaskView/TaskCanvas.cpp
+    TaskView/TaskCanvas.h
+    TaskView/TaskCanvas.ui
     TaskView/TaskSelectLinkProperty.cpp
     TaskView/TaskSelectLinkProperty.h
     TaskView/TaskSelectLinkProperty.ui
@@ -1011,6 +1015,7 @@ SET(Viewprovider_CPP_SRCS
     ViewProviderFeature.cpp
     ViewProviderGeometryObject.cpp
     ViewProviderImagePlane.cpp
+    ViewProviderCanvas.cpp
     ViewProviderInventorObject.cpp
     ViewProviderPyImp.cpp
     ViewProviderFeaturePython.cpp
@@ -1050,6 +1055,7 @@ SET(Viewprovider_SRCS
     ViewProviderFeature.h
     ViewProviderGeometryObject.h
     ViewProviderImagePlane.h
+    ViewProviderCanvas.h
     ViewProviderInventorObject.h
     ViewProviderFeaturePython.h
     ViewProviderVRMLObject.h
@@ -1495,6 +1501,7 @@ if(MSVC)
         TaskView/TaskAppearance.cpp
         TaskView/TaskOrientation.cpp
         TaskView/TaskImage.cpp
+        TaskView/TaskCanvas.cpp
         TaskView/TaskSelectLinkProperty.cpp
         TaskView/TaskSolverMessages.ui
         TaskView/TaskEditControl.cpp

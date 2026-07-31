@@ -125,6 +125,7 @@
 #include "ViewProviderGeometryObjectPy.h"
 #include "ViewProviderGroupExtension.h"
 #include "ViewProviderSuppressibleExtension.h"
+#include "ViewProviderCanvas.h"
 #include "ViewProviderImagePlane.h"
 #include "ViewProviderInventorObject.h"
 #include "ViewProviderLine.h"
@@ -1038,6 +1039,7 @@ void Application::createStandardOperations()
     Gui::CreateStructureCommands();
     Gui::CreateTestCommands();
     Gui::CreateLinkCommands();
+    Gui::CreateCanvasCommands();
 }
 
 void Application::slotNewDocument(const App::Document& Doc, bool isMainDoc)
@@ -2463,6 +2465,7 @@ void Application::initTypes()
     Gui::ViewProviderDragger                    ::init();
     Gui::ViewProviderGeometryObject             ::init();
     Gui::ViewProviderImagePlane                 ::init();
+    Gui::ViewProviderCanvas                     ::init();
     Gui::ViewProviderInventorObject             ::init();
     Gui::ViewProviderVRMLObject                 ::init();
     Gui::ViewProviderAnnotation                 ::init();

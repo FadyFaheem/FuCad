@@ -129,6 +129,7 @@
 #include "FeaturePython.h"
 #include "GeoFeature.h"
 #include "GeoFeatureGroupExtension.h"
+#include "Canvas.h"
 #include "ImagePlane.h"
 #include "InventorObject.h"
 #include "Link.h"
@@ -2317,6 +2318,7 @@ void Application::initTypes()
     App::DocumentObjectGroupPython ::init();
     App::DocumentObjectFileIncluded::init();
     Image::ImagePlane              ::init();
+    Image::Canvas                  ::init();
     App::InventorObject            ::init();
     App::VRMLObject                ::init();
     App::Annotation                ::init();

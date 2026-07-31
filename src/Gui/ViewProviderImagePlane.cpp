@@ -66,6 +66,9 @@ ViewProviderImagePlane::ViewProviderImagePlane()
     pcCoords = new SoCoordinate3();
     pcCoords->ref();
 
+    textureCoords = new SoTextureCoordinate2;
+    textureCoords->ref();
+
     shapeHints = new SoShapeHints;
     shapeHints->shapeType = SoShapeHints::UNKNOWN_SHAPE_TYPE;
     shapeHints->vertexOrdering = SoShapeHints::COUNTERCLOCKWISE;
@@ -79,9 +82,13 @@ ViewProviderImagePlane::ViewProviderImagePlane()
 ViewProviderImagePlane::~ViewProviderImagePlane()
 {
     pcCoords->unref();
+    textureCoords->unref();
     texture->unref();
     shapeHints->unref();
 }
+
+void ViewProviderImagePlane::addRenderStateNodes(SoSeparator* /*root*/)
+{}
 
 void ViewProviderImagePlane::attach(App::DocumentObject* pcObj)
 {
@@ -91,14 +98,14 @@ void ViewProviderImagePlane::attach(App::DocumentObject* pcObj)
     // problems using the image as a construction plane with the
     // draft commands
     SoSeparator* shading = new SoSeparator;
+    addRenderStateNodes(shading);
     shading->addChild(pcCoords);
 
-    SoTextureCoordinate2* textCoord = new SoTextureCoordinate2;
-    textCoord->point.set1Value(0, 0, 0);
-    textCoord->point.set1Value(1, 1, 0);
-    textCoord->point.set1Value(2, 1, 1);
-    textCoord->point.set1Value(3, 0, 1);
-    shading->addChild(textCoord);
+    textureCoords->point.set1Value(0, 0, 0);
+    textureCoords->point.set1Value(1, 1, 0);
+    textureCoords->point.set1Value(2, 1, 1);
+    textureCoords->point.set1Value(3, 0, 1);
+    shading->addChild(textureCoords);
 
     // texture
     texture->model = SoTexture2::MODULATE;
@@ -122,8 +129,9 @@ void ViewProviderImagePlane::attach(App::DocumentObject* pcObj)
     lightmodel->model = SoLightModel::BASE_COLOR;
 
     SoSeparator* noshading = new SoSeparator;
+    addRenderStateNodes(noshading);
     noshading->addChild(pcCoords);
-    noshading->addChild(textCoord);
+    noshading->addChild(textureCoords);
     noshading->addChild(texture);
     noshading->addChild(shapeHints);
     noshading->addChild(pcShapeMaterial);
@@ -278,6 +286,22 @@ QSizeF ViewProviderImagePlane::defaultSizeOfSvg(const char* filename) const
     QSvgRenderer svg;
     svg.load(QString::fromUtf8(filename));
     return svg.defaultSize();
+}
+
+QSizeF ViewProviderImagePlane::naturalSize() const
+{
+    auto* imagePlane = static_cast<Image::ImagePlane*>(pcObject);
+    std::string fileName = imagePlane->ImageFile.getValue();
+
+    if (fileName.empty()) {
+        return {};
+    }
+
+    if (isSvgFile(fileName.c_str())) {
+        return defaultSizeOfSvg(fileName.c_str());
+    }
+
+    return getSizeInMM(loadRaster(fileName.c_str()));
 }
 
 QSizeF ViewProviderImagePlane::getSizeInMM(const QImage& img) const
