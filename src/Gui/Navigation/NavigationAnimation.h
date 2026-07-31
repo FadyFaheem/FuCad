@@ -26,6 +26,7 @@
 #include "Navigation/NavigationStyle.h"
 #include <Inventor/SbRotation.h>
 #include <Inventor/SbVec3f.h>
+#include <Inventor/SoType.h>
 #include <QVariantAnimation>
 
 namespace Gui
@@ -81,6 +82,51 @@ private:
 
     SbVec3f rotationCenter;
     SbVec3f rotationAxis;
+
+    void initialize() override;
+    void update(const QVariant& value) override;
+    void onStop(bool finished) override;
+};
+
+/**
+ * A complete camera pose. An orientation and a position alone do not describe what the
+ * viewer shows, because the zoom lives in a field whose name and meaning depend on the
+ * projection, so it is read and written here rather than at every call site.
+ */
+struct GuiExport CameraPose
+{
+    SbVec3f position {0.0F, 0.0F, 0.0F};
+    SbRotation orientation;
+    float focalDistance {1.0F};
+    /// Orthographic height or perspective height angle, whichever the camera carries.
+    float height {1.0F};
+    /// The projection the pose was taken from. A pose does not carry over to another one.
+    SoType type;
+
+    static CameraPose capture(const SoCamera* camera);
+    void apply(SoCamera* camera) const;
+};
+
+/**
+ * Carries the camera from wherever it is to a given pose, zoom included.
+ *
+ * FixedTimeAnimation cannot do this: it turns the camera through a fixed angle about a
+ * fixed centre and never touches the zoom, so it cannot land on a framing that was worked
+ * out somewhere else, which is what entering and leaving a sketch needs.
+ */
+class GuiExport CameraAnimation: public NavigationAnimation
+{
+public:
+    explicit CameraAnimation(
+        NavigationStyle* navigation,
+        const CameraPose& target,
+        int duration,
+        QEasingCurve::Type easingCurve
+    );
+
+private:
+    CameraPose start;
+    CameraPose target;
 
     void initialize() override;
     void update(const QVariant& value) override;

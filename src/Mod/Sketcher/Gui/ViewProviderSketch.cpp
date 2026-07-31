@@ -72,6 +72,7 @@
 #include <Gui/Selection/SelectionObject.h>
 #include <Gui/Selection/SoFCUnifiedSelection.h>
 // #include <Gui/Inventor/SoFCSwitch.h>
+#include <Gui/Navigation/NavigationAnimation.h>
 #include <Gui/Utilities.h>
 #include <Gui/View3DInventor.h>
 #include <Gui/View3DInventorViewer.h>
@@ -4607,6 +4608,17 @@ void ViewProviderSketch::unsetEdit(int ModNum)
 
     unsetupActiveAndInEdit();
 
+    // The visibility automation below puts the camera the sketch was entered from back in
+    // one jump. Where it lands is only known once it has, so the pose the view is leaving
+    // is kept here and the jump is replayed as a move afterwards.
+    auto* editView = dynamic_cast<Gui::View3DInventor*>(getDocument()->getActiveView());
+    Gui::View3DInventorViewer* viewer = editView ? editView->getViewer() : nullptr;
+    const bool animate = viewer && viewer->isAnimationEnabled();
+    Gui::CameraPose from;
+    if (animate) {
+        from = Gui::CameraPose::capture(viewer->getSoRenderManager()->getCamera());
+    }
+
     // visibility automation
     try {
         QString cmdstr =
@@ -4627,6 +4639,19 @@ void ViewProviderSketch::unsetEdit(int ModNum)
             "ViewProviderSketch",
             "unsetEdit: visibility automation failed with an error: %s \n",
             e.what());
+    }
+
+    if (animate) {
+        // Restoring the camera may have swapped the projection, and a pose taken from one
+        // projection does not describe the other, so that case is left as the jump it is.
+        SoCamera* camera = viewer->getSoRenderManager()->getCamera();
+        if (camera) {
+            const Gui::CameraPose to = Gui::CameraPose::capture(camera);
+            if (to.type == from.type) {
+                from.apply(camera);
+                viewer->animateCamera(to);
+            }
+        }
     }
 }
 
@@ -4691,7 +4716,15 @@ void ViewProviderSketch::setEditViewer(Gui::View3DInventorViewer* viewer, int Mo
 
     // Will the sketch be visible from the new position (#0000957)?
     //
+    // Fusion glides onto the sketch plane rather than cutting to it. The framing below is
+    // unchanged and still decides where the camera ends up; it is just run with animation
+    // off so it lands in one go, and the pose it lands on is then read back, the camera put
+    // back where the user left it, and the whole move played as one.
     SoCamera* camera = viewer->getSoRenderManager()->getCamera();
+    const Gui::CameraPose from = Gui::CameraPose::capture(camera);
+    const bool animate = viewer->isAnimationEnabled();
+    viewer->setAnimationEnabled(false);
+
     SbVec3f curdir;// current view direction
     camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), curdir);
     SbVec3f plnpos = Base::convertTo<SbVec3f>(plm.getPosition());
@@ -4701,6 +4734,13 @@ void ViewProviderSketch::setEditViewer(Gui::View3DInventorViewer* viewer, int Mo
         std::vector<App::SubObjectT> objs;
         objs.emplace_back(getObject(), "");
         viewer->viewObjects(objs);
+    }
+
+    viewer->setAnimationEnabled(animate);
+    if (animate) {
+        const Gui::CameraPose to = Gui::CameraPose::capture(camera);
+        from.apply(camera);
+        viewer->animateCamera(to);
     }
 
     viewer->setEditing(true);

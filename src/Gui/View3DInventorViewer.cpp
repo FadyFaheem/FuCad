@@ -5019,6 +5019,34 @@ std::shared_ptr<NavigationAnimation> View3DInventorViewer::startAnimation(
     return animation;
 }
 
+std::shared_ptr<NavigationAnimation> View3DInventorViewer::animateCamera(
+    const CameraPose& target,
+    int duration
+) const
+{
+    if (!isAnimationEnabled() || !getCamera()) {
+        return {};
+    }
+
+    ParameterGrp::handle view
+        = App::GetApplication().GetParameterGroupByPath("User parameter:BaseApp/Preferences/View");
+
+    if (duration < 0) {
+        duration = view->GetInt("AnimationDuration", 500);
+    }
+
+    auto easingCurve = static_cast<QEasingCurve::Type>(
+        view->GetInt("NavigationAnimationEasingCurve", QEasingCurve::Type::InOutCubic)
+    );
+
+    auto animation
+        = std::make_shared<CameraAnimation>(navigation, target, duration, easingCurve);
+
+    navigation->startAnimating(animation);
+
+    return animation;
+}
+
 /**
  * @brief Start an infinite spin animation
  *

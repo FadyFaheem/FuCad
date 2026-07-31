@@ -24,7 +24,10 @@
 
 #include "NavigationAnimation.h"
 #include <Inventor/nodes/SoCamera.h>
+#include <Inventor/nodes/SoOrthographicCamera.h>
+#include <Inventor/nodes/SoPerspectiveCamera.h>
 
+#include <cmath>
 #include <numbers>
 
 using namespace Gui;
@@ -140,6 +143,128 @@ void FixedTimeAnimation::onStop(bool finished)
             NavigationStyle::OrientationChangeSource::Programmatic
         );
         camera->position = camera->position.getValue() + targetTranslation - prevTranslation;
+    }
+}
+
+CameraPose CameraPose::capture(const SoCamera* camera)
+{
+    CameraPose pose;
+    if (!camera) {
+        return pose;
+    }
+
+    pose.position = camera->position.getValue();
+    pose.orientation = camera->orientation.getValue();
+    pose.focalDistance = camera->focalDistance.getValue();
+    pose.type = camera->getTypeId();
+
+    if (camera->isOfType(SoOrthographicCamera::getClassTypeId())) {
+        pose.height = static_cast<const SoOrthographicCamera*>(camera)->height.getValue();
+    }
+    else if (camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
+        pose.height = static_cast<const SoPerspectiveCamera*>(camera)->heightAngle.getValue();
+    }
+
+    return pose;
+}
+
+void CameraPose::apply(SoCamera* camera) const
+{
+    if (!camera) {
+        return;
+    }
+
+    camera->position = position;
+    camera->orientation = orientation;
+    camera->focalDistance = focalDistance;
+
+    // The height fields of the two projections are not the same quantity, so a pose taken
+    // from one is meaningless on the other and only the pose it does describe is written.
+    if (camera->getTypeId() != type) {
+        return;
+    }
+
+    if (camera->isOfType(SoOrthographicCamera::getClassTypeId())) {
+        static_cast<SoOrthographicCamera*>(camera)->height = height;
+    }
+    else if (camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
+        static_cast<SoPerspectiveCamera*>(camera)->heightAngle = height;
+    }
+}
+
+CameraAnimation::CameraAnimation(
+    NavigationStyle* navigation,
+    const CameraPose& target,
+    int duration,
+    const QEasingCurve::Type easingCurve
+)
+    : NavigationAnimation(navigation)
+    , target(target)
+{
+    setDuration(duration);
+    setStartValue(0.0);
+    setEndValue(1.0);
+    setEasingCurve(easingCurve);
+}
+
+void CameraAnimation::initialize()
+{
+#if (COIN_MAJOR_VERSION * 100 + COIN_MINOR_VERSION * 10 + COIN_MICRO_VERSION < 403)
+    navigation->findBoundingSphere();
+#endif
+
+    // Read at the last moment rather than on construction, so that a move interrupting an
+    // earlier one picks up from where the camera actually is instead of jumping.
+    start = CameraPose::capture(navigation->getCamera());
+}
+
+/**
+ * @param value The progress of the move, from 0 at the start pose to 1 at the target
+ */
+void CameraAnimation::update(const QVariant& value)
+{
+    SoCamera* camera = navigation->getCamera();
+    if (!camera) {
+        return;
+    }
+
+    const float t = value.toFloat();
+
+    // Zoom is a scale, so it is walked geometrically. Interpolating it linearly makes a
+    // large change rush at one end and crawl at the other.
+    const auto scaleStep = [t](float from, float to) {
+        if (from <= 0.0F || to <= 0.0F) {
+            return from + t * (to - from);
+        }
+        return from * std::pow(to / from, t);
+    };
+
+    navigation->setCameraOrientationValue(
+        camera,
+        SbRotation::slerp(start.orientation, target.orientation, t),
+        NavigationStyle::OrientationChangeSource::Programmatic
+    );
+    camera->position = start.position + t * (target.position - start.position);
+    camera->focalDistance = scaleStep(start.focalDistance, target.focalDistance);
+
+    if (camera->getTypeId() == start.type && start.type == target.type) {
+        const float height = scaleStep(start.height, target.height);
+        if (camera->isOfType(SoOrthographicCamera::getClassTypeId())) {
+            static_cast<SoOrthographicCamera*>(camera)->height = height;
+        }
+        else if (camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
+            static_cast<SoPerspectiveCamera*>(camera)->heightAngle = height;
+        }
+    }
+}
+
+/**
+ * @param finished True when the animation is finished, false when interrupted
+ */
+void CameraAnimation::onStop(bool finished)
+{
+    if (finished) {
+        target.apply(navigation->getCamera());
     }
 }
 

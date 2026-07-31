@@ -99,6 +99,7 @@ class BoundBox2d;
 namespace Gui
 {
 class NavigationAnimation;
+struct CameraPose;
 class View3DInventor;
 class ViewProvider;
 class SoFCBackgroundGradient;
@@ -217,6 +218,13 @@ public:
         int duration = -1,
         bool wait = false
     ) const;
+    /**
+     * Glide the camera from where it is to \a target, zoom included. Does nothing and
+     * returns nothing when animation is turned off, so the caller is expected to have put
+     * the camera on the target itself if it wants the move to happen either way.
+     */
+    std::shared_ptr<NavigationAnimation> animateCamera(const CameraPose& target, int duration = -1)
+        const;
     void startSpinningAnimation(const SbVec3f& axis, float velocity);
     void stopAnimating();
 
