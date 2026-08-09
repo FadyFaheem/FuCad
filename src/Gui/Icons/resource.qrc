@@ -198,6 +198,7 @@
         <file>Std_SaveAll.svg</file>
         <file>Std_SaveCopy.svg</file>
         <file>Std_SceneInspector.svg</file>
+        <file>Std_SelectionFilter.svg</file>
         <file>Std_SelectVisibleObjects.svg</file>
         <file>Std_SetAppearance.svg</file>
         <file>Std_ShowObjects.svg</file>
@@ -270,6 +271,7 @@
         <file>user-input/mouse-scroll.svg</file>
         <file>user-input/mouse.svg</file>
         <file>user.svg</file>
+        <file>solid-selection.svg</file>
         <file>utilities-terminal.svg</file>
         <file>VarSet.svg</file>
         <file>vertex-selection.svg</file>

@@ -1040,6 +1040,7 @@ void Application::createStandardOperations()
     Gui::CreateTestCommands();
     Gui::CreateLinkCommands();
     Gui::CreateCanvasCommands();
+    Gui::CreateSelectionCommands();
 }
 
 void Application::slotNewDocument(const App::Document& Doc, bool isMainDoc)

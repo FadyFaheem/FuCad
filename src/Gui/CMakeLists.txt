@@ -481,6 +481,7 @@ SET(Command_CPP_SRCS
     CommandStructure.cpp
     CommandLink.cpp
     CommandCanvas.cpp
+    CommandSelection.cpp
     CommandPyImp.cpp
     DefaultShortcuts.cpp
     ShortcutManager.cpp
