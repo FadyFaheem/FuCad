@@ -112,6 +112,7 @@
 #include "ReportView.h"
 #include "Ribbon/AppBar.h"
 #include "Ribbon/CommandPalette.h"
+#include "Ribbon/FramelessWindow.h"
 #include "Ribbon/RibbonBar.h"
 #include "Ribbon/RibbonManager.h"
 #include "SelectionView.h"
@@ -655,6 +656,12 @@ void MainWindow::setupRibbon()
 {
     if (!Ribbon::RibbonManager::isEnabled()) {
         return;
+    }
+
+    // Before the app bar is built, because whether it is also the title bar
+    // decides what it puts in itself.
+    if (Ribbon::FramelessWindow::isEnabled()) {
+        Ribbon::FramelessWindow::install(this);
     }
 
     // setMenuWidget() is the only place QMainWindow offers for a full width

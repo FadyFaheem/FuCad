@@ -1323,6 +1323,7 @@ SOURCE_GROUP("Workbench" FILES ${Workbench_SRCS})
 SET(Ribbon_CPP_SRCS
     Ribbon/AppBar.cpp
     Ribbon/CommandPalette.cpp
+    Ribbon/FramelessWindow.cpp
     Ribbon/RibbonBar.cpp
     Ribbon/RibbonButton.cpp
     Ribbon/RibbonManager.cpp
@@ -1332,6 +1333,7 @@ SET(Ribbon_SRCS
     ${Ribbon_CPP_SRCS}
     Ribbon/AppBar.h
     Ribbon/CommandPalette.h
+    Ribbon/FramelessWindow.h
     Ribbon/RibbonBar.h
     Ribbon/RibbonButton.h
     Ribbon/RibbonManager.h

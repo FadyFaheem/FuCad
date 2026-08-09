@@ -21,10 +21,14 @@
 
 
 #include <QAction>
+#include <QEvent>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QList>
 #include <QMenu>
 #include <QMenuBar>
+#include <QMouseEvent>
+#include <QPoint>
 #include <QResizeEvent>
 #include <QSize>
 #include <QSizePolicy>
@@ -32,14 +36,17 @@
 #include <QStyle>
 #include <QToolButton>
 #include <QWidget>
+#include <QWindow>
 
 #include <Base/Console.h>
 #include <Gui/Action.h>
 #include <Gui/Application.h>
 #include <Gui/Command.h>
+#include <Gui/MainWindow.h>
 #include <Gui/WorkbenchSelector.h>
 
 #include "AppBar.h"
+#include "FramelessWindow.h"
 #include "RibbonButton.h"
 
 
@@ -53,6 +60,7 @@ constexpr int quickAccessIconExtent = 16;
 constexpr int separatorGap = 3;
 constexpr int separatorWidth = 1;
 constexpr int workspaceSelectorWidth = 170;
+constexpr int windowButtonWidth = 40;
 }  // namespace
 
 
@@ -62,6 +70,8 @@ AppBar::AppBar(QWidget* parent)
     , appMenuBar(nullptr)
     , menuButton(nullptr)
     , menuButtonMenu(nullptr)
+    , titleLabel(nullptr)
+    , maximizeButton(nullptr)
 {
     setObjectName(QStringLiteral("RibbonAppBar"));
     setAttribute(Qt::WA_StyledBackground, true);
@@ -74,7 +84,10 @@ AppBar::AppBar(QWidget* parent)
     createMenuButton();
     createQuickAccess();
     barLayout->addStretch(1);
+    createTitle();
+    barLayout->addStretch(1);
     createWorkspaceSelector();
+    createWindowControls();
 }
 
 QMenuBar* AppBar::menuBar() const
@@ -157,6 +170,170 @@ void AppBar::createQuickAccess()
         button->setDefaultAction(action);
         barLayout->addWidget(button);
     }
+}
+
+void AppBar::createTitle()
+{
+    if (!FramelessWindow::isEnabled()) {
+        return;
+    }
+
+    titleLabel = new QLabel(this);
+    titleLabel->setObjectName(QStringLiteral("RibbonWindowTitle"));
+    titleLabel->setAlignment(Qt::AlignCenter);
+    titleLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    barLayout->addWidget(titleLabel);
+
+    if (MainWindow* window = getMainWindow()) {
+        window->installEventFilter(this);
+    }
+
+    refreshTitle();
+}
+
+void AppBar::createWindowControls()
+{
+    if (!FramelessWindow::isEnabled()) {
+        return;
+    }
+
+    MainWindow* window = getMainWindow();
+    if (!window) {
+        return;
+    }
+
+    struct Control
+    {
+        const char* name;
+        QStyle::StandardPixmap icon;
+        QString tip;
+    };
+
+    const Control controls[] = {
+        {"RibbonMinimizeButton", QStyle::SP_TitleBarMinButton, tr("Minimize")},
+        {"RibbonMaximizeButton", QStyle::SP_TitleBarMaxButton, tr("Maximize")},
+        {"RibbonCloseButton", QStyle::SP_TitleBarCloseButton, tr("Close")},
+    };
+
+    for (const Control& control : controls) {
+        auto* button = new QToolButton(this);
+        button->setObjectName(QString::fromLatin1(control.name));
+        button->setAutoRaise(true);
+        button->setFocusPolicy(Qt::NoFocus);
+        button->setIcon(style()->standardIcon(control.icon));
+        button->setIconSize(QSize(quickAccessIconExtent, quickAccessIconExtent));
+        button->setToolTip(control.tip);
+        button->setFixedWidth(windowButtonWidth);
+        barLayout->addWidget(button);
+
+        if (button->objectName() == QLatin1String("RibbonMinimizeButton")) {
+            connect(button, &QToolButton::clicked, window, &QWidget::showMinimized);
+        }
+        else if (button->objectName() == QLatin1String("RibbonCloseButton")) {
+            connect(button, &QToolButton::clicked, window, &QWidget::close);
+        }
+        else {
+            maximizeButton = button;
+            connect(button, &QToolButton::clicked, this, [window]() {
+                if (window->isMaximized()) {
+                    window->showNormal();
+                }
+                else {
+                    window->showMaximized();
+                }
+            });
+        }
+    }
+
+    refreshWindowState();
+}
+
+void AppBar::refreshTitle()
+{
+    MainWindow* window = getMainWindow();
+    if (!titleLabel || !window) {
+        return;
+    }
+
+    titleLabel->setText(window->windowTitle());
+}
+
+void AppBar::refreshWindowState()
+{
+    MainWindow* window = getMainWindow();
+    if (!maximizeButton || !window) {
+        return;
+    }
+
+    const bool maximized = window->isMaximized();
+    maximizeButton->setIcon(style()->standardIcon(
+        maximized ? QStyle::SP_TitleBarNormalButton : QStyle::SP_TitleBarMaxButton
+    ));
+    maximizeButton->setToolTip(maximized ? tr("Restore") : tr("Maximize"));
+}
+
+bool AppBar::isBackgroundAt(const QPoint& pos) const
+{
+    // childAt() reports the deepest child, so anything it names is a control the
+    // press belongs to rather than a place to grab the window by.
+    const QWidget* child = childAt(pos);
+    return !child || child == titleLabel;
+}
+
+void AppBar::mousePressEvent(QMouseEvent* event)
+{
+    MainWindow* window = getMainWindow();
+    if (event->button() != Qt::LeftButton || !FramelessWindow::isEnabled() || !window) {
+        QWidget::mousePressEvent(event);
+        return;
+    }
+
+    if (!isBackgroundAt(event->position().toPoint())) {
+        QWidget::mousePressEvent(event);
+        return;
+    }
+
+    // Handed to the window system, which is what makes dragging to an edge snap.
+    if (QWindow* handle = window->windowHandle()) {
+        handle->startSystemMove();
+        event->accept();
+        return;
+    }
+
+    QWidget::mousePressEvent(event);
+}
+
+void AppBar::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    MainWindow* window = getMainWindow();
+    if (event->button() != Qt::LeftButton || !FramelessWindow::isEnabled() || !window
+        || !isBackgroundAt(event->position().toPoint())) {
+        QWidget::mouseDoubleClickEvent(event);
+        return;
+    }
+
+    if (window->isMaximized()) {
+        window->showNormal();
+    }
+    else {
+        window->showMaximized();
+    }
+
+    event->accept();
+}
+
+bool AppBar::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched == getMainWindow()) {
+        if (event->type() == QEvent::WindowTitleChange) {
+            refreshTitle();
+        }
+        else if (event->type() == QEvent::WindowStateChange) {
+            refreshWindowState();
+        }
+    }
+
+    return QWidget::eventFilter(watched, event);
 }
 
 void AppBar::createWorkspaceSelector()

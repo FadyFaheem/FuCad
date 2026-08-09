@@ -22,17 +22,14 @@
 
 #pragma once
 
-#include <QWidget>
+#include <array>
+
+#include <QObject>
 
 #include <FCGlobal.h>
 
-class QHBoxLayout;
-class QLabel;
-class QMenu;
-class QMenuBar;
-class QMouseEvent;
-class QResizeEvent;
-class QToolButton;
+class QMainWindow;
+class QWidget;
 
 namespace Gui
 {
@@ -40,57 +37,51 @@ namespace Ribbon
 {
 
 /**
- * The strip above the ribbon tabs: the application menu button, the
- * quick-access buttons and the workspace selector.
+ * Takes the system title bar off the main window so that the ribbon's app bar
+ * can be the title bar, the way Fusion has one row where other applications have
+ * two.
  *
- * The app bar also hosts the application's one and only QMenuBar. The bar is
- * never installed into the QMainWindow menu slot, because the ribbon container
- * occupies it; MainWindow::menuBar() hands out the bar living here so that
- * MenuManager keeps driving the menus unchanged.
- *
- * With the system frame gone it is also the title bar: it carries the document
- * name, the buttons that minimise, maximise and close, and it is what a drag
- * moves the window by.
+ * Losing the frame means losing what the frame did, so this puts it back: a
+ * border around the window that starts a resize, and a caption area that starts
+ * a move. Both are handed to the window system rather than emulated, so dragging
+ * to an edge still snaps and dragging a corner still resizes the way it does for
+ * every other window.
  * @author FuCad contributors
  */
-class GuiExport AppBar: public QWidget
+class GuiExport FramelessWindow: public QObject
 {
     Q_OBJECT
 
 public:
-    explicit AppBar(QWidget* parent = nullptr);
-    ~AppBar() override = default;
+    /**
+     * Whether the main window drops the system frame. Off in safe mode, which is
+     * the way back for anyone the frameless window does not suit.
+     */
+    static bool isEnabled();
 
-    QMenuBar* menuBar() const;
+    /// Drops the frame of \a window and takes over moving and resizing it.
+    static void install(QMainWindow* window);
+
+    /// The height of the strip along each edge that starts a resize.
+    static int borderWidth();
 
 protected:
-    void resizeEvent(QResizeEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseDoubleClickEvent(QMouseEvent* event) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
-    void createMenuButton();
-    void createQuickAccess();
-    void createTitle();
-    void createWorkspaceSelector();
-    void createWindowControls();
-    void refreshMenu();
-    void refreshTitle();
-    /// Swaps the maximise button between maximising and restoring.
-    void refreshWindowState();
-    /// Whether \a pos is over the bar itself rather than one of its controls.
-    bool isBackgroundAt(const QPoint& pos) const;
+    explicit FramelessWindow(QMainWindow* window);
 
-    QHBoxLayout* barLayout;
-    QMenuBar* appMenuBar;
-    QToolButton* menuButton;
-    QMenu* menuButtonMenu;
-    /// All null unless the app bar is also the title bar.
-    QLabel* titleLabel;
-    QToolButton* maximizeButton;
+    /**
+     * Puts the grips back along the edges and on top of everything, and takes
+     * them away while the window is maximized and has no edge to drag.
+     */
+    void layOutGrips();
 
-    Q_DISABLE_COPY(AppBar)
+    QMainWindow* window;
+    /// Four edges then four corners, owned by the window they sit on.
+    std::array<QWidget*, 8> grips {};
+
+    Q_DISABLE_COPY(FramelessWindow)
 };
 
 }  // namespace Ribbon
