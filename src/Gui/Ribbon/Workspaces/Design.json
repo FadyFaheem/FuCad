@@ -37,16 +37,21 @@
                 {
                     "caption": "MODIFY",
                     "items": [
+                        { "command": "PartDesign_PressPull", "label": "Press Pull" },
                         { "command": "PartDesign_Fillet", "label": "Fillet" },
                         { "command": "PartDesign_Chamfer", "label": "Chamfer" },
                         { "command": "PartDesign_Thickness", "label": "Shell" },
                         { "command": "PartDesign_Draft", "label": "Draft" }
                     ],
                     "menu": [
+                        { "command": "PartDesign_PressPull", "label": "Press Pull" },
                         { "command": "PartDesign_Fillet", "label": "Fillet" },
                         { "command": "PartDesign_Chamfer", "label": "Chamfer" },
                         { "command": "PartDesign_Thickness", "label": "Shell" },
                         { "command": "PartDesign_Draft", "label": "Draft" },
+                        { "command": "PartDesign_OffsetFace", "label": "Offset Face" },
+                        { "command": "PartDesign_MoveFace", "label": "Move Face" },
+                        { "command": "PartDesign_DeleteFace", "label": "Delete Face" },
                         { "command": "Part_Scale", "label": "Scale" },
                         { "command": "PartDesign_Boolean", "label": "Combine" },
                         { "command": "Part_Defeaturing", "label": "Remove" },

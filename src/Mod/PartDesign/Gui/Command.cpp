@@ -2516,6 +2516,180 @@ bool CmdPartDesignThickness::isActive()
 }
 
 //===========================================================================
+// Direct edit tools, which work on faces of the solid rather than on a profile
+//===========================================================================
+
+namespace
+{
+/**
+ * Starts the direct edit feature \a which on whichever faces are selected. Faces
+ * are the only thing these tools can act on, so anything else in the selection is
+ * dropped rather than refused: picking a body and reaching for Offset Face should
+ * open the dialog ready to pick, not complain.
+ */
+void makeFaceTool(Gui::Command* cmd, const std::string& which)
+{
+    Gui::SelectionObject selected;
+    bool useAllEdges = false;
+    bool noSelection = false;
+    if (!dressupGetSelected(cmd, which, selected, useAllEdges, noSelection)) {
+        return;
+    }
+
+    Part::Feature* base = nullptr;
+    std::vector<std::string> faces;
+
+    if (noSelection) {
+        base = static_cast<Part::Feature*>(PartDesignGui::getBody(true)->Tip.getValue());
+    }
+    else {
+        base = static_cast<Part::Feature*>(selected.getObject());
+        for (const std::string& name : selected.getSubNames()) {
+            if (name.compare(0, 4, "Face") == 0) {
+                faces.push_back(name);
+            }
+        }
+    }
+
+    finishDressupFeature(cmd, which, base, faces, false);
+}
+}  // namespace
+
+//===========================================================================
+// PartDesign_OffsetFace
+//===========================================================================
+DEF_STD_CMD_A(CmdPartDesignOffsetFace)
+
+CmdPartDesignOffsetFace::CmdPartDesignOffsetFace()
+    : Command("PartDesign_OffsetFace")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Offset Face");
+    sToolTipText = QT_TR_NOOP("Pushes the selected faces along their own normal");
+    sWhatsThis = "PartDesign_OffsetFace";
+    sStatusTip = sToolTipText;
+    sPixmap = "PartDesign_OffsetFace";
+}
+
+void CmdPartDesignOffsetFace::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+    makeFaceTool(this, "OffsetFace");
+}
+
+bool CmdPartDesignOffsetFace::isActive()
+{
+    return hasActiveDocument();
+}
+
+//===========================================================================
+// PartDesign_MoveFace
+//===========================================================================
+DEF_STD_CMD_A(CmdPartDesignMoveFace)
+
+CmdPartDesignMoveFace::CmdPartDesignMoveFace()
+    : Command("PartDesign_MoveFace")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Move Face");
+    sToolTipText = QT_TR_NOOP("Moves the selected faces along a direction of your choosing");
+    sWhatsThis = "PartDesign_MoveFace";
+    sStatusTip = sToolTipText;
+    sPixmap = "PartDesign_MoveFace";
+}
+
+void CmdPartDesignMoveFace::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+    makeFaceTool(this, "MoveFace");
+}
+
+bool CmdPartDesignMoveFace::isActive()
+{
+    return hasActiveDocument();
+}
+
+//===========================================================================
+// PartDesign_DeleteFace
+//===========================================================================
+DEF_STD_CMD_A(CmdPartDesignDeleteFace)
+
+CmdPartDesignDeleteFace::CmdPartDesignDeleteFace()
+    : Command("PartDesign_DeleteFace")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Delete Face");
+    sToolTipText = QT_TR_NOOP("Removes the selected faces and closes the solid over the gap");
+    sWhatsThis = "PartDesign_DeleteFace";
+    sStatusTip = sToolTipText;
+    sPixmap = "PartDesign_DeleteFace";
+}
+
+void CmdPartDesignDeleteFace::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+    makeFaceTool(this, "DeleteFace");
+}
+
+bool CmdPartDesignDeleteFace::isActive()
+{
+    return hasActiveDocument();
+}
+
+//===========================================================================
+// PartDesign_PressPull
+//===========================================================================
+DEF_STD_CMD_A(CmdPartDesignPressPull)
+
+CmdPartDesignPressPull::CmdPartDesignPressPull()
+    : Command("PartDesign_PressPull")
+{
+    sAppModule = "PartDesign";
+    sGroup = QT_TR_NOOP("PartDesign");
+    sMenuText = QT_TR_NOOP("Press/Pull");
+    sToolTipText = QT_TR_NOOP(
+        "Extrudes a profile, offsets a face or fillets an edge, whichever the selection asks for"
+    );
+    sWhatsThis = "PartDesign_PressPull";
+    sStatusTip = sToolTipText;
+    sPixmap = "PartDesign_PressPull";
+}
+
+void CmdPartDesignPressPull::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+
+    // Fusion's Q is one key for the three things a user reaches for most, told
+    // apart by what they have picked. Nothing picked starts the face tool, which
+    // opens ready to pick, rather than refusing.
+    const char* follow = "PartDesign_OffsetFace";
+
+    const std::vector<Gui::SelectionObject> selection = getSelection().getSelectionEx();
+    if (selection.size() == 1) {
+        const std::vector<std::string> subs = selection.front().getSubNames();
+        const bool profile = selection.front().getObject()
+            && selection.front().getObject()->isDerivedFrom<Part::Part2DObject>();
+
+        if (profile) {
+            follow = "PartDesign_Extrude";
+        }
+        else if (!subs.empty() && subs.front().compare(0, 4, "Edge") == 0) {
+            follow = "PartDesign_Fillet";
+        }
+    }
+
+    Gui::Application::Instance->commandManager().runCommandByName(follow);
+}
+
+bool CmdPartDesignPressPull::isActive()
+{
+    return hasActiveDocument();
+}
+
+//===========================================================================
 // Common functions for all Transformed features
 //===========================================================================
 
@@ -3128,6 +3302,11 @@ void CreatePartDesignCommands()
     rcCmdMgr.addCommand(new CmdPartDesignDraft());
     rcCmdMgr.addCommand(new CmdPartDesignChamfer());
     rcCmdMgr.addCommand(new CmdPartDesignThickness());
+
+    rcCmdMgr.addCommand(new CmdPartDesignOffsetFace());
+    rcCmdMgr.addCommand(new CmdPartDesignMoveFace());
+    rcCmdMgr.addCommand(new CmdPartDesignDeleteFace());
+    rcCmdMgr.addCommand(new CmdPartDesignPressPull());
 
     rcCmdMgr.addCommand(new CmdPartDesignMirrored());
     rcCmdMgr.addCommand(new CmdPartDesignLinearPattern());

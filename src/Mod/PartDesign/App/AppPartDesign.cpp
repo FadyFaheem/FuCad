@@ -51,6 +51,10 @@
 #include "FeaturePocket.h"
 #include "FeaturePolarPattern.h"
 #include "FeaturePrimitive.h"
+#include "FeatureDeleteFace.h"
+#include "FeatureFaceOperation.h"
+#include "FeatureMoveFace.h"
+#include "FeatureOffsetFace.h"
 #include "FeatureRevolution.h"
 #include "FeatureScaled.h"
 #include "FeatureSketchBased.h"
@@ -116,6 +120,11 @@ PyMOD_INIT_FUNC(_PartDesign)
     PartDesign::Chamfer                     ::init();
     PartDesign::Draft                       ::init();
     PartDesign::Thickness                   ::init();
+    PartDesign::FaceOperation               ::init();
+    PartDesign::SweptFace                   ::init();
+    PartDesign::OffsetFace                  ::init();
+    PartDesign::MoveFace                    ::init();
+    PartDesign::DeleteFace                  ::init();
     PartDesign::Pipe                        ::init();
     PartDesign::AdditivePipe                ::init();
     PartDesign::SubtractivePipe             ::init();

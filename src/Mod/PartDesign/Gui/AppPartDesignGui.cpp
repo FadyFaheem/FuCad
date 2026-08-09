@@ -56,6 +56,7 @@
 #include "ViewProviderPocket.h"
 #include "ViewProviderPolarPattern.h"
 #include "ViewProviderPrimitive.h"
+#include "ViewProviderFaceTools.h"
 #include "ViewProviderRevolution.h"
 #include "ViewProviderScaled.h"
 #include "ViewProviderShapeBinder.h"
@@ -141,6 +142,9 @@ PyMOD_INIT_FUNC(PartDesignGui)
     PartDesignGui::ViewProviderFillet        ::init();
     PartDesignGui::ViewProviderDraft         ::init();
     PartDesignGui::ViewProviderThickness     ::init();
+    PartDesignGui::ViewProviderOffsetFace    ::init();
+    PartDesignGui::ViewProviderMoveFace      ::init();
+    PartDesignGui::ViewProviderDeleteFace    ::init();
     PartDesignGui::ViewProviderTransformed   ::init();
     PartDesignGui::ViewProviderMirrored      ::init();
     PartDesignGui::ViewProviderLinearPattern ::init();
