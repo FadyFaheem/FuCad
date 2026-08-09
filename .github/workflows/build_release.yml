@@ -16,7 +16,8 @@ concurrency:
 jobs:
   upload_src:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'FreeCAD' || github.event_name == 'workflow_dispatch'
+    # Forks are kept off the weekly cron, but a release they publish still has to get binaries.
+    if: github.repository_owner == 'FreeCAD' || github.event_name == 'workflow_dispatch' || github.event_name == 'release'
     permissions:
       contents: write
       actions: write
