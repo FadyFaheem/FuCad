@@ -51,6 +51,7 @@
 #include "Application.h"
 #include "BitmapFactory.h"
 #include "Control.h"
+#include "DefaultShortcuts.h"
 #include "Dialogs/DlgUndoRedo.h"
 #include "PreferencePages/DlgSettingsWorkbenchesImp.h"
 #include "Document.h"
@@ -2054,6 +2055,11 @@ void CommandManager::addCommand(Command* pCom)
         }
         return;
     }
+    // Before anything can build the action, which is what reads the accelerator.
+    if (const char* accel = defaultShortcutFor(pCom->getName())) {
+        pCom->setAccel(accel);
+    }
+
     ++_revision;
     cmd = pCom;
     signalChanged();

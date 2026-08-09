@@ -482,6 +482,7 @@ SET(Command_CPP_SRCS
     CommandLink.cpp
     CommandCanvas.cpp
     CommandPyImp.cpp
+    DefaultShortcuts.cpp
     ShortcutManager.cpp
     CommandCompleter.cpp
     CommandActionPy.cpp
@@ -492,6 +493,7 @@ SET(Command_SRCS
     ActionFunction.h
     Command.h
     CommandT.h
+    DefaultShortcuts.h
     ShortcutManager.h
     CommandCompleter.h
     CommandActionPy.h
