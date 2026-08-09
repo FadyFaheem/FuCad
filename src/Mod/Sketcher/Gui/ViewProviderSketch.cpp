@@ -87,6 +87,7 @@
 #include "EditDatumDialog.h"
 #include "EditTextDialog.h"
 #include "EditModeCoinManager.h"
+#include "SketchStatusChip.h"
 #include "SnapManager.h"
 #include "StyleParameters.h"
 #include "TaskDlgEditSketch.h"
@@ -4340,6 +4341,8 @@ bool ViewProviderSketch::setEdit(int ModNum)
 
     Gui::Control().showDialog(sketchDlg);
 
+    SketchStatusChip::showFor(this);
+
     // This call to the solver is needed to initialize the DoF and solve time controls
     // The false parameter indicates that the geometry of the SketchObject shall not be updateData
     // so as not to trigger an onChanged that would set the document as modified and trigger a
@@ -4569,6 +4572,8 @@ void ViewProviderSketch::unsetEdit(int ModNum)
     if (ModNum != ViewProviderSketch::Default) {
         return PartGui::ViewProvider2DObject::unsetEdit(ModNum);
     }
+
+    SketchStatusChip::dismiss();
 
     if (dragAutoConstraintHandler) {
         dragAutoConstraintHandler->clear();
