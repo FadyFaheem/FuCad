@@ -1514,8 +1514,8 @@ TaskDlgAttacher::TaskDlgAttacher(
     };
     if (onAccept) {
         hints.push_back({
-            .message = tr("2x%1 select and confirm"),
-            .sequences = {MouseLeft},
+            .message = tr("%1 select and confirm"),
+            .sequences = {MouseDoubleLeft},
         });
     }
     Gui::getMainWindow()->showHints(hints);
