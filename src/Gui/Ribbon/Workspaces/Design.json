@@ -323,6 +323,257 @@
             ]
         },
         {
+            "id": "DRAWING",
+            "workbench": "TechDrawWorkbench",
+            "optional": true,
+            "panels": [
+                {
+                    "caption": "CREATE",
+                    "items": [
+                        { "command": "TechDraw_PageDefault", "label": "New Drawing" },
+                        { "command": "TechDraw_View", "label": "Base View" },
+                        { "command": "TechDraw_ProjectionGroup", "label": "Projected View" },
+                        { "command": "TechDraw_SectionView", "label": "Section View" },
+                        { "command": "TechDraw_DetailView", "label": "Detail View" }
+                    ],
+                    "menu": [
+                        { "command": "TechDraw_PageDefault", "label": "New Drawing" },
+                        { "command": "TechDraw_PageTemplate", "label": "New Drawing From Template" },
+                        { "command": "TechDraw_RedrawPage", "label": "Update Drawing" },
+                        { "command": "TechDraw_View", "label": "Base View" },
+                        { "command": "TechDraw_ProjectionGroup", "label": "Projected View" },
+                        { "command": "TechDraw_SectionGroup", "label": "Section View" },
+                        { "command": "TechDraw_DetailView", "label": "Detail View" },
+                        { "command": "TechDraw_BrokenView", "label": "Broken View" },
+                        { "command": "TechDraw_SpreadsheetView", "label": "Table View" },
+                        { "command": "TechDraw_DraftView", "label": "Draft View" }
+                    ]
+                },
+                {
+                    "caption": "DIMENSIONS",
+                    "items": [
+                        { "command": "TechDraw_Dimension", "label": "Dimension" },
+                        { "command": "TechDraw_Balloon", "label": "Balloon" },
+                        { "command": "TechDraw_LeaderLine", "label": "Leader" },
+                        { "command": "TechDraw_RichTextAnnotation", "label": "Text" }
+                    ],
+                    "menu": [
+                        { "command": "TechDraw_Dimension", "label": "Dimension" },
+                        { "command": "TechDraw_CompDimensionTools", "label": "Dimension Types" },
+                        { "command": "TechDraw_ExtentGroup", "label": "Extent Dimension" },
+                        { "command": "TechDraw_Balloon", "label": "Balloon" },
+                        { "command": "TechDraw_LeaderLine", "label": "Leader" },
+                        { "command": "TechDraw_RichTextAnnotation", "label": "Text" },
+                        { "command": "TechDraw_Annotation", "label": "Plain Annotation" },
+                        { "command": "TechDraw_SurfaceFinishSymbols", "label": "Surface Finish" },
+                        { "command": "TechDraw_WeldSymbol", "label": "Weld Symbol" },
+                        { "command": "TechDraw_DimensionRepair", "label": "Repair Dimension" }
+                    ]
+                },
+                {
+                    "caption": "MODIFY",
+                    "items": [
+                        { "command": "TechDraw_CenterLineGroup", "label": "Centerline" },
+                        { "command": "TechDraw_CosmeticVertexGroup", "label": "Cosmetic Vertex" },
+                        { "command": "TechDraw_Hatch", "label": "Hatch" },
+                        { "command": "TechDraw_DecorateLine", "label": "Line Style" }
+                    ],
+                    "menu": [
+                        { "command": "TechDraw_CenterLineGroup", "label": "Centerline" },
+                        { "command": "TechDraw_CosmeticVertexGroup", "label": "Cosmetic Vertex" },
+                        { "command": "TechDraw_2PointCosmeticLine", "label": "Cosmetic Line" },
+                        { "command": "TechDraw_CosmeticCircle", "label": "Cosmetic Circle" },
+                        { "command": "TechDraw_CosmeticEraser", "label": "Remove Cosmetic" },
+                        { "command": "TechDraw_Hatch", "label": "Hatch" },
+                        { "command": "TechDraw_GeometricHatch", "label": "Geometric Hatch" },
+                        { "command": "TechDraw_DecorateLine", "label": "Line Style" },
+                        { "command": "TechDraw_StackGroup", "label": "Stacking" },
+                        { "command": "TechDraw_ClipGroup", "label": "Clip Group" }
+                    ]
+                },
+                {
+                    "caption": "INSERT",
+                    "items": [
+                        { "command": "TechDraw_Symbol", "label": "Symbol" },
+                        { "command": "TechDraw_Image", "label": "Image" }
+                    ],
+                    "menu": [
+                        { "command": "TechDraw_Symbol", "label": "Symbol" },
+                        { "command": "TechDraw_Image", "label": "Image" },
+                        { "command": "TechDraw_ArchView", "label": "Arch View", "optional": true }
+                    ]
+                },
+                {
+                    "caption": "OUTPUT",
+                    "items": [
+                        { "command": "TechDraw_PrintAll", "label": "Print" },
+                        { "command": "TechDraw_ExportPageSVG", "label": "Export SVG" },
+                        { "command": "TechDraw_ExportPageDXF", "label": "Export DXF" }
+                    ],
+                    "menu": [
+                        { "command": "TechDraw_PrintAll", "label": "Print" },
+                        { "command": "TechDraw_ExportPageSVG", "label": "Export SVG" },
+                        { "command": "TechDraw_ExportPageDXF", "label": "Export DXF" },
+                        { "command": "TechDraw_ToggleFrame", "label": "Toggle Frames" },
+                        { "command": "TechDraw_ToggleGrid", "label": "Toggle Grid" }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "MANUFACTURE",
+            "workbench": "CAMWorkbench",
+            "optional": true,
+            "panels": [
+                {
+                    "caption": "SETUP",
+                    "items": [
+                        { "command": "CAM_Job", "label": "Setup" },
+                        { "command": "CAM_ToolBitLibraryOpen", "label": "Tool Library" },
+                        { "command": "CAM_Fixture", "label": "Fixture" }
+                    ],
+                    "menu": [
+                        { "command": "CAM_Job", "label": "Setup" },
+                        { "command": "CAM_ToolBitLibraryOpen", "label": "Tool Library" },
+                        { "command": "CAM_ToolBitDock", "label": "Tool Dock" },
+                        { "command": "CAM_Fixture", "label": "Fixture" },
+                        { "command": "CAM_Comment", "label": "Comment" },
+                        { "command": "CAM_Stop", "label": "Stop" }
+                    ]
+                },
+                {
+                    "caption": "MILLING",
+                    "items": [
+                        { "command": "CAM_DrillingTools", "label": "Drilling" },
+                        { "command": "CAM_EngraveTools", "label": "Engrave" },
+                        { "command": "CAM_3dTools", "label": "3D Milling" }
+                    ]
+                },
+                {
+                    "caption": "MODIFY",
+                    "items": [
+                        { "command": "CAM_DressupTools", "label": "Dressup" },
+                        { "command": "CAM_Array", "label": "Array" },
+                        { "command": "CAM_Copy", "label": "Copy" }
+                    ],
+                    "menu": [
+                        { "command": "CAM_DressupTools", "label": "Dressup" },
+                        { "command": "CAM_Array", "label": "Array" },
+                        { "command": "CAM_Copy", "label": "Copy" },
+                        { "command": "CAM_SimpleCopy", "label": "Simple Copy" },
+                        { "command": "CAM_Compound", "label": "Compound" },
+                        { "command": "CAM_OpActiveToggle", "label": "Toggle Operation" }
+                    ]
+                },
+                {
+                    "caption": "INSPECT",
+                    "items": [
+                        { "command": "CAM_Simulator", "label": "Simulate" },
+                        { "command": "CAM_Inspect", "label": "Inspect G-code" },
+                        { "command": "CAM_Sanity", "label": "Check Job" }
+                    ]
+                },
+                {
+                    "caption": "OUTPUT",
+                    "items": [
+                        { "command": "CAM_Post", "label": "Post Process" }
+                    ],
+                    "menu": [
+                        { "command": "CAM_Post", "label": "Post Process" },
+                        { "command": "CAM_PostSelected", "label": "Post Selected" },
+                        { "command": "CAM_ExportTemplate", "label": "Export Template" }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "SIMULATION",
+            "workbench": "FemWorkbench",
+            "optional": true,
+            "panels": [
+                {
+                    "caption": "STUDY",
+                    "items": [
+                        { "command": "FEM_Analysis", "label": "New Study" },
+                        { "command": "FEM_CompSolvers", "label": "Solver" },
+                        { "command": "FEM_SolverControl", "label": "Solver Settings" },
+                        { "command": "FEM_SolverRun", "label": "Solve" }
+                    ]
+                },
+                {
+                    "caption": "MATERIALS",
+                    "items": [
+                        { "command": "FEM_MaterialSolid", "label": "Solid Material" },
+                        { "command": "FEM_MaterialFluid", "label": "Fluid Material" }
+                    ],
+                    "menu": [
+                        { "command": "FEM_MaterialSolid", "label": "Solid Material" },
+                        { "command": "FEM_MaterialFluid", "label": "Fluid Material" },
+                        { "command": "FEM_MaterialReinforced", "label": "Reinforced Material" },
+                        {
+                            "command": "FEM_MaterialMechanicalNonlinear",
+                            "label": "Nonlinear Material"
+                        },
+                        { "command": "FEM_MaterialEditor", "label": "Material Editor" }
+                    ]
+                },
+                {
+                    "caption": "CONSTRAINTS",
+                    "items": [
+                        { "command": "FEM_ConstraintFixed", "label": "Fixed" },
+                        { "command": "FEM_ConstraintForce", "label": "Force" },
+                        { "command": "FEM_ConstraintPressure", "label": "Pressure" },
+                        { "command": "FEM_ConstraintContact", "label": "Contact" }
+                    ],
+                    "menu": [
+                        { "command": "FEM_ConstraintFixed", "label": "Fixed" },
+                        { "command": "FEM_ConstraintDisplacement", "label": "Displacement" },
+                        { "command": "FEM_ConstraintForce", "label": "Force" },
+                        { "command": "FEM_ConstraintPressure", "label": "Pressure" },
+                        { "command": "FEM_ConstraintSelfWeight", "label": "Gravity" },
+                        { "command": "FEM_ConstraintCentrif", "label": "Centrifugal" },
+                        { "command": "FEM_ConstraintSpring", "label": "Spring" },
+                        { "command": "FEM_ConstraintContact", "label": "Contact" },
+                        { "command": "FEM_ConstraintTie", "label": "Tie" },
+                        { "command": "FEM_ConstraintTemperature", "label": "Temperature" },
+                        { "command": "FEM_ConstraintHeatflux", "label": "Heat Flux" }
+                    ]
+                },
+                {
+                    "caption": "MESH",
+                    "items": [
+                        { "command": "FEM_MeshGmshFromShape", "label": "Mesh From Shape" },
+                        { "command": "FEM_MeshRegion", "label": "Mesh Refinement" },
+                        { "command": "FEM_MeshGroup", "label": "Mesh Group" }
+                    ],
+                    "menu": [
+                        { "command": "FEM_MeshGmshFromShape", "label": "Mesh From Shape" },
+                        { "command": "FEM_MeshNetgenFromShape", "label": "Mesh With Netgen" },
+                        { "command": "FEM_MeshRegion", "label": "Mesh Refinement" },
+                        { "command": "FEM_MeshGroup", "label": "Mesh Group" },
+                        { "command": "FEM_MeshBoundaryLayer", "label": "Boundary Layer" },
+                        { "command": "FEM_MeshDisplayInfo", "label": "Mesh Info" },
+                        { "command": "FEM_MeshClear", "label": "Clear Mesh" }
+                    ]
+                },
+                {
+                    "caption": "RESULTS",
+                    "items": [
+                        { "command": "FEM_ResultShow", "label": "Show Results" },
+                        { "command": "FEM_PostPipelineFromResult", "label": "Result Pipeline" }
+                    ],
+                    "menu": [
+                        { "command": "FEM_ResultShow", "label": "Show Results" },
+                        { "command": "FEM_PostPipelineFromResult", "label": "Result Pipeline" },
+                        { "command": "FEM_PostCreateFunctions", "label": "Cut Functions" },
+                        { "command": "FEM_PostFilterDataAlongLine", "label": "Data Along Line" },
+                        { "command": "FEM_PostFilterWarp", "label": "Warp" },
+                        { "command": "FEM_ResultsPurge", "label": "Purge Results" }
+                    ]
+                }
+            ]
+        },
+        {
             "id": "UTILITIES",
             "workbench": null,
             "panels": [
