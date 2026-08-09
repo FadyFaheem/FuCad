@@ -59,6 +59,7 @@
 #include "Command.h"
 #include "Action.h"
 #include "Inventor/SoMouseWheelEvent.h"
+#include "MarkingMenu.h"
 #include "MenuManager.h"
 #include "MouseSelection.h"
 #include "Navigation/NavigationAnimator.h"
@@ -2550,6 +2551,37 @@ SbBool NavigationStyle::isPopupMenuEnabled() const
     return this->menuenabled;
 }
 
+namespace
+{
+/// What the context menu is about, for the row that heads it.
+QString selectionHeading()
+{
+    const std::vector<SelectionObject> selection = Selection().getSelectionEx();
+    if (selection.empty()) {
+        return QObject::tr("Nothing selected");
+    }
+
+    if (selection.size() > 1) {
+        return QObject::tr("%n objects selected", "", static_cast<int>(selection.size()));
+    }
+
+    const SelectionObject& only = selection.front();
+    const App::DocumentObject* object = only.getObject();
+    const QString label = object ? QString::fromUtf8(object->Label.getValue())
+                                 : QString::fromLatin1(only.getFeatName());
+
+    const std::vector<std::string> subs = only.getSubNames();
+    if (subs.size() == 1 && !subs.front().empty()) {
+        return QStringLiteral("%1 · %2").arg(label, QString::fromStdString(subs.front()));
+    }
+    if (subs.size() > 1) {
+        return QObject::tr("%1 · %n elements", "", static_cast<int>(subs.size())).arg(label);
+    }
+
+    return label;
+}
+}  // namespace
+
 void NavigationStyle::openPopupMenu(const SbVec2s& position)
 {
     // store the right-click position for potential use by Clarify Selection
@@ -2600,19 +2632,38 @@ void NavigationStyle::openPopupMenu(const SbVec2s& position)
         contextMenu->insertSeparator(posAction);
     }
 
-    auto clarifyFunction = [pickAction](QAction* selectedAction) {
-        if (selectedAction == pickAction) {
+    if (pickAction) {
+        // Connected to the entry itself rather than to the menu, so that it also
+        // works when the marking menu is what presents it.
+        QObject::connect(pickAction, &QAction::triggered, []() {
             // Execute the Clarify Selection command at this position
             auto cmd = Application::Instance->commandManager().getCommandByName("Std_ClarifySelection");
             if (cmd && cmd->isActive()) {
                 cmd->invoke(0);  // required placeholder value - we don't use group command
             }
-        }
-    };
+        });
+    }
 
-    QObject::connect(contextMenu, &QMenu::triggered, clarifyFunction);
+    // A row at the top naming what the menu is about, so a menu opened on a face
+    // of one body among several says which one it will act on.
+    auto* header = new QAction(selectionHeading(), contextMenu);
+    header->setObjectName(QStringLiteral("ContextMenuHeader"));
+    header->setEnabled(false);
+    if (contextMenu->actions().empty()) {
+        contextMenu->addAction(header);
+    }
+    else {
+        QAction* first = contextMenu->actions().front();
+        contextMenu->insertAction(first, header);
+        contextMenu->insertSeparator(first);
+    }
 
-    contextMenu->popup(QCursor::pos());
+    if (MarkingMenu::isEnabled()) {
+        MarkingMenu::popUp(contextMenu, QCursor::pos(), viewer->getGLWidget());
+    }
+    else {
+        contextMenu->popup(QCursor::pos());
+    }
 
     rightClickPosition.reset();
 }

@@ -1176,6 +1176,7 @@ SET(Widget_CPP_SRCS
     FileDialog.cpp
     MainWindow.cpp
     MainWindowPy.cpp
+    MarkingMenu.cpp
     NotificationBox.cpp
     NotificationArea.cpp
     PrefWidgets.cpp
@@ -1208,6 +1209,7 @@ SET(Widget_HPP_SRCS
     FileDialogInternal.h
     MainWindow.h
     MainWindowPy.h
+    MarkingMenu.h
     NotificationBox.h
     NotificationArea.h
     PrefWidgets.h
