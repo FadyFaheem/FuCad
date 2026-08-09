@@ -3,7 +3,7 @@
 set -e
 set -x
 
-conda_env="FreeCAD.app/Contents/Resources"
+conda_env="FuCad.app/Contents/Resources"
 
 mkdir -p ${conda_env}
 
@@ -15,8 +15,8 @@ find ${conda_env} -name \*.a -delete
 
 mv ${conda_env}/bin ${conda_env}/bin_tmp
 mkdir ${conda_env}/bin
-cp ${conda_env}/bin_tmp/freecad ${conda_env}/bin/
-cp ${conda_env}/bin_tmp/freecadcmd ${conda_env}/bin
+cp ${conda_env}/bin_tmp/fucad ${conda_env}/bin/
+cp ${conda_env}/bin_tmp/fucadcmd ${conda_env}/bin
 cp ${conda_env}/bin_tmp/ccx ${conda_env}/bin/
 cp ${conda_env}/bin_tmp/python ${conda_env}/bin/
 cp ${conda_env}/bin_tmp/pip ${conda_env}/bin/
@@ -44,13 +44,13 @@ python ../scripts/fix_macos_lib_paths.py ${conda_env}/lib -r
 # build and install the launcher
 cmake -B build launcher
 cmake --build build
-mkdir -p FreeCAD.app/Contents/MacOS
-cp build/FreeCAD FreeCAD.app/Contents/MacOS/FreeCAD
+mkdir -p FuCad.app/Contents/MacOS
+cp build/FuCad FuCad.app/Contents/MacOS/FuCad
 
 # Add deployment target suffix to artifact name (e.g., "-macOS11" or "-macOS15")
 deploy_target="${MACOS_DEPLOYMENT_TARGET:-11.0}"
-version_name="FreeCAD_${BUILD_TAG}-macOS${deploy_target%%.*}-$(uname -m)"
-application_menu_name="FreeCAD_${BUILD_TAG}"
+version_name="FuCad_${BUILD_TAG}-macOS${deploy_target%%.*}-$(uname -m)"
+application_menu_name="FuCad_${BUILD_TAG}"
 
 echo -e "\################"
 echo -e "version_name:  ${version_name}"
@@ -74,18 +74,18 @@ cp Info.plist.template ${conda_env}/../Info.plist
 sed -i "s/FREECAD_BUNDLE_VERSION/${bundle_version}/" ${conda_env}/../Info.plist
 sed -i "s/APPLICATION_MENU_NAME/${application_menu_name}/" ${conda_env}/../Info.plist
 
-pixi list -e default > FreeCAD.app/Contents/packages.txt
-sed -i '1s/.*/\nLIST OF PACKAGES:/' FreeCAD.app/Contents/packages.txt
+pixi list -e default > FuCad.app/Contents/packages.txt
+sed -i '1s/.*/\nLIST OF PACKAGES:/' FuCad.app/Contents/packages.txt
 
-echo "Running FreeCAD command-line smoke test..."
-if ! "${conda_env}/bin/freecadcmd" --safe-mode --version; then
-    echo "FreeCAD command-line smoke test failed; the macOS bundle cannot start."
+echo "Running FuCad command-line smoke test..."
+if ! "${conda_env}/bin/fucadcmd" --safe-mode --version; then
+    echo "FuCad command-line smoke test failed; the macOS bundle cannot start."
     exit 1
 fi
 
-echo "Running FreeCAD bundled Pivy smoke test..."
-if ! "${conda_env}/bin/freecadcmd" --safe-mode --console "import pivy; from pivy import coin; print(pivy.__file__); print(coin.SoDB.getVersion())"; then
-    echo "FreeCAD bundled Pivy smoke test failed; the macOS bundle cannot import the bundled Coin/Pivy runtime."
+echo "Running FuCad bundled Pivy smoke test..."
+if ! "${conda_env}/bin/fucadcmd" --safe-mode --console "import pivy; from pivy import coin; print(pivy.__file__); print(coin.SoDB.getVersion())"; then
+    echo "FuCad bundled Pivy smoke test failed; the macOS bundle cannot import the bundled Coin/Pivy runtime."
     exit 1
 fi
 
@@ -101,27 +101,27 @@ fi
 
 if [[ "${MACOS_SIGN_RELEASE}" == "true" ]]; then
     # create the signed dmg
-    ../../scripts/macos_sign_and_notarize.zsh -p "FreeCAD" -k ${MACOS_SIGNING_KEY_ID} -o "${version_name}.dmg"
+    ../../scripts/macos_sign_and_notarize.zsh -p "FuCad" -k ${MACOS_SIGNING_KEY_ID} -o "${version_name}.dmg"
 else
     # Ad-hoc sign for local builds (required for QuickLook extensions to register)
-    if [ -d "FreeCAD.app/Contents/PlugIns" ]; then
+    if [ -d "FuCad.app/Contents/PlugIns" ]; then
         echo "Ad-hoc signing App Extensions with entitlements..."
         codesign --force --sign - \
             --entitlements ../../../src/MacAppBundle/QuickLook/modern/ThumbnailExtension.entitlements \
-            FreeCAD.app/Contents/PlugIns/FreeCADThumbnailExtension.appex
+            FuCad.app/Contents/PlugIns/FuCadThumbnailExtension.appex
         codesign --force --sign - \
             --entitlements ../../../src/MacAppBundle/QuickLook/modern/PreviewExtension.entitlements \
-            FreeCAD.app/Contents/PlugIns/FreeCADPreviewExtension.appex
+            FuCad.app/Contents/PlugIns/FuCadPreviewExtension.appex
     fi
     echo "Ad-hoc signing app bundle..."
-    codesign --force --sign - FreeCAD.app/Contents/packages.txt
-    if [ -f "FreeCAD.app/Contents/Library/QuickLook/QuicklookFCStd.qlgenerator/Contents/MacOS/QuicklookFCStd" ]; then
-        codesign --force --sign - FreeCAD.app/Contents/Library/QuickLook/QuicklookFCStd.qlgenerator/Contents/MacOS/QuicklookFCStd
+    codesign --force --sign - FuCad.app/Contents/packages.txt
+    if [ -f "FuCad.app/Contents/Library/QuickLook/QuicklookFCStd.qlgenerator/Contents/MacOS/QuicklookFCStd" ]; then
+        codesign --force --sign - FuCad.app/Contents/Library/QuickLook/QuicklookFCStd.qlgenerator/Contents/MacOS/QuicklookFCStd
     fi
-    codesign --force --sign - FreeCAD.app
+    codesign --force --sign - FuCad.app
 
     # create the dmg
-    dmgbuild -s dmg_settings.py "FreeCAD" "${version_name}.dmg"
+    dmgbuild -s dmg_settings.py "FuCad" "${version_name}.dmg"
 fi
 
 # create hash

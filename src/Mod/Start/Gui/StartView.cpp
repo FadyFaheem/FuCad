@@ -210,7 +210,7 @@ void StartView::configureNewFileButtons(QLayout* layout) const
 {
     auto newEmptyFile = gsl::owner<NewFileButton*>(new NewFileButton(
         {tr("Empty File"),
-         tr("Creates a new empty FreeCAD file"),
+         tr("Creates a new empty FuCad file"),
          QLatin1String(":/icons/document-new.svg")}
     ));
     auto openFile = gsl::owner<NewFileButton*>(new NewFileButton(

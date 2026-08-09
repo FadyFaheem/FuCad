@@ -80,7 +80,7 @@
 #endif
 
 #else
-#   error "FreeCAD is not ported to this OS yet. For help see www.freecad.org"
+#   error "FuCad is not ported to this OS yet. For help see https://github.com/FadyFaheem/FuCad"
 #endif
 
 #ifdef FC_OS_WIN32

@@ -182,7 +182,7 @@
          <item row="5" column="0">
           <widget class="Gui::PrefCheckBox" name="preventNonIntrusiveNotificationsWhenWindowNotActive">
            <property name="toolTip">
-            <string>Prevent pop-up notifications from appearing when the FreeCAD window is not the active window.</string>
+            <string>Prevent pop-up notifications from appearing when the FuCad window is not the active window.</string>
            </property>
            <property name="text">
             <string>Do not show when window is inactive</string>

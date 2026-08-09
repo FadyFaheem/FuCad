@@ -372,7 +372,7 @@ void ModelLoader::getModelLibraries()
                                                      + "/Mod/Material/Resources/Models");
         auto libData = std::make_shared<ModelLibraryLocal>(QStringLiteral("System"),
                                                       resourceDir,
-                                                      QStringLiteral(":/icons/freecad.svg"));
+                                                      QStringLiteral(":/icons/fucad.svg"));
         _libraryList->push_back(libData);
     }
 

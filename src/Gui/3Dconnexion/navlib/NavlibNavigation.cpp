@@ -197,7 +197,7 @@ void NavlibInterface::onViewChanged(const Gui::MDIView* view)
 //    inside an .app bundle.
 //
 // 2. The process must have been launched through LaunchServices (e.g.
-//    via `open FreeCAD.app`), which registers the bundle identity with
+//    via `open FuCad.app`), which registers the bundle identity with
 //    the window server.  Running the binary directly skips this.
 
 static bool NavlibCanRecognizeApp()

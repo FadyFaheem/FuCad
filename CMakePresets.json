@@ -343,7 +343,7 @@
                 },
                 "CMAKE_INSTALL_PREFIX": {
                     "type": "PATH",
-                    "value": "/usr/lib64/freecad"
+                    "value": "/usr/lib64/fucad"
                 },
                 "CMAKE_INSTALL_FULL_SBINDIR": {
                     "type": "PATH",
@@ -379,7 +379,7 @@
                 },
                 "CMAKE_INSTALL_DOCDIR": {
                     "type": "PATH",
-                    "value": "/usr/share/doc/freecad"
+                    "value": "/usr/share/doc/fucad"
                 },
                 "CMAKE_INSTALL_INCLUDEDIR": {
                     "type": "PATH",
@@ -387,7 +387,7 @@
                 },
                 "RESOURCEDIR": {
                     "type": "PATH",
-                    "value": "/usr/share/freecad"
+                    "value": "/usr/share/fucad"
                 },
                 "FREECAD_USE_EXTERNAL_PIVY": {
                     "type": "BOOL",

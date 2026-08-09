@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <package format="1">
   <name>Built-In Preference Packs</name>
-  <description>Preference Packs included with the FreeCAD distribution</description>
+  <description>Preference Packs included with the FuCad distribution</description>
   <version>1.0.0</version>
-  <maintainer email="email@FreeCAD.org">MisterMaker</maintainer>
+  <maintainer email="noreply@fucad.invalid">FuCad contributors</maintainer>
   <license file="../../LICENSE">LGPL2</license>
-  <url type="repository">https://github.com/FreeCAD/FreeCAD</url>
+  <url type="repository">https://github.com/FadyFaheem/FuCad</url>
   <content>
     <preferencepack>
-      <name>FreeCAD Classic</name>
+      <name>Classic</name>
       <type>Theme</type>
       <description>Removes stylesheets, and applies the classic purple/gray background. Resets all colors to default</description>
       <version>1.0.0</version>
@@ -18,7 +18,7 @@
       <tag>classic theme</tag>
     </preferencepack>
 	<preferencepack>
-	  <name>FreeCAD Light</name>
+	  <name>Light</name>
       <type>Theme</type>
       <description>Applies a basic light theme.</description>
       <version>1.0.0</version>
@@ -27,7 +27,7 @@
       <tag>light</tag>
     </preferencepack>
 	<preferencepack>
-	  <name>FreeCAD Dark</name>
+	  <name>Dark</name>
       <type>Theme</type>
       <description>Applies a basic dark theme.</description>
       <version>1.0.0</version>

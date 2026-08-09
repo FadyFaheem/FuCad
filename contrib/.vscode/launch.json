@@ -53,7 +53,7 @@
       "type": "cppdbg",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "program": "${command:cmake.buildDirectory}/bin/FreeCAD",
+      "program": "${command:cmake.buildDirectory}/bin/FuCad",
       "args": ["${workspaceFolder}/.vscode/scripts/VSCodeAutostartDebug.FCMacro"],
       "environment": [
         {
@@ -122,7 +122,7 @@
   ],
   "compounds": [
     {
-      "name": "Debug FreeCAD",
+      "name": "Debug FuCad",
       "configurations": ["C/C++ debugger", "Python debugger"],
       "preLaunchTask": "CMake: build",
       "stopAll": true,

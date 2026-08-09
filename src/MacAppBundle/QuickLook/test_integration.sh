@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # FreeCAD QuickLook Extensions - Integration Test Script
-# This script tests the QuickLook extension integration in FreeCAD.app
+# This script tests the QuickLook extension integration in FuCad.app
 
 set -e  # Exit on any error
 
@@ -14,22 +14,22 @@ NC='\033[0m' # No Color
 
 # Test configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Look for FreeCAD.app in common install locations
-if [[ -d "${SCRIPT_DIR}/../../../FreeCAD.app" ]]; then
-    FREECAD_APP="${SCRIPT_DIR}/../../../FreeCAD.app"
-elif [[ -d "${SCRIPT_DIR}/../../../../FreeCAD.app" ]]; then
-    FREECAD_APP="${SCRIPT_DIR}/../../../../FreeCAD.app"
+# Look for FuCad.app in common install locations
+if [[ -d "${SCRIPT_DIR}/../../../FuCad.app" ]]; then
+    FREECAD_APP="${SCRIPT_DIR}/../../../FuCad.app"
+elif [[ -d "${SCRIPT_DIR}/../../../../FuCad.app" ]]; then
+    FREECAD_APP="${SCRIPT_DIR}/../../../../FuCad.app"
 else
     # Default to relative path from script
-    FREECAD_APP="${SCRIPT_DIR}/../../../FreeCAD.app"
+    FREECAD_APP="${SCRIPT_DIR}/../../../FuCad.app"
 fi
 
 EXTENSIONS_DIR="${FREECAD_APP}/Contents/PlugIns"
-THUMBNAIL_EXT="${EXTENSIONS_DIR}/FreeCADThumbnailExtension.appex"
-PREVIEW_EXT="${EXTENSIONS_DIR}/FreeCADPreviewExtension.appex"
+THUMBNAIL_EXT="${EXTENSIONS_DIR}/FuCadThumbnailExtension.appex"
+PREVIEW_EXT="${EXTENSIONS_DIR}/FuCadPreviewExtension.appex"
 
-THUMBNAIL_BUNDLE_ID="org.freecad.FreeCAD.quicklook.thumbnail"
-PREVIEW_BUNDLE_ID="org.freecad.FreeCAD.quicklook.preview"
+THUMBNAIL_BUNDLE_ID="org.fucad.FuCad.quicklook.thumbnail"
+PREVIEW_BUNDLE_ID="org.fucad.FuCad.quicklook.preview"
 
 # Function to print colored output
 print_status() {
@@ -61,20 +61,20 @@ main() {
     local total_tests=0
     local passed_tests=0
 
-    # Test 1: Check if FreeCAD.app exists
+    # Test 1: Check if FuCad.app exists
     ((total_tests++))
     if [[ -d "$FREECAD_APP" ]]; then
-        print_status "OK" "FreeCAD.app exists at: $FREECAD_APP"
+        print_status "OK" "FuCad.app exists at: $FREECAD_APP"
         ((passed_tests++))
     else
-        print_status "FAIL" "FreeCAD.app not found at: $FREECAD_APP"
+        print_status "FAIL" "FuCad.app not found at: $FREECAD_APP"
         print_status "INFO" "Please build and install FreeCAD first with: make install"
         exit 1
     fi
 
     # Test 2: Check if main FreeCAD executable exists
     ((total_tests++))
-    if [[ -f "$FREECAD_APP/Contents/MacOS/FreeCAD" ]]; then
+    if [[ -f "$FREECAD_APP/Contents/MacOS/FuCad" ]]; then
         print_status "OK" "FreeCAD executable exists"
         ((passed_tests++))
     else
@@ -111,7 +111,7 @@ main() {
 
     # Test 6: Check if thumbnail extension executable exists
     ((total_tests++))
-    if [[ -f "$THUMBNAIL_EXT/Contents/MacOS/FreeCADThumbnailExtension" ]]; then
+    if [[ -f "$THUMBNAIL_EXT/Contents/MacOS/FuCadThumbnailExtension" ]]; then
         print_status "OK" "Thumbnail extension executable exists"
         ((passed_tests++))
     else
@@ -120,7 +120,7 @@ main() {
 
     # Test 7: Check if preview extension executable exists
     ((total_tests++))
-    if [[ -f "$PREVIEW_EXT/Contents/MacOS/FreeCADPreviewExtension" ]]; then
+    if [[ -f "$PREVIEW_EXT/Contents/MacOS/FuCadPreviewExtension" ]]; then
         print_status "OK" "Preview extension executable exists"
         ((passed_tests++))
     else
@@ -172,7 +172,7 @@ main() {
     # Test 12: Basic FreeCAD launch test
     ((total_tests++))
     print_status "INFO" "Testing FreeCAD launch (--version)..."
-    if timeout 10 "$FREECAD_APP/Contents/MacOS/FreeCAD" --version >/dev/null 2>&1; then
+    if timeout 10 "$FREECAD_APP/Contents/MacOS/FuCad" --version >/dev/null 2>&1; then
         print_status "OK" "FreeCAD launches successfully"
         ((passed_tests++))
     else
@@ -198,9 +198,9 @@ main() {
 
     # App signing status
     if codesign -v "$FREECAD_APP" >/dev/null 2>&1; then
-        print_status "OK" "FreeCAD.app is signed"
+        print_status "OK" "FuCad.app is signed"
     else
-        print_status "WARN" "FreeCAD.app is unsigned (normal for development builds)"
+        print_status "WARN" "FuCad.app is unsigned (normal for development builds)"
     fi
 
     # Optional tests (don't count toward pass/fail)
@@ -212,7 +212,7 @@ main() {
         echo
         print_status "INFO" "Signing Details:"
 
-        echo "  FreeCAD.app:"
+        echo "  FuCad.app:"
         codesign -dv "$FREECAD_APP" 2>&1 | grep -E "(Identifier|Authority|Signature)" | head -3 | sed 's/^/    /' || echo "    No signature information"
 
         echo "  Thumbnail Extension:"
@@ -246,16 +246,16 @@ main() {
 
     if command -v spctl >/dev/null 2>&1; then
         if spctl -a -v "$FREECAD_APP" >/dev/null 2>&1; then
-            print_status "OK" "FreeCAD.app passes Gatekeeper checks"
+            print_status "OK" "FuCad.app passes Gatekeeper checks"
         else
-            print_status "WARN" "FreeCAD.app rejected by Gatekeeper (normal for unsigned development builds)"
+            print_status "WARN" "FuCad.app rejected by Gatekeeper (normal for unsigned development builds)"
             print_status "INFO" "You may need to: sudo xattr -rd com.apple.quarantine '$FREECAD_APP'"
         fi
     fi
 
     # Check for quarantine attributes
     if xattr "$FREECAD_APP" 2>/dev/null | grep -q quarantine; then
-        print_status "WARN" "FreeCAD.app has quarantine attributes"
+        print_status "WARN" "FuCad.app has quarantine attributes"
         print_status "INFO" "Remove with: sudo xattr -rd com.apple.quarantine '$FREECAD_APP'"
     else
         print_status "OK" "No quarantine attributes found"
@@ -344,10 +344,10 @@ show_usage() {
     echo "  --test-registration  Also test extension registration with pluginkit"
     echo "  --help              Show this help message"
     echo
-    echo "This script tests the QuickLook extension integration in FreeCAD.app."
+    echo "This script tests the QuickLook extension integration in FuCad.app."
     echo "Run this after building and installing FreeCAD: 'make install'"
     echo
-    echo "The script will look for FreeCAD.app in common install locations relative to the script."
+    echo "The script will look for FuCad.app in common install locations relative to the script."
 }
 
 # Handle command line arguments

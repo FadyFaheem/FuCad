@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# call this file from within the FreeCAD git repo
+# call this file from within the FuCad git repo
 # this script creates a file with the important version information
 import os
 import sys

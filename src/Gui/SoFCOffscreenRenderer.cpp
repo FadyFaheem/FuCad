@@ -121,7 +121,7 @@ void SoFCOffscreenRenderer::writeToImageFile(
         // writing comment in case of jpeg (Qt ignores setText() in case of jpeg)
         std::string com;
         if (strcmp(comment, "") == 0) {
-            com = "Screenshot created by FreeCAD";
+            com = "Screenshot created by FuCad";
         }
         else if (strcmp(comment, "$MIBA") == 0) {
             com = createMIBA(mat);
@@ -171,7 +171,7 @@ void SoFCOffscreenRenderer::writeToImageFile(
                 if (strcmp(comment, "") == 0) {
                     img.setText(
                         QLatin1String("Description"),
-                        QLatin1String("Screenshot created by FreeCAD")
+                        QLatin1String("Screenshot created by FuCad")
                     );
                 }
                 else if (strcmp(comment, "$MIBA") == 0) {

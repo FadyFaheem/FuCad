@@ -2019,7 +2019,7 @@ void MainWindow::delayedStartup()
         auto safeModePopup = QMessageBox(
             QMessageBox::Information,
             tr("Safe mode enabled"),
-            tr("FreeCAD is now running in safe mode."),
+            tr("FuCad is now running in safe mode."),
             QMessageBox::Ok
         );
         safeModePopup.setInformativeText(
@@ -2045,12 +2045,12 @@ void MainWindow::registerQuickLookExtensions()
     }
     quickLookChecked = true;
 
-    // Get the path to FreeCAD.app/Contents/PlugIns
+    // Get the path to FuCad.app/Contents/PlugIns
     QString appPath = QApplication::applicationDirPath();
     QString plugInsPath = appPath + "/../PlugIns";
 
-    QString thumbnailExt = plugInsPath + "/FreeCADThumbnailExtension.appex";
-    QString previewExt = plugInsPath + "/FreeCADPreviewExtension.appex";
+    QString thumbnailExt = plugInsPath + "/FuCadThumbnailExtension.appex";
+    QString previewExt = plugInsPath + "/FuCadPreviewExtension.appex";
 
     // Check if extensions exist before attempting registration
     if (!QFileInfo::exists(thumbnailExt) || !QFileInfo::exists(previewExt)) {
@@ -2063,8 +2063,8 @@ void MainWindow::registerQuickLookExtensions()
     checkProcess.waitForFinished();
     QString registeredPlugins = QString::fromUtf8(checkProcess.readAllStandardOutput());
 
-    const QString thumbnailId = QStringLiteral("org.freecad.FreeCAD.quicklook.thumbnail");
-    const QString previewId = QStringLiteral("org.freecad.FreeCAD.quicklook.preview");
+    const QString thumbnailId = QStringLiteral("org.fucad.FuCad.quicklook.thumbnail");
+    const QString previewId = QStringLiteral("org.fucad.FuCad.quicklook.preview");
 
     bool thumbnailRegistered = registeredPlugins.contains(thumbnailId);
     bool previewRegistered = registeredPlugins.contains(previewId);

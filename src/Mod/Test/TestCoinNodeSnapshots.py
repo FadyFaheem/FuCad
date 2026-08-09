@@ -355,7 +355,7 @@ def _require_gui():
     if os.environ.get("CI", "").strip() and not sys.platform.startswith("linux"):
         raise unittest.SkipTest("Coin node snapshot visual tests are only supported on Linux CI")
 
-    # `FreeCADCmd -t 0` runs the base test suite without X11/Wayland. Creating a Qt application
+    # `FuCadCmd -t 0` runs the base test suite without X11/Wayland. Creating a Qt application
     # in that environment can abort the whole process (instead of raising a Python exception).
     # Skip early unless a display (or explicit headless Qt platform) is configured.
     if sys.platform.startswith("linux"):

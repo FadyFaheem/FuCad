@@ -425,7 +425,7 @@ This will slow down the import, but one can watch the import.</string>
 FreeCAD object properties</string>
         </property>
         <property name="text">
-         <string>Import full FreeCAD parametric definitions if available</string>
+         <string>Import full FuCad parametric definitions if available</string>
         </property>
         <property name="prefEntry" stdset="0">
          <cstring>IfcImportFreeCADProperties</cstring>

@@ -112,9 +112,9 @@ void ThemeSelectorWidget::setupButtons(QBoxLayout* layout)
         return;
     }
     std::map<Theme, QString> themeMap {
-        {Theme::Classic, tr("FreeCAD Classic")},
-        {Theme::Dark, tr("FreeCAD Dark")},
-        {Theme::Light, tr("FreeCAD Light")},
+        {Theme::Classic, tr("Classic")},
+        {Theme::Dark, tr("Dark")},
+        {Theme::Light, tr("Light")},
         {Theme::FuCadDark, tr("FuCad Dark")}
     };
     std::map<Theme, QIcon> iconMap {
@@ -146,16 +146,10 @@ void ThemeSelectorWidget::setupButtons(QBoxLayout* layout)
         if (theme.first == Theme::Classic && styleSheetName.isEmpty()) {
             button->setChecked(true);
         }
-        else if (
-            theme.first == Theme::Light
-            && styleSheetName.contains(QLatin1String("FreeCAD Light"), Qt::CaseSensitivity::CaseInsensitive)
-        ) {
+        else if (theme.first == Theme::Light && themeName == QLatin1String("Light")) {
             button->setChecked(true);
         }
-        else if (
-            theme.first == Theme::Dark
-            && styleSheetName.contains(QLatin1String("FreeCAD Dark"), Qt::CaseSensitivity::CaseInsensitive)
-        ) {
+        else if (theme.first == Theme::Dark && themeName == QLatin1String("Dark")) {
             button->setChecked(true);
         }
         else if (theme.first == Theme::FuCadDark && themeName == QLatin1String("FuCad Dark")) {
@@ -223,13 +217,13 @@ void ThemeSelectorWidget::themeChanged(Theme newTheme)
     auto prefPackManager = Gui::Application::Instance->prefPackManager();
     switch (newTheme) {
         case Theme::Classic:
-            prefPackManager->apply("FreeCAD Classic");
+            prefPackManager->apply("Classic");
             break;
         case Theme::Dark:
-            prefPackManager->apply("FreeCAD Dark");
+            prefPackManager->apply("Dark");
             break;
         case Theme::Light:
-            prefPackManager->apply("FreeCAD Light");
+            prefPackManager->apply("Light");
             break;
         case Theme::FuCadDark:
             prefPackManager->apply("FuCad Dark");
@@ -271,8 +265,8 @@ void ThemeSelectorWidget::retranslateUi()
     else {
         _descriptionLabel->hide();
     }
-    _buttons[static_cast<int>(Theme::Dark)]->setText(tr("FreeCAD Dark", "Visual theme name"));
-    _buttons[static_cast<int>(Theme::Light)]->setText(tr("FreeCAD Light", "Visual theme name"));
-    _buttons[static_cast<int>(Theme::Classic)]->setText(tr("FreeCAD Classic", "Visual theme name"));
+    _buttons[static_cast<int>(Theme::Dark)]->setText(tr("Dark", "Visual theme name"));
+    _buttons[static_cast<int>(Theme::Light)]->setText(tr("Light", "Visual theme name"));
+    _buttons[static_cast<int>(Theme::Classic)]->setText(tr("Classic", "Visual theme name"));
     _buttons[static_cast<int>(Theme::FuCadDark)]->setText(tr("FuCad Dark", "Visual theme name"));
 }

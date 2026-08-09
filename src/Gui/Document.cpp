@@ -1624,7 +1624,7 @@ bool Document::warnIfOlderVersion()
     if (!hasVersion || (docMajor < currentMajor)
         || (docMajor == currentMajor && docMinor < currentMinor)) {
         QMessageBox msgBox(getMainWindow());
-        msgBox.setWindowTitle(QObject::tr("File Created with Older FreeCAD Version"));
+        msgBox.setWindowTitle(QObject::tr("File Created with Older Version"));
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.setText(
             QObject::tr(
@@ -1636,8 +1636,8 @@ bool Document::warnIfOlderVersion()
             )
                 .arg(
                     !hasVersionString
-                        ? QObject::tr("an unknown older version of FreeCAD")
-                        : QObject::tr("FreeCAD version %1").arg(QString::fromUtf8(docVersion))
+                        ? QObject::tr("an unknown older version")
+                        : QObject::tr("version %1").arg(QString::fromUtf8(docVersion))
                 )
                 .arg(currentMajor)
                 .arg(currentMinor)

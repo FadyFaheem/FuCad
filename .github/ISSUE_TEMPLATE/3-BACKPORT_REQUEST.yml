@@ -8,7 +8,7 @@ body:
     attributes:
       label: Original PR
       description: A link to the PR that contains the commits to be backported
-      placeholder: https://github.com/FreeCAD/FreeCAD/pulls/1234
+      placeholder: https://github.com/FadyFaheem/FuCad/pulls/1234
     validations:
       required: true
   - type: textarea

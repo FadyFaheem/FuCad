@@ -69,7 +69,7 @@
              </property>
              <property name="icon">
               <iconset resource="../Icons/resource.qrc">
-               <normaloff>:/icons/FreeCAD-default/scalable/zoom-in.svg</normaloff>:/icons/FreeCAD-default/scalable/zoom-in.svg</iconset>
+               <normaloff>:/icons/FuCad-default/scalable/zoom-in.svg</normaloff>:/icons/FuCad-default/scalable/zoom-in.svg</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -89,7 +89,7 @@
              </property>
              <property name="icon">
               <iconset resource="../Icons/resource.qrc">
-               <normaloff>:/icons/FreeCAD-default/scalable/zoom-out.svg</normaloff>:/icons/FreeCAD-default/scalable/zoom-out.svg</iconset>
+               <normaloff>:/icons/FuCad-default/scalable/zoom-out.svg</normaloff>:/icons/FuCad-default/scalable/zoom-out.svg</iconset>
              </property>
              <property name="iconSize">
               <size>

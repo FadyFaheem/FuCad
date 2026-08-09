@@ -35,11 +35,11 @@
 # ${REF} => The full reference of the branch owning the cache (starting with "/refs/pull/" or "/refs/heads/")
 # ${ID} => A cache unique identifier, generally an ascending number, in no case containing a '-' (hyphen) sign
 
-name: FreeCAD CI cleaner
+name: FuCad CI cleaner
 
 on:
   workflow_run:
-    workflows: [FreeCAD CI primary, FreeCAD CI approved]
+    workflows: [FuCad CI primary, FuCad CI approved]
     types:
       - completed
 

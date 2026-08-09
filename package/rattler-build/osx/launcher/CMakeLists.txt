@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(freecad-launcher LANGUAGES CXX)
+project(fucad-launcher LANGUAGES CXX)
 
 # Use MACOS_DEPLOYMENT_TARGET from environment if set, otherwise keep original default
 if(DEFINED ENV{MACOS_DEPLOYMENT_TARGET})
@@ -9,5 +9,5 @@ else()
 endif()
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(FreeCAD FreeCAD.cpp)
-target_link_libraries(FreeCAD)
+add_executable(FuCad FuCad.cpp)
+target_link_libraries(FuCad)

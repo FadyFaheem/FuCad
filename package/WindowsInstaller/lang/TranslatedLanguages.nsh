@@ -1,7 +1,7 @@
 ﻿!macro LANG LANG_NAME
   # NSIS language file
   !insertmacro MUI_LANGUAGE "${LANG_NAME}"
-  # FreeCAD language file
+  # FuCad language file
   !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "lang\${LANG_NAME}.nsh" "lang\english.nsh"
 !macroend
 

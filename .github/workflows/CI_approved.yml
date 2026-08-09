@@ -34,7 +34,7 @@
 #     (or are running) for the same HEAD SHA.  If so, bail out so we do
 #     not restart builds that are already covered.
 
-name: FreeCAD CI approved
+name: FuCad CI approved
 
 on:
   workflow_dispatch: ~

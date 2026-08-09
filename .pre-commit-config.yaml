@@ -90,5 +90,5 @@ repos:
         name: Verify version consistency
         entry: python src/Tools/sync_version.py --check
         language: python
-        files: '(pixi\.toml|recipe\.yaml|declarations\.nsh|freecad\.spec)'
+        files: '(pixi\.toml|recipe\.yaml|declarations\.nsh|fucad\.spec)'
         pass_filenames: false

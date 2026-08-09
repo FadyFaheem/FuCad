@@ -1,5 +1,5 @@
 ﻿/*
-FreeCAD Installer Language File
+FuCad Installer Language File
 Language: English
 */
 
@@ -14,18 +14,18 @@ ${LangFileString} TEXT_WELCOME "This wizard will guide you through the installat
 #${LangFileString} TEXT_CONFIGURE_PYTHON "Compiling Python scripts..."
 
 ${LangFileString} TEXT_FINISH_DESKTOP "Create desktop shortcut"
-${LangFileString} TEXT_FINISH_WEBSITE "Visit freecad.org/ for the latest news, support and tips"
+${LangFileString} TEXT_FINISH_WEBSITE "Visit github.com/FadyFaheem/FuCad for the latest news, support and tips"
 
-#${LangFileString} FileTypeTitle "FreeCAD-Document"
+#${LangFileString} FileTypeTitle "FuCad-Document"
 
 #${LangFileString} SecAllUsersTitle "Install for all users?"
 ${LangFileString} SecFileAssocTitle "File associations"
 ${LangFileString} SecDesktopTitle "Desktop icon"
 
-${LangFileString} SecCoreDescription "The FreeCAD files."
-#${LangFileString} SecAllUsersDescription "Install FreeCAD for all users or just the current user."
-${LangFileString} SecFileAssocDescription "Files with a .FCStd extension will automatically open in FreeCAD."
-${LangFileString} SecDesktopDescription "A FreeCAD icon on the desktop."
+${LangFileString} SecCoreDescription "The FuCad files."
+#${LangFileString} SecAllUsersDescription "Install FuCad for all users or just the current user."
+${LangFileString} SecFileAssocDescription "Files with a .FCStd extension will automatically open in FuCad."
+${LangFileString} SecDesktopDescription "A FuCad icon on the desktop."
 #${LangFileString} SecDictionaries "Dictionaries"
 #${LangFileString} SecDictionariesDescription "Spell-checker dictionaries that can be downloaded and installed."
 
@@ -34,38 +34,38 @@ ${LangFileString} SecDesktopDescription "A FreeCAD icon on the desktop."
 
 #${LangFileString} DictionariesFailed 'Download of dictionary for language $\"$R3$\" failed.'
 
-#${LangFileString} ConfigInfo "The following configuration of FreeCAD could take a while."
+#${LangFileString} ConfigInfo "The following configuration of FuCad could take a while."
 
 #${LangFileString} RunConfigureFailed "Could not run configure script."
 ${LangFileString} InstallRunning "The installer is already running!"
-${LangFileString} AlreadyInstalled "FreeCAD ${APP_SERIES_KEY2} is already installed!$\r$\n\
-				Do you nevertheless want to install FreeCAD over the existing version?"
-${LangFileString} NewerInstalled "You are trying to install an older version of FreeCAD than what you have installed.$\r$\n\
-				  If you really want this, you must uninstall the existing FreeCAD $OldVersionNumber before."
+${LangFileString} AlreadyInstalled "FuCad ${APP_SERIES_KEY2} is already installed!$\r$\n\
+				Do you nevertheless want to install FuCad over the existing version?"
+${LangFileString} NewerInstalled "You are trying to install an older version of FuCad than what you have installed.$\r$\n\
+				  If you really want this, you must uninstall the existing FuCad $OldVersionNumber before."
 
-#${LangFileString} FinishPageMessage "Congratulations! FreeCAD has been installed successfully.$\r$\n\
+#${LangFileString} FinishPageMessage "Congratulations! FuCad has been installed successfully.$\r$\n\
 #					$\r$\n\
-#					(The first start of FreeCAD might take some seconds.)"
-${LangFileString} FinishPageRun "Launch FreeCAD"
+#					(The first start of FuCad might take some seconds.)"
+${LangFileString} FinishPageRun "Launch FuCad"
 
-${LangFileString} UnNotInRegistryLabel "Unable to find FreeCAD in the registry.$\r$\n\
+${LangFileString} UnNotInRegistryLabel "Unable to find FuCad in the registry.$\r$\n\
 					Shortcuts on the desktop and in the Start Menu will not be removed."
-${LangFileString} UnInstallRunning "You must close FreeCAD first!"
-${LangFileString} UnNotAdminLabel "You must have administrator privileges to uninstall FreeCAD!"
-${LangFileString} UnReallyRemoveLabel "Are you sure you want to completely remove FreeCAD and all of its components?"
-${LangFileString} UnFreeCADPreferencesTitle 'FreeCAD$\'s user preferences'
+${LangFileString} UnInstallRunning "You must close FuCad first!"
+${LangFileString} UnNotAdminLabel "You must have administrator privileges to uninstall FuCad!"
+${LangFileString} UnReallyRemoveLabel "Are you sure you want to completely remove FuCad and all of its components?"
+${LangFileString} UnFuCadPreferencesTitle 'FuCad$\'s user preferences'
 
 #${LangFileString} SecUnProgDescription "Uninstalls xxx."
-${LangFileString} SecUnPreferencesDescription 'Deletes FreeCAD$\'s configuration$\r$\n\
+${LangFileString} SecUnPreferencesDescription 'Deletes FuCad$\'s configuration$\r$\n\
 						(folder $\"$AppPre\username\$\r$\n\
 						$AppSuff\$\r$\n\
 						${APP_DIR_USERDATA}$\")$\r$\n\
 						for you or for all users (if you are admin).'
-${LangFileString} DialogUnPreferences 'You chose to delete the FreeCAD user configuration.$\r$\n\
-						This will also delete all installed FreeCAD addons, and will affect the$\r$\n\
-						preferences for all versions of FreeCAD.$\r$\n\
+${LangFileString} DialogUnPreferences 'You chose to delete the FuCad user configuration.$\r$\n\
+						This will also delete all installed FuCad addons, and will affect the$\r$\n\
+						preferences for all versions of FuCad.$\r$\n\
 						Are you sure you want to proceed?'
-${LangFileString} SecUnProgramFilesDescription "Uninstall FreeCAD and all of its components."
+${LangFileString} SecUnProgramFilesDescription "Uninstall FuCad and all of its components."
 
 ${LangFileString} DirNotEmptyWarning "The selected folder '$INSTDIR' is not empty.$\r$\n\
                         The installer will remove all its content before installing. Continue?"

@@ -333,7 +333,7 @@ void AboutDialog::showCredits()
     QString creditsHTML
         = QStringLiteral("<html><body><h1>%1</h1><p>%2</p><h2>%3</h2><ul>")
               .arg(tr("Credits", "Header for the Credits tab of the About screen"))
-              .arg(tr("FreeCAD would not be possible without the contributions of:"))
+              .arg(tr("FuCad would not be possible without the contributions of:"))
               .arg(tr("Individuals", "Header for the list of individual people in the Credits list."));
 
     QTextStream stream(&creditsFile);

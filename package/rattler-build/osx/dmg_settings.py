@@ -2,8 +2,8 @@
 
 # Ensure default values are set in defines if they are not already provided
 defines.setdefault('containing_folder', '.')
-defines.setdefault('app_name', 'FreeCAD.app')
-defines.setdefault('icon_path', 'Contents/Resources/freecad.icns')
+defines.setdefault('app_name', 'FuCad.app')
+defines.setdefault('icon_path', 'Contents/Resources/fucad.icns')
 
 
 files = [f"{defines['containing_folder']}/{defines['app_name']}"]

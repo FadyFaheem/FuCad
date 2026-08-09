@@ -12,38 +12,38 @@ if(NOT DEFINED APPDATA_RELEASE_DATE)
 endif()
 
 configure_file(
-    org.freecad.FreeCAD.metainfo.xml.in
-    ${CMAKE_BINARY_DIR}/org.freecad.FreeCAD.metainfo.xml
+    org.fucad.FuCad.metainfo.xml.in
+    ${CMAKE_BINARY_DIR}/org.fucad.FuCad.metainfo.xml
 )
 install(
-    FILES ${CMAKE_BINARY_DIR}/org.freecad.FreeCAD.metainfo.xml
+    FILES ${CMAKE_BINARY_DIR}/org.fucad.FuCad.metainfo.xml
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/metainfo
 )
 
 install(
-    FILES org.freecad.FreeCAD.desktop
+    FILES org.fucad.FuCad.desktop
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications
 )
 
 install(
-    FILES org.freecad.FreeCAD.xml
+    FILES org.fucad.FuCad.xml
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/mime/packages
 )
 
 configure_file(
-    FreeCAD.thumbnailer.in
-    ${CMAKE_BINARY_DIR}/FreeCAD.thumbnailer
+    FuCad.thumbnailer.in
+    ${CMAKE_BINARY_DIR}/FuCad.thumbnailer
 )
 install(
-    FILES ${CMAKE_BINARY_DIR}/FreeCAD.thumbnailer
+    FILES ${CMAKE_BINARY_DIR}/FuCad.thumbnailer
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thumbnailers
 )
 
 configure_file(
-    ${CMAKE_SOURCE_DIR}/src/Tools/freecad-thumbnailer.in
-    ${CMAKE_BINARY_DIR}/freecad-thumbnailer
+    ${CMAKE_SOURCE_DIR}/src/Tools/fucad-thumbnailer.in
+    ${CMAKE_BINARY_DIR}/fucad-thumbnailer
 )
 install(
-    PROGRAMS ${CMAKE_BINARY_DIR}/freecad-thumbnailer
+    PROGRAMS ${CMAKE_BINARY_DIR}/fucad-thumbnailer
     TYPE BIN
 )

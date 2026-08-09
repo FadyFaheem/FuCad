@@ -20,7 +20,7 @@ class TestSketchPlacementUpdate(SketcherGuiTestCase):
     edit mode. These tests use an attached sketch to properly test
     this scenario.
 
-    These tests require GUI and will be skipped with freecadcmd.
+    These tests require GUI and will be skipped with fucadcmd.
     """
 
     def setUp(self):

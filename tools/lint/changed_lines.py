@@ -137,7 +137,7 @@ def main():
     )
     parser.add_argument("--token")
     parser.add_argument("--api-url", default="https://api.github.com")
-    parser.add_argument("--repo", default="FreeCAD/FreeCAD")
+    parser.add_argument("--repo", default="FadyFaheem/FuCad")
     parser.add_argument("--ref", required=True)
     parser.add_argument("--pr", required=True)
     parser.add_argument("--file-filter", default="")

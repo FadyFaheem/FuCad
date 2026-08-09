@@ -1,4 +1,4 @@
-# FuCad
+<img src="/.github/images/fucad-banner.png" width="900" alt="FuCad"/>
 
 ### A Fusion 360-style fork of FreeCAD
 

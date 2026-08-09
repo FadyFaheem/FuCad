@@ -98,11 +98,11 @@
 
   @if DEV_DOCUMENTATION
 
-  @mainpage FreeCAD source documentation
+  @mainpage FuCad source documentation
 
-    @image html freecadsplash.png
+    @image html fucadsplash.png
 
-    <b>Welcome to FreeCAD source documentation!</b>
+    <b>Welcome to FuCad source documentation!</b>
 
     We hope you'll find it a convenient tool to explore, understand and
     experiment with the internals of the program.
@@ -114,11 +114,13 @@
     If you seek information on FreeCAD at large, please consult our
     <a href="https://www.freecad.org/wiki/Main_Page">Wiki</a>
 
-    FreeCAD being a fast moving target, don't hesitate to rebuild an up to
+    FuCad being a fast moving target, don't hesitate to rebuild an up to
     date doc from source as often as needed (\ref makingdocs "more info"). CPU cycles are cheap
     nowadays!
 
-    The homepage of FreeCAD is <a href="https://www.freecad.org">here</a>.
+    The FuCad repository is
+    <a href="https://github.com/FadyFaheem/FuCad">here</a>, and the homepage of
+    upstream FreeCAD is <a href="https://www.freecad.org">here</a>.
 
   @endif
 

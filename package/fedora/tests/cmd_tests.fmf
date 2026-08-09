@@ -1,42 +1,42 @@
 /tests:
   /TestAssemblyWorkbench :
-    test: /usr/bin/FreeCADCmd -t  TestAssemblyWorkbench
+    test: /usr/bin/FuCadCmd -t  TestAssemblyWorkbench
   /TestArch              :
-    test: /usr/bin/FreeCADCmd -t  TestArch
+    test: /usr/bin/FuCadCmd -t  TestArch
   /TestCAMApp            :
-    test: /usr/bin/FreeCADCmd -t  TestCAMApp
+    test: /usr/bin/FuCadCmd -t  TestCAMApp
   /TestDraft             :
-    test: /usr/bin/FreeCADCmd -t  TestDraft
+    test: /usr/bin/FuCadCmd -t  TestDraft
   /TestFemApp            :
-    test: /usr/bin/FreeCADCmd -t  TestFemApp
+    test: /usr/bin/FuCadCmd -t  TestFemApp
   /TestMaterialsApp      :
-    test: /usr/bin/FreeCADCmd -t  TestMaterialsApp
+    test: /usr/bin/FuCadCmd -t  TestMaterialsApp
   /MeshTestsApp          :
-    test: /usr/bin/FreeCADCmd -t  MeshTestsApp
+    test: /usr/bin/FuCadCmd -t  MeshTestsApp
   /TestPartApp           :
-    test: /usr/bin/FreeCADCmd -t  TestPartApp
+    test: /usr/bin/FuCadCmd -t  TestPartApp
   /TestPartDesignApp     :
-    test: /usr/bin/FreeCADCmd -t  TestPartDesignApp
+    test: /usr/bin/FuCadCmd -t  TestPartDesignApp
   /TestSketcherApp       :
-    test: /usr/bin/FreeCADCmd -t  TestSketcherApp
+    test: /usr/bin/FuCadCmd -t  TestSketcherApp
   /TestSpreadsheet       :
-    test: /usr/bin/FreeCADCmd -t  TestSpreadsheet
+    test: /usr/bin/FuCadCmd -t  TestSpreadsheet
   /TestSurfaceApp        :
-    test: /usr/bin/FreeCADCmd -t  TestSurfaceApp
+    test: /usr/bin/FuCadCmd -t  TestSurfaceApp
   /TestTechDrawApp       :
-    test: /usr/bin/FreeCADCmd -t  TestTechDrawApp
+    test: /usr/bin/FuCadCmd -t  TestTechDrawApp
   /BaseTests             :
-    test: /usr/bin/FreeCADCmd -t  BaseTests
+    test: /usr/bin/FuCadCmd -t  BaseTests
   /UnitTests             :
-    test: /usr/bin/FreeCADCmd -t  UnitTests
+    test: /usr/bin/FuCadCmd -t  UnitTests
   /Document              :
-    test: /usr/bin/FreeCADCmd -t  Document
+    test: /usr/bin/FuCadCmd -t  Document
   /Metadata              :
-    test: /usr/bin/FreeCADCmd -t  Metadata
+    test: /usr/bin/FuCadCmd -t  Metadata
   /StringHasher          :
-    test: /usr/bin/FreeCADCmd -t  StringHasher
+    test: /usr/bin/FuCadCmd -t  StringHasher
   /UnicodeTests          :
-    test: /usr/bin/FreeCADCmd -t  UnicodeTests
+    test: /usr/bin/FuCadCmd -t  UnicodeTests
   /TestPythonSyntax      :
-    test: /usr/bin/FreeCADCmd -t  TestPythonSyntax
+    test: /usr/bin/FuCadCmd -t  TestPythonSyntax
 

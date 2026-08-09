@@ -117,7 +117,7 @@ Metadata::Metadata(const DOMNode* domNode, int format)
                 break;
             default:
                 throw Base::XMLBaseException(
-                    "package.xml format version is not supported by this version of FreeCAD");
+                    "package.xml format version is not supported by this version of FuCad");
         }
     }
 }
@@ -160,7 +160,7 @@ void Metadata::loadFromInputSource(const InputSource& source)
             break;
         default:
             throw Base::XMLBaseException(
-                "package.xml format version is not supported by this version of FreeCAD");
+                "package.xml format version is not supported by this version of FuCad");
     }
 }
 

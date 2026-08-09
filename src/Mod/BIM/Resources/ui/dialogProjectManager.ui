@@ -111,7 +111,7 @@
             <item>
              <widget class="QRadioButton" name="radioNative1">
               <property name="toolTip">
-               <string>This will create a new FreeCAD document for the construction of a BIM model, but initially with no specific IFC structure. This is the most flexible option when starting working on a BIM project. This project can be converted to IFC anytime later.</string>
+               <string>This will create a new FuCad document for the construction of a BIM model, but initially with no specific IFC structure. This is the most flexible option when starting working on a BIM project. This project can be converted to IFC anytime later.</string>
               </property>
               <property name="text">
                <string>Create a new document without IFC support</string>

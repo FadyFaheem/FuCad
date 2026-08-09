@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.22)
 # CMAKE_OSX_DEPLOYMENT_TARGET
 
 # Paths (inherited from parent)
-set(TARGET_APP_BUNDLE "${CMAKE_BINARY_DIR}/src/MacAppBundle/FreeCAD.app")
+set(TARGET_APP_BUNDLE "${CMAKE_BINARY_DIR}/src/MacAppBundle/FuCad.app")
 set(LEGACY_QUICKLOOK_DIR "${TARGET_APP_BUNDLE}/Contents/Library/QuickLook")
 
 # Build legacy QuickLook generator as a proper macOS plugin bundle
@@ -57,7 +57,7 @@ add_custom_target(embed_legacy_generator ALL
     DEPENDS
         QuicklookFCStd
         create_legacy_bundle_dirs
-    COMMENT "Embedding legacy QuickLook generator in main FreeCAD.app"
+    COMMENT "Embedding legacy QuickLook generator in main FuCad.app"
 )
 
 # Main legacy generator target
@@ -76,7 +76,7 @@ install(DIRECTORY ${LEGACY_QUICKLOOK_DIR}/QuicklookFCStd.qlgenerator
 # Verification target
 add_custom_target(verify_legacy_build
     COMMAND test -f ${LEGACY_QUICKLOOK_DIR}/QuicklookFCStd.qlgenerator/Contents/MacOS/QuicklookFCStd
-    COMMAND echo "Legacy generator successfully embedded in FreeCAD.app"
+    COMMAND echo "Legacy generator successfully embedded in FuCad.app"
     DEPENDS FreeCADLegacyQuickLook
     COMMENT "Verifying legacy QuickLook generator integration"
 )
@@ -94,5 +94,5 @@ message(STATUS "Legacy Objective-C QuickLook Generator Configuration:")
 message(STATUS "  Target Library: QuicklookFCStd")
 message(STATUS "  Deployment Target: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 message(STATUS "  Legacy QuickLook Directory: ${LEGACY_QUICKLOOK_DIR}")
-message(STATUS "  Bundle ID: org.freecad.qlgenerator.QuicklookFCStd")
+message(STATUS "  Bundle ID: org.fucad.qlgenerator.QuicklookFCStd")
 message(STATUS "  Code Signing: Handled by official macos_sign_and_notarize.sh script")

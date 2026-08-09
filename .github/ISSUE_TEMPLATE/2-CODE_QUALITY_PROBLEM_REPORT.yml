@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to help improve FreeCAD's code quality!
+        Thanks for taking the time to help improve FuCad's code quality!
 
         > [!NOTE]
         > This form is intended **only for code quality issues**, such as:
@@ -17,8 +17,8 @@ body:
         >
         > If the issue affects user-visible behavior, workflows, or UI, please use the regular **Report Problem** form instead.
 
-        Please [search existing issues](https://github.com/FreeCAD/FreeCAD/issues) before submitting.
-        By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/FreeCAD/FreeCAD/blob/main/CODE_OF_CONDUCT.md).
+        Please [search existing issues](https://github.com/FuCad/FuCad/issues) before submitting.
+        By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/FuCad/FuCad/blob/main/CODE_OF_CONDUCT.md).
 
   - type: dropdown
     id: wb
@@ -97,7 +97,7 @@ body:
       label: Development version (if relevant)
       description: |
         If the issue is version-specific or recently introduced, paste the output from the
-        **About FreeCAD** dialog of a development build.
+        **About FuCad** dialog of a development build.
         Otherwise, this can be left empty.
-      placeholder: Paste About FreeCAD information here.
+      placeholder: Paste About FuCad information here.
       render: shell

@@ -54,7 +54,7 @@ def emit_problem_matchers(log_path: str, matcher_filename: str, remove_owner: st
     if os.path.isfile(log_path):
         runner_workspace = os.getenv("RUNNER_WORKSPACE")
         matcher_path = os.path.join(
-            runner_workspace, "FreeCAD", ".github", "problemMatcher", matcher_filename
+            runner_workspace, "FuCad", ".github", "problemMatcher", matcher_filename
         )
         print(f"::add-matcher::{matcher_path}")
         with open(log_path, "r", encoding="utf-8") as f:

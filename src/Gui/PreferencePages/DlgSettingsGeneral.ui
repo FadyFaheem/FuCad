@@ -321,7 +321,7 @@ dot/period will always be printed</string>
         <widget class="Gui::PrefCheckBox" name="SplashScreen">
          <property name="toolTip">
           <string>A splash screen is a small loading window that is shown
-when FreeCAD is launching. If this option is checked, FreeCAD will
+when FuCad is launching. If this option is checked, FuCad will
 display the splash screen.</string>
          </property>
          <property name="text">

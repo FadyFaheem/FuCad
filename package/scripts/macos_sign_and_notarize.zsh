@@ -3,12 +3,12 @@
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
 # Default values
-SIGNING_KEY_ID="${FREECAD_SIGNING_KEY_ID}"
-KEYCHAIN_PROFILE="FreeCAD"
+SIGNING_KEY_ID="${FUCAD_SIGNING_KEY_ID}"
+KEYCHAIN_PROFILE="FuCad"
 CONTAINING_FOLDER="."
-APP_NAME="FreeCAD.app"
-VOLUME_NAME="FreeCAD"
-DMG_NAME="FreeCAD-macOS-$(uname -m).dmg"
+APP_NAME="FuCad.app"
+VOLUME_NAME="FuCad"
+DMG_NAME="FuCad-macOS-$(uname -m).dmg"
 DMG_SETTINGS="dmg_settings.py"
 
 # Function to display usage information
@@ -18,12 +18,12 @@ function usage {
     echo "                [-v|--volume-name <volume_name>] [-o|--output <image_name.dmg>]"
     echo "                [-s|--dmg-settings <dmg_settings.py>]"
     echo
-    echo "This script signs and notarizes a FreeCAD.app bundle. It expects that the bundle is in a folder"
+    echo "This script signs and notarizes a FuCad.app bundle. It expects that the bundle is in a folder"
     echo "by itself (that folder will be used as the basis for the created disk image file, so anything"
     echo "else in it will become part of the image). That folder should be located in the same folder as"
     echo "this script."
     echo
-    echo "If <signing_key_id> is not passed it defaults to env variable FREECAD_SIGNING_KEY_ID, it should"
+    echo "If <signing_key_id> is not passed it defaults to env variable FUCAD_SIGNING_KEY_ID, it should"
     echo "be a Developer ID Application certificate that has been installed into the login keychain."
     echo "For a list of available keys see the output of"
     echo "    security find-identity -p basic -v"
@@ -148,19 +148,19 @@ if [ -d "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns" ]; then
     THUMBNAIL_ENTITLEMENTS="${SCRIPT_DIR}/../../src/MacAppBundle/QuickLook/modern/ThumbnailExtension.entitlements"
 
     # Sign individual executables within .appex bundles first
-    if [ -f "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FreeCADThumbnailExtension.appex/Contents/MacOS/FreeCADThumbnailExtension" ]; then
-        run_codesign "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FreeCADThumbnailExtension.appex/Contents/MacOS/FreeCADThumbnailExtension"
+    if [ -f "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FuCadThumbnailExtension.appex/Contents/MacOS/FuCadThumbnailExtension" ]; then
+        run_codesign "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FuCadThumbnailExtension.appex/Contents/MacOS/FuCadThumbnailExtension"
     fi
-    if [ -f "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FreeCADPreviewExtension.appex/Contents/MacOS/FreeCADPreviewExtension" ]; then
-        run_codesign "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FreeCADPreviewExtension.appex/Contents/MacOS/FreeCADPreviewExtension"
+    if [ -f "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FuCadPreviewExtension.appex/Contents/MacOS/FuCadPreviewExtension" ]; then
+        run_codesign "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FuCadPreviewExtension.appex/Contents/MacOS/FuCadPreviewExtension"
     fi
 
     # Then sign the .appex bundles themselves with extension-specific entitlements
-    if [ -d "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FreeCADThumbnailExtension.appex" ] && [ -f "$THUMBNAIL_ENTITLEMENTS" ]; then
-        run_codesign_extension "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FreeCADThumbnailExtension.appex" "$THUMBNAIL_ENTITLEMENTS"
+    if [ -d "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FuCadThumbnailExtension.appex" ] && [ -f "$THUMBNAIL_ENTITLEMENTS" ]; then
+        run_codesign_extension "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FuCadThumbnailExtension.appex" "$THUMBNAIL_ENTITLEMENTS"
     fi
-    if [ -d "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FreeCADPreviewExtension.appex" ] && [ -f "$PREVIEW_ENTITLEMENTS" ]; then
-        run_codesign_extension "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FreeCADPreviewExtension.appex" "$PREVIEW_ENTITLEMENTS"
+    if [ -d "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FuCadPreviewExtension.appex" ] && [ -f "$PREVIEW_ENTITLEMENTS" ]; then
+        run_codesign_extension "${CONTAINING_FOLDER}/${APP_NAME}/Contents/PlugIns/FuCadPreviewExtension.appex" "$PREVIEW_ENTITLEMENTS"
     fi
 fi
 

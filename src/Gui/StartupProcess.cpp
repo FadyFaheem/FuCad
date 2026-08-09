@@ -174,7 +174,7 @@ void StartupProcess::registerEventType()
 void StartupProcess::setThemePaths()
 {
 #if !defined(Q_OS_LINUX)
-    QIcon::setThemeSearchPaths(QIcon::themeSearchPaths() << QStringLiteral(":/icons/FreeCAD-default"));
+    QIcon::setThemeSearchPaths(QIcon::themeSearchPaths() << QStringLiteral(":/icons/FuCad-default"));
 #endif
 
     ParameterGrp::handle hTheme = App::GetApplication().GetParameterGroupByPath(
@@ -336,11 +336,12 @@ void StartupPostProcess::migrateOldTheme(const std::string& style)
 {
     auto prefPackManager = Application::Instance->prefPackManager();
 
-    if (style == "FreeCAD Light.qss") {
-        prefPackManager->apply("FreeCAD Light");
+    // Configurations inherited from FreeCAD still name the stylesheets the old way.
+    if (style == "FreeCAD Light.qss" || style == "Light.qss") {
+        prefPackManager->apply("Light");
     }
-    else if (style == "FreeCAD Dark.qss") {
-        prefPackManager->apply("FreeCAD Dark");
+    else if (style == "FreeCAD Dark.qss" || style == "Dark.qss") {
+        prefPackManager->apply("Dark");
     }
 }
 
@@ -369,7 +370,7 @@ void StartupPostProcess::checkOpenGL()
         if (major < 2) {
             auto message = QObject::tr(
                                "This system is running OpenGL %1.%2. "
-                               "FreeCAD requires OpenGL 2.0 or above. "
+                               "FuCad requires OpenGL 2.0 or above. "
                                "Upgrade the graphics driver and/or card as required."
                            )
                                .arg(major)

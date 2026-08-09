@@ -399,13 +399,16 @@ QPixmap SplashScreen::splashImage()
             }
         }
 
+        // Artwork that already carries the wordmark only needs the version painted onto it.
+        std::map<std::string, std::string>::const_iterator ti = App::Application::Config().find(
+            "SplashTitleInImage"
+        );
+        const bool titleInImage = ti != App::Application::Config().end() && ti->second == "true";
+
         QFont fontExe = painter.font();
         fontExe.setPointSizeF(20.0);
         QFontMetrics metricExe(fontExe);
-        int l = QtTools::horizontalAdvance(metricExe, title);
-        if (title == QLatin1String("FreeCAD")) {
-            l = 0.0;  // "FreeCAD" text is already part of the splashscreen, version goes below it
-        }
+        int l = titleInImage ? 0 : QtTools::horizontalAdvance(metricExe, title);
         int w = splash_image.width();
         int h = splash_image.height();
 
@@ -429,13 +432,13 @@ QPixmap SplashScreen::splashImage()
         QColor color(QString::fromStdString(tc->second));
         if (color.isValid()) {
             painter.setPen(color);
-            painter.setFont(fontExe);
-            if (title != QLatin1String("FreeCAD")) {
-                // FreeCAD's Splashscreen already contains the EXE name, no need to draw it
+            if (!titleInImage) {
+                painter.setFont(fontExe);
                 painter.drawText(x, y, title);
+                l += QtTools::horizontalAdvance(metricVer, QLatin1String("  "));
             }
             painter.setFont(fontVer);
-            painter.drawText(x + (l + 235), y - 7, version);
+            painter.drawText(x + l, y, version);
             QColor warningColor(QString::fromStdString(wc->second));
             if (suffix == QLatin1String("dev") && warningColor.isValid()) {
                 fontVer.setPointSizeF(14.0);

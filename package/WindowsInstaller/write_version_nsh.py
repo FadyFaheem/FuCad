@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: LGPL-2.1-or-later
 #
 # this script is meant to be called by nsis installer scripts, it gets version information
-# from freecad and writes version.nsh file in the directory the script is located at
+# from FuCad and writes version.nsh file in the directory the script is located at
+# (the Python module keeps its upstream name for macro and addon compatibility)
 import FreeCAD
 import datetime
 import os

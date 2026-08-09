@@ -14,7 +14,7 @@ FreeCAD -c make_snapshot_from_file.py
 
 or
 
-FreeCADCmd make_snapshot_from_file.py
+FuCadCmd make_snapshot_from_file.py
 """
 
 import FreeCAD

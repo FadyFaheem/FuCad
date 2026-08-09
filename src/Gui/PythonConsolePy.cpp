@@ -30,7 +30,7 @@ using namespace Gui;
 void PythonStdout::init_type()
 {
     behaviors().name("PythonStdout");
-    behaviors().doc("Redirection of stdout to FreeCAD's Python console window");
+    behaviors().doc("Redirection of stdout to FuCad's Python console window");
     // you must have overwritten the virtual functions
     behaviors().supportRepr();
     add_varargs_method("write", &PythonStdout::write, "write()");
@@ -93,7 +93,7 @@ Py::Object PythonStdout::isatty()
 void PythonStderr::init_type()
 {
     behaviors().name("PythonStderr");
-    behaviors().doc("Redirection of stdout to FreeCAD's Python console window");
+    behaviors().doc("Redirection of stdout to FuCad's Python console window");
     // you must have overwritten the virtual functions
     behaviors().supportRepr();
     add_varargs_method("write", &PythonStderr::write, "write()");
@@ -156,7 +156,7 @@ Py::Object PythonStderr::isatty()
 void OutputStdout::init_type()
 {
     behaviors().name("OutputStdout");
-    behaviors().doc("Redirection of stdout to FreeCAD's report view");
+    behaviors().doc("Redirection of stdout to FuCad's report view");
     // you must have overwritten the virtual functions
     behaviors().supportRepr();
     add_varargs_method("write", &OutputStdout::write, "write()");
@@ -217,7 +217,7 @@ Py::Object OutputStdout::isatty()
 void OutputStderr::init_type()
 {
     behaviors().name("OutputStderr");
-    behaviors().doc("Redirection of stdout to FreeCAD's report view");
+    behaviors().doc("Redirection of stdout to FuCad's report view");
     // you must have overwritten the virtual functions
     behaviors().supportRepr();
     add_varargs_method("write", &OutputStderr::write, "write()");
@@ -278,7 +278,7 @@ Py::Object OutputStderr::isatty()
 void PythonStdin::init_type()
 {
     behaviors().name("PythonStdin");
-    behaviors().doc("Redirection of stdin to FreeCAD to open an input dialog");
+    behaviors().doc("Redirection of stdin to FuCad to open an input dialog");
     // you must have overwritten the virtual functions
     behaviors().supportRepr();
     behaviors().supportGetattr();

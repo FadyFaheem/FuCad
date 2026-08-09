@@ -5,7 +5,7 @@ import os.log
 
 private let logger = Logger(
     subsystem: Bundle(for: PreviewProvider.self).bundleIdentifier
-        ?? "org.freecad.quicklook.fallback",
+        ?? "org.fucad.quicklook.fallback",
     category: "PreviewProvider"
 )
 
@@ -27,7 +27,7 @@ class PreviewProvider: QLPreviewProvider, QLPreviewingController {
             logger.error("\(errorMessage)")
             throw NSError(
                 domain: Bundle(for: PreviewProvider.self).bundleIdentifier
-                    ?? "org.freecad.quicklook.fallback",
+                    ?? "org.fucad.quicklook.fallback",
                 code: 1001,
                 userInfo: [NSLocalizedDescriptionKey: errorMessage]
             )
@@ -52,7 +52,7 @@ class PreviewProvider: QLPreviewProvider, QLPreviewingController {
             logger.error("\(errorMessage)")
             throw NSError(
                 domain: Bundle(for: PreviewProvider.self).bundleIdentifier
-                    ?? "org.freecad.quicklook.fallback",
+                    ?? "org.fucad.quicklook.fallback",
                 code: 1003,
                 userInfo: [NSLocalizedDescriptionKey: errorMessage]
             )

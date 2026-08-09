@@ -1,17 +1,17 @@
 
 SET(Stylesheets_Files
-    "FreeCAD.qss"
+    "FuCad.qss"
     "defaults.qss"
 )
 
 SET(Parameters_Files
-    "parameters/FreeCAD Dark.yaml"
-    "parameters/FreeCAD Light.yaml"
+    "parameters/Dark.yaml"
+    "parameters/Light.yaml"
     "parameters/FuCad Dark.yaml"
 )
 
 SET(Overlay_Stylesheets_Files
-    "overlay/Freecad Overlay.qss"
+    "overlay/FuCad Overlay.qss"
 )
 
 # Find all the image files

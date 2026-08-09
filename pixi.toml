@@ -1,7 +1,7 @@
 [workspace]
-name = "FreeCAD"
+name = "FuCad"
 version = "26.3.0"
-description = "pixi instructions for FreeCAD"
+description = "pixi instructions for FuCad"
 authors = ["looooo <sppedflyer@gmail.com>"]
 channels = ["conda-forge"]
 platforms = [ "linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64" ]
@@ -182,8 +182,8 @@ configure-release = { cmd = [ "cmake", "--preset", "conda-macos-release" ], depe
 [target.win-64.tasks]
 configure-debug = { cmd = [ "cmake", "--preset", "conda-windows-debug", "-DCMAKE_GENERATOR_PLATFORM=", "-DCMAKE_GENERATOR_TOOLSET=", "{{ extra_args }}" ], args = [{ "arg" = "extra_args", "default" = "" }], depends-on = ["initialize"], env={ CFLAGS="", CXXFLAGS="", DEBUG_CFLAGS="", DEBUG_CXXFLAGS="" }}
 configure-release = { cmd = [ "cmake", "--preset", "conda-windows-release", "-DCMAKE_GENERATOR_PLATFORM=", "-DCMAKE_GENERATOR_TOOLSET=" ], depends-on = ["initialize"], env={ CFLAGS="", CXXFLAGS="", DEBUG_CFLAGS="", DEBUG_CXXFLAGS="" }}
-freecad-debug = { cmd = [ ".pixi/envs/default/Library/bin/FreeCAD.exe" ], depends-on = ["install-debug"]}
-freecad-release = { cmd = [ ".pixi/envs/default/Library/bin/FreeCAD.exe" ], depends-on = ["install-release"]}
+freecad-debug = { cmd = [ ".pixi/envs/default/Library/bin/FuCad.exe" ], depends-on = ["install-debug"]}
+freecad-release = { cmd = [ ".pixi/envs/default/Library/bin/FuCad.exe" ], depends-on = ["install-release"]}
 
 [tasks]
 initialize = { cmd = ["git", "submodule", "update", "--init", "--recursive"]}
@@ -200,5 +200,5 @@ install-debug = { cmd = ["cmake", "--install", "build/debug"]}
 install-release = { cmd = ["cmake", "--install", "build/release"]}
 test-debug = { cmd = ["ctest", "--test-dir", "build/debug"]}
 test-release = { cmd = ["ctest", "--test-dir", "build/release"]}
-freecad-debug = "build/debug/bin/FreeCAD"
-freecad-release = "build/release/bin/FreeCAD"
+freecad-debug = "build/debug/bin/FuCad"
+freecad-release = "build/release/bin/FuCad"

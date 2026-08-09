@@ -2,5 +2,5 @@
 *.pfx
 *-SHA256.txt
 MSVCRedist
-FreeCAD
+FuCad
 version.nsh

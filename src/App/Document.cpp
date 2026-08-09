@@ -2025,7 +2025,7 @@ bool Document::saveToFile(const char* filename) const
             throw Base::FileException("Failed to open file", tmp);
         }
 
-        writer.setComment("FreeCAD Document");
+        writer.setComment("FuCad Document");
         writer.setLevel(compression);
         writer.putNextEntry("Document.xml");
 
@@ -2035,7 +2035,8 @@ bool Document::saveToFile(const char* filename) const
 
         writer.Stream() << "<?xml version='1.0' encoding='utf-8'?>" << '\n'
                         << "<!--" << '\n'
-                        << " FreeCAD Document, see https://www.freecad.org for more information..."
+                        << " FuCad Document, see https://github.com/FadyFaheem/FuCad for more"
+                           " information..."
                         << '\n'
                         << "-->" << '\n';
         Document::Save(writer);

@@ -163,7 +163,7 @@ def get_material_resources(category='Solid'):
             builtin_mat_dir = join(
                 FreeCAD.getResourceDir(), "Mod", "Material", "Resources", "Materials", "StandardMaterial"
             )
-        resources[builtin_mat_dir] = ":/icons/freecad.svg"
+        resources[builtin_mat_dir] = ":/icons/fucad.svg"
 
     if use_mat_from_modules:
         module_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Material/Resources/Modules")
@@ -209,7 +209,7 @@ def get_material_libraries():
         builtin_mat_dir = join(
             FreeCAD.getResourceDir(), "Mod", "Material", "Resources", "Materials"
         )
-        resources["System"] = (builtin_mat_dir, ":/icons/freecad.svg")
+        resources["System"] = (builtin_mat_dir, ":/icons/fucad.svg")
 
     if use_mat_from_modules:
         module_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Material/Resources/Modules")

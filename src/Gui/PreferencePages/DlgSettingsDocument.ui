@@ -568,7 +568,7 @@ get date suffix according to the specified format</string>
       <item row="10" column="0">
        <widget class="Gui::PrefCheckBox" name="prefDisableVersionCheckOnSave">
         <property name="toolTip">
-         <string>Suppresses the version mismatch warning when saving files created with an older FreeCAD version</string>
+         <string>Suppresses the version mismatch warning when saving files created with an older FuCad version</string>
         </property>
         <property name="text">
          <string>Suppress older version warning on save</string>

@@ -393,7 +393,7 @@ class BIM_Library_TaskPanel:
                 it.setToolTip(dp.rstrip(sep) + sep + f.lstrip(sep))
                 self.filemodel.appendRow(it)
                 if f.lower().endswith(".fcstd"):
-                    it.setIcon(QtGui.QIcon(":icons/freecad-doc.png"))
+                    it.setIcon(QtGui.QIcon(":icons/fucad-doc.png"))
                 elif f.lower().endswith(".ifc"):
                     it.setIcon(QtGui.QIcon(":/icons/IFC.svg"))
                 else:
@@ -463,7 +463,7 @@ class BIM_Library_TaskPanel:
                         addItems(it, v, path + "/" + k)
                         it.setToolTip("")
                     elif k.lower().endswith(".fcstd"):
-                        it.setIcon(QtGui.QIcon(":icons/freecad-doc.png"))
+                        it.setIcon(QtGui.QIcon(":icons/fucad-doc.png"))
                     elif k.lower().endswith(".ifc"):
                         it.setIcon(QtGui.QIcon(":/icons/IFC.svg"))
                     else:
@@ -1025,7 +1025,7 @@ if FreeCAD.GuiUp:
 
             if index.column() == 0 and role == QtCore.Qt.DecorationRole:
                 if index.data().lower().endswith(".fcstd"):
-                    return QtGui.QIcon(":icons/freecad-doc.png")
+                    return QtGui.QIcon(":icons/fucad-doc.png")
                 elif index.data().lower().endswith(".ifc"):
                     return QtGui.QIcon(os.path.join(os.path.dirname(__file__), "icons", "IFC.svg"))
                 elif index.data().lower() == "private":

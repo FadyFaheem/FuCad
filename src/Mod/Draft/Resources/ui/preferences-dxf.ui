@@ -89,7 +89,7 @@ required by the legacy importer. This can also be done manually by installing
 the 'dxf_library' addon from the Addon Manager.</string>
         </property>
         <property name="text">
-         <string>Allow FreeCAD to automatically download and update the DXF libraries</string>
+         <string>Allow FuCad to automatically download and update the DXF libraries</string>
         </property>
         <property name="prefEntry" stdset="0">
          <cstring>dxfAllowDownload</cstring>

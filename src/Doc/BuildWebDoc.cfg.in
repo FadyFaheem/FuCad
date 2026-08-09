@@ -1428,7 +1428,10 @@ HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/templates/customdoxygen.css
 
 HTML_EXTRA_FILES       = @CMAKE_CURRENT_SOURCE_DIR@/templates/doxy-boot.js \
 		         @CMAKE_CURRENT_SOURCE_DIR@/templates/Roboto-Regular.woff2 \
-			 @CMAKE_CURRENT_SOURCE_DIR@/templates/FiraSans-Regular.woff2
+			 @CMAKE_CURRENT_SOURCE_DIR@/templates/FiraSans-Regular.woff2 \
+			 @CMAKE_CURRENT_SOURCE_DIR@/sphinx/_static/fucad.css \
+			 @CMAKE_CURRENT_SOURCE_DIR@/sphinx/_static/favicon.ico \
+			 @CMAKE_CURRENT_SOURCE_DIR@/../Gui/Icons/fucad.svg
 
 # The HTML_COLORSTYLE tag can be used to specify if the generated HTML output
 # should be rendered with a dark or light theme.

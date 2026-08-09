@@ -3181,7 +3181,7 @@ void Application::runApplication()
 
     if (mConfig["RunMode"] == "Cmd") {
         // Run the commandline interface
-        Base::Interpreter().runCommandLine("FreeCAD Console mode");
+        Base::Interpreter().runCommandLine("FuCad Console mode");
     }
     else if (mConfig["RunMode"] == "Internal") {
         // run internal script

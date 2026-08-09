@@ -142,7 +142,7 @@ will be stored inside the FreeCAD object for reuse next time that object
 is exported. This leads to smaller differences between file versions.</string>
         </property>
         <property name="text">
-         <string>Store IFC unique ID in FreeCAD objects</string>
+         <string>Store IFC unique ID in FuCad objects</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -200,7 +200,7 @@ Note: The serializer is still an experimental feature!</string>
 allowing to recreate a full parametric model on reimport.</string>
         </property>
         <property name="text">
-         <string>Export full FreeCAD parametric model</string>
+         <string>Export full FuCad parametric model</string>
         </property>
         <property name="prefEntry" stdset="0">
          <cstring>IfcExportFreeCADProperties</cstring>
@@ -389,7 +389,7 @@ Warning: The IFC standard asks for at least one building in each file. By turnin
          <string>If not checked, standard FreeCAD groups (App::DocumentObjectGroup) will not be exported as IfcGroup or IfcElementAssembly.\nTheir children will be re-parented to the container of the skipped group in the IFC structure.</string>
         </property>
         <property name="title">
-         <string>Export FreeCAD groups</string>
+         <string>Export FuCad groups</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -407,7 +407,7 @@ Warning: The IFC standard asks for at least one building in each file. By turnin
          <item>
           <widget class="Gui::PrefCheckBox" name="checkBox_2">
            <property name="toolTip">
-            <string>In FreeCAD, it is possible to nest groups inside buildings or storeys. If this option is disabled, FreeCAD groups will be saved as IfcGroups and aggregated to the building structure. Aggregating non-building elements such as IfcGroups is however not recommended by the IFC standards. It is therefore also possible to export these groups as IfcElementAssemblies, which produces an IFC-compliant file.</string>
+            <string>In FuCad, it is possible to nest groups inside buildings or storeys. If this option is disabled, FuCad groups will be saved as IfcGroups and aggregated to the building structure. Aggregating non-building elements such as IfcGroups is however not recommended by the IFC standards. It is therefore also possible to export these groups as IfcElementAssemblies, which produces an IFC-compliant file.</string>
            </property>
            <property name="text">
             <string>Export nested groups as assemblies</string>

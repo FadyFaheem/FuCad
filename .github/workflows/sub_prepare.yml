@@ -21,7 +21,7 @@
 # *                                                                         *
 # ***************************************************************************
 
-# This is the pre-check workflow for CI of FreeCAD.
+# This is the pre-check workflow for CI of FuCad.
 # It aims at running some basic checks about the workflow run ...
 # ... and gathering some data needed for the next steps.
 

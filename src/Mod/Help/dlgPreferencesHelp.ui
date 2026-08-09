@@ -199,7 +199,7 @@ custom stylesheet below and can look nicer than the wiki option. The 'Markdown' 
          <string>The documentation will open in a new tab inside the FreeCAD interface. This requires the PySide QtWebengineWidgets component.</string>
         </property>
         <property name="text">
-         <string>In a FreeCAD tab</string>
+         <string>In a FuCad tab</string>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -218,7 +218,7 @@ custom stylesheet below and can look nicer than the wiki option. The 'Markdown' 
          <bool>true</bool>
         </property>
         <property name="toolTip">
-        <string>Documentation opens in a dockable dialog within FreeCAD, allowing simultaneous work in the 3D view.
+        <string>Documentation opens in a dockable dialog within FuCad, allowing simultaneous work in the 3D view.
 Requires the PySide QtWebengineWidgets component.</string>
         </property>
         <property name="text">

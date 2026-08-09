@@ -2,8 +2,8 @@ linux/AppDir/usr
 linux/AppDir/*.desktop
 linux/AppDir/*.svg
 linux/AppDir/packages.txt
-windows/FreeCAD_*Windows*
-osx/FreeCAD.app
+windows/FuCad_*Windows*
+osx/FuCad.app
 **.AppImage
 **.AppImage.zsync
 **.dmg

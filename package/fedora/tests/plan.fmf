@@ -1,5 +1,5 @@
 summary:
-    Run All FreeCAD python tests
+    Run All FuCad python tests
 prepare:
     how: install
     package: 

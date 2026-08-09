@@ -7,4 +7,13 @@
     <AppDataSkipVendor>true</AppDataSkipVendor>
     <MaintainerUrl>https://github.com/FadyFaheem/FuCad</MaintainerUrl>
     <CopyrightInfo>FuCad is a fork of FreeCAD (https://www.freecad.org), (C) 2001-2026 FreeCAD contributors. FuCad is free and open-source software licensed under the terms of the LGPL-2.1-or-later license.</CopyrightInfo>
+    <DesktopFileName>org.fucad.FuCad</DesktopFileName>
+    <SplashScreen>fucadsplash</SplashScreen>
+    <SplashAlignment>Bottom|Left</SplashAlignment>
+    <!-- The wordmark is part of the artwork, so only the version is painted on the splash. -->
+    <SplashTitleInImage>true</SplashTitleInImage>
+    <SplashInfoPosition>52,258</SplashInfoPosition>
+    <SplashInfoColor>#7C98A1</SplashInfoColor>
+    <SplashTextColor>#F0A202</SplashTextColor>
+    <SplashWarningColor>#CA333B</SplashWarningColor>
 </Branding>

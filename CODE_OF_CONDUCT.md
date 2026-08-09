@@ -1,8 +1,8 @@
-# FreeCAD Project Code of Conduct
+# FuCad Project Code of Conduct
 
 ## Statement
 
-The FreeCAD Project community covers people from a wide variety of countries,
+The FuCad Project community covers people from a wide variety of countries,
 backgrounds and positions. This global diversity is a great strength of the
 project, but can also lead to communication issues, which may in turn cause
 unhappiness. To maximise happiness of the project community taken as a whole,
@@ -55,8 +55,8 @@ further defined and clarified by project maintainers.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting any of the community admins or moderators at
-https://forum.freecad.org/memberlist.php?mode=team . All
+reported by opening a confidential report at
+https://github.com/FadyFaheem/FuCad/security/advisories/new . All
 complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is
 obligated to maintain confidentiality with regard to the reporter of an incident.

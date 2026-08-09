@@ -183,7 +183,7 @@ void CmdFemAddPart::activated(int)
 {
 #ifndef FCWithNetgen
     QMessageBox::warning(Gui::getMainWindow(), QObject::tr("Wrong selection"),
-            QObject::tr("Your FreeCAD is built without NETGEN support. Meshing will not work…"));
+            QObject::tr("Your FuCad is built without NETGEN support. Meshing will not work…"));
     return;
 #endif
 

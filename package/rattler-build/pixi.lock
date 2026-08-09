@@ -331,7 +331,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/xlrd-2.0.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/xlutils-2.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/xlwt-1.3.0-py_1.tar.bz2
-      - conda_source: freecad[6c707e0d] @ .
+      - conda_source: fucad[6c707e0d] @ .
       linux-aarch64:
       - conda: https://prefix.dev/conda-forge/linux-aarch64/_openmp_mutex-4.5-2_gnu.tar.bz2
       - conda: https://prefix.dev/conda-forge/linux-aarch64/aiohttp-3.13.3-py311hf076524_0.conda
@@ -645,7 +645,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/xlrd-2.0.2-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/xlutils-2.0.0-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/xlwt-1.3.0-py_1.tar.bz2
-      - conda_source: freecad[82a8351e] @ .
+      - conda_source: fucad[82a8351e] @ .
       osx-64:
       - conda: https://prefix.dev/conda-forge/noarch/adwaita-icon-theme-49.0-unix_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/aiohappyeyeballs-2.6.1-pyhd8ed1ab_0.conda
@@ -905,7 +905,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-64/zlib-1.3.2-hbb4bfdb_2.conda
       - conda: https://prefix.dev/conda-forge/osx-64/zlib-ng-2.3.2-h8bce59a_1.conda
       - conda: https://prefix.dev/conda-forge/osx-64/zstd-1.5.7-h3eecb57_6.conda
-      - conda_source: freecad[25e33b5a] @ .
+      - conda_source: fucad[25e33b5a] @ .
       osx-arm64:
       - conda: https://prefix.dev/conda-forge/noarch/adwaita-icon-theme-49.0-unix_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/aiohappyeyeballs-2.6.1-pyhd8ed1ab_0.conda
@@ -1165,7 +1165,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/zlib-1.3.2-h8088a28_2.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/zlib-ng-2.3.2-hed4e4f5_1.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/zstd-1.5.7-hbf9d68e_6.conda
-      - conda_source: freecad[0ce6190b] @ .
+      - conda_source: fucad[0ce6190b] @ .
       win-64:
       - conda: https://prefix.dev/conda-forge/noarch/aiohappyeyeballs-2.6.1-pyhd8ed1ab_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/aiosignal-1.4.0-pyhd8ed1ab_0.conda
@@ -1398,7 +1398,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/win-64/zlib-1.3.2-hfd05255_2.conda
       - conda: https://prefix.dev/conda-forge/win-64/zlib-ng-2.3.2-h0261ad2_1.conda
       - conda: https://prefix.dev/conda-forge/win-64/zstd-1.5.7-h534d264_6.conda
-      - conda_source: freecad[c450b9e9] @ .
+      - conda_source: fucad[c450b9e9] @ .
   package:
     channels:
     - url: https://prefix.dev/pixi-build-backends/
@@ -27690,7 +27690,7 @@ packages:
     - zstd >=1.5.7,<1.6.0a0
   size: 388453
   timestamp: 1764777142545
-- conda_source: freecad[0ce6190b] @ .
+- conda_source: fucad[0ce6190b] @ .
   variants:
     build_platform: osx-arm64
     target_platform: osx-arm64
@@ -28052,7 +28052,7 @@ packages:
   - conda: https://prefix.dev/conda-forge/osx-arm64/zlib-1.3.2-h8088a28_2.conda
   - conda: https://prefix.dev/conda-forge/osx-arm64/zlib-ng-2.3.3-hed4e4f5_1.conda
   - conda: https://prefix.dev/conda-forge/osx-arm64/zstd-1.5.7-hbf9d68e_6.conda
-- conda_source: freecad[25e33b5a] @ .
+- conda_source: fucad[25e33b5a] @ .
   variants:
     build_platform: osx-64
     target_platform: osx-64
@@ -28414,7 +28414,7 @@ packages:
   - conda: https://prefix.dev/conda-forge/osx-64/zlib-1.3.2-hbb4bfdb_2.conda
   - conda: https://prefix.dev/conda-forge/osx-64/zlib-ng-2.3.3-h8bce59a_1.conda
   - conda: https://prefix.dev/conda-forge/osx-64/zstd-1.5.7-h3eecb57_6.conda
-- conda_source: freecad[6c707e0d] @ .
+- conda_source: fucad[6c707e0d] @ .
   variants:
     build_platform: linux-64
     target_platform: linux-64
@@ -28904,7 +28904,7 @@ packages:
   - conda: https://prefix.dev/conda-forge/noarch/tzdata-2025c-hc9c84f9_1.conda
   - conda: https://prefix.dev/conda-forge/noarch/wayland-protocols-1.49-hd8ed1ab_0.conda
   - conda: https://prefix.dev/conda-forge/noarch/wslink-2.5.7-pyhd8ed1ab_0.conda
-- conda_source: freecad[82a8351e] @ .
+- conda_source: fucad[82a8351e] @ .
   variants:
     build_platform: linux-aarch64
     target_platform: linux-aarch64
@@ -29385,7 +29385,7 @@ packages:
   - conda: https://prefix.dev/conda-forge/noarch/typing_extensions-4.15.0-pyhcf101f3_0.conda
   - conda: https://prefix.dev/conda-forge/noarch/tzdata-2025c-hc9c84f9_1.conda
   - conda: https://prefix.dev/conda-forge/noarch/wslink-2.5.7-pyhd8ed1ab_0.conda
-- conda_source: freecad[c450b9e9] @ .
+- conda_source: fucad[c450b9e9] @ .
   variants:
     build_platform: win-64
     target_platform: win-64

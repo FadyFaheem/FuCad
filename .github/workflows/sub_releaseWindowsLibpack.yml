@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 The FreeCAD project association AISBL
 # SPDX-FileNotice: Part of the FreeCAD project.
 
-# Experimental Windows release build using the FreeCAD LibPack (OCCT 8, Qt 6, Python from LibPack).
+# Experimental Windows release build using the upstream FreeCAD LibPack (OCCT 8, Qt 6, Python from LibPack).
 # This produces experimental portable and (x64 only) installer artifacts and uploads them to an
 # existing release. It runs alongside the primary conda-based release build and is non-blocking:
 # a failure here must never fail the release, so the Build job uses continue-on-error.
@@ -72,7 +72,7 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 2
           fetch-tags: true
-          # Coin/Pivy are built from FreeCAD's own submodules (no longer supplied by the LibPack).
+          # Coin/Pivy are built from the repository's own submodules (no longer supplied by the LibPack).
           submodules: 'recursive'
 
       - name: Make needed directories

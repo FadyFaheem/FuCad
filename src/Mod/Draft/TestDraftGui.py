@@ -40,7 +40,7 @@ For the non-GUI tests see TestDraft.
 # within FreeCAD itself.
 #
 # The tests can be run using the full 'FreeCAD' executable
-# or the console only 'FreeCADCmd' executable. In the latter case
+# or the console only 'FuCadCmd' executable. In the latter case
 # some functions cannot be tested as the view providers (visual properties)
 # are not available.
 #

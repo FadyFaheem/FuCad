@@ -1,6 +1,6 @@
 [Icon Theme]
-Name=FreeCAD-default
-Comment=Default FreeCAD icon theme
+Name=FuCad-default
+Comment=Default FuCad icon theme
 Inherits=Default
 
 # Directory list

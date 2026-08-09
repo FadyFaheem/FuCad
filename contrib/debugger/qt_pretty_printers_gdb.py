@@ -33,7 +33,7 @@
              "name": "(gdb) Launch",
              "type": "cppdbg",
              "request": "launch",
-             "program": "${workspaceFolder}/build/bin/FreeCAD",
+             "program": "${workspaceFolder}/build/bin/FuCad",
              "args": [],
              "stopAtEntry": true,
              "cwd": "${workspaceFolder}/build",

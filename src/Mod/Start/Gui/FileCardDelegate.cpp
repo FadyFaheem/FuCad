@@ -191,7 +191,7 @@ QPixmap FileCardDelegate::loadAndCacheThumbnail(const QString& path, int thumbna
     if (path.endsWith(QLatin1String(".fcstd"), Qt::CaseSensitivity::CaseInsensitive)) {
         // This is a fallback, the model will have pulled the thumbnail out of the FCStd file if it
         // existed.
-        QImageReader reader(QLatin1String(":/icons/freecad-doc.svg"));
+        QImageReader reader(QLatin1String(":/icons/fucad-doc.svg"));
         reader.setScaledSize(QSize(thumbnailSize, thumbnailSize));
         thumbnail = QPixmap::fromImage(reader.read());
     }

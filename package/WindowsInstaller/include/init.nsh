@@ -13,9 +13,9 @@ Var FCLangName
 
 Function InitUser
 
-  # Get FreeCAD language
+  # Get FuCad language
 
-  ReadRegStr $FCLangName SHELL_CONTEXT "${APP_REGKEY_SETUP}" "FreeCAD Language"
+  ReadRegStr $FCLangName SHELL_CONTEXT "${APP_REGKEY_SETUP}" "FuCad Language"
 
   ${If} $FCLangName != ""
     StrCpy $LangName $FCLangName
@@ -31,11 +31,11 @@ Function PostMultiUserPageInit
   ${if} $OriginalCmdInstDir != ""
     StrCpy $INSTDIR $OriginalCmdInstDir
   ${endif}
-  # check if this FreeCAD version is already installed
+  # check if this FuCad version is already installed
   ReadRegStr $0 SHCTX "${APP_UNINST_KEY}" "UninstallString"
   ${if} $0 != ""
    # check if the uninstaller was accidentally deleted
-   # if so, don't bother the user if they really want to install a new FreeCAD over an existing one
+   # if so, don't bother the user if they really want to install a new FuCad over an existing one
    # because they won't have a chance to deny this
 
    # remove quotes from uninstaller filename
@@ -43,9 +43,9 @@ Function PostMultiUserPageInit
    # skip message box if uninstaller file is missing
    IfFileExists $0 0 ContinueInstall
 
-   # installing over an existing installation of the same FreeCAD release is not necessary
-   # if the users does this, they most probably have a problem with FreeCAD that can better be solved
-   # by reinstalling FreeCAD
+   # installing over an existing installation of the same FuCad release is not necessary
+   # if the users does this, they most probably have a problem with FuCad that can better be solved
+   # by reinstalling FuCad
    # for beta and other test releases over-installing can even cause errors
    MessageBox MB_YESNOCANCEL "$(AlreadyInstalled)" /SD IDCANCEL IDYES ContinueInstall IDNO BackToMuiltUserPage
    Quit
@@ -54,7 +54,7 @@ Function PostMultiUserPageInit
    ContinueInstall:
   ${endif}
 
-  # check if there is an existing FreeCAD installation of the same FreeCAD series
+  # check if there is an existing FuCad installation of the same FuCad series
   # we usually don't release more than 10 versions so with 20 we are safe to check if a newer version is installed
   IntOp $4 ${APP_VERSION_PATCH} + 20
   ${for} $5 0 $4
@@ -125,11 +125,11 @@ Function .onInit
    !define LIBRARY_X64
   ${endif}
 
-  # Check that FreeCAD is not currently running
+  # Check that FuCad is not currently running
   Push $R0
   Push $R1
-  ${FindProc} $R0 ${BIN_FREECAD}
-  ${FindProc} $R1 ${BIN_FREECADCMD}
+  ${FindProc} $R0 ${BIN_FUCAD}
+  ${FindProc} $R1 ${BIN_FUCADCMD}
   # if running result is '0', if not running it is '1'
   ${if} $R0 == "0"
   ${orif} $R1 == "0"
@@ -163,16 +163,16 @@ FunctionEnd
 # this function is called at first after starting the uninstaller
 Function un.onInit
 
-  # Macro to investigate name of FreeCAD's preferences folders to be able remove them
+  # Macro to investigate name of FuCad's preferences folders to be able remove them
   !insertmacro UnAppPreSuff $AppPre $AppSuff # macro from Utils.nsh
 
   !insertmacro MULTIUSER_UNINIT
 
-  # Check that FreeCAD is not currently running
+  # Check that FuCad is not currently running
   Push $R0
   Push $R1
-  ${FindProc} $R0 ${BIN_FREECAD}
-  ${FindProc} $R1 ${BIN_FREECADCMD}
+  ${FindProc} $R0 ${BIN_FUCAD}
+  ${FindProc} $R1 ${BIN_FUCADCMD}
   # if running result is '0', if not running it is '1'
   ${if} $R0 == "0"
   ${orif} $R1 == "0"
@@ -188,7 +188,7 @@ Function un.onInit
   ${endif}
 
   # Ascertain whether the user has sufficient privileges to uninstall.
-  # abort when FreeCAD was installed with admin permissions but the user doesn't have administrator privileges
+  # abort when FuCad was installed with admin permissions but the user doesn't have administrator privileges
   ReadRegStr $0 HKLM "${APP_UNINST_KEY}" "DisplayVersion"
   ${if} $0 != ""
   ${andif} $MultiUser.Privileges != "Admin"
@@ -196,7 +196,7 @@ Function un.onInit
    MessageBox MB_OK|MB_ICONSTOP "$(UnNotAdminLabel)" /SD IDOK
    Abort
   ${endif}
-  # warning when FreeCAD couldn't be found in the registry
+  # warning when FuCad couldn't be found in the registry
   ${if} $0 == "" # check in HKCU
    ReadRegStr $0 HKCU "${APP_UNINST_KEY}" "DisplayVersion"
    ${if} $0 == ""
@@ -204,7 +204,7 @@ Function un.onInit
    ${endif}
   ${endif}
 
-  # question message if the user really wants to uninstall FreeCAD
+  # question message if the user really wants to uninstall FuCad
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UnReallyRemoveLabel)" /SD IDYES IDYES +2 # continue if yes
   Abort
 

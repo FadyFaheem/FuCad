@@ -10,7 +10,7 @@ Var FileAssociation
 
 # ----------------------------------
 
-Section "un.FreeCAD" un.SecUnProgramFiles
+Section "un.FuCad" un.SecUnProgramFiles
 
   SectionIn RO
 
@@ -59,7 +59,7 @@ Section "un.FreeCAD" un.SecUnProgramFiles
   DeleteRegKey SHCTX "${APP_REGKEY_SETUP}"
   DeleteRegKey SHCTX "${APP_REGKEY}"
   DeleteRegKey SHCTX "${APP_UNINST_KEY}"
-  DeleteRegKey HKCR "Applications\${BIN_FREECAD}"
+  DeleteRegKey HKCR "Applications\${BIN_FUCAD}"
   DeleteRegValue HKCR "${APP_NAME}.Document\Shell\open\command" ""
   DeleteRegValue HKCR "${APP_NAME}.Document\DefaultIcon" ""
 
@@ -80,12 +80,12 @@ SectionEnd
 
 #---------------------------------
 # user preferences
-Section /o "un.$(UnFreeCADPreferencesTitle)" un.SecUnPreferences
+Section /o "un.$(UnFuCadPreferencesTitle)" un.SecUnPreferences
 
  # issue a warning dialog
  MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION $(DialogUnPreferences) /SD IDYES IDYES +2 # continue if yes
   Goto NotPreferences
- # remove FreeCAD's config files
+ # remove FuCad's config files
  StrCpy $AppSubfolder ${APP_DIR_USERDATA}
  Call un.DelAppPathSub # function from Utils.nsh
  # remove the registry key that stores the main window parameters

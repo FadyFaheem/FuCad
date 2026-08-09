@@ -2,7 +2,7 @@
   "tasks": [
     {
       "type": "process",
-      "label": "FreeCAD: setup conda environment",
+      "label": "FuCad: setup conda environment",
       "linux": {
         "command": "conda/setup-environment.sh",
       },
@@ -56,9 +56,9 @@
     },
     {
       "label": "Tests: run python tests",
-      "detail": "Run FreeCAD integrated tests",
+      "detail": "Run FuCad integrated tests",
       "type": "shell",
-      "command": "${command:cmake.buildDirectory}/bin/FreeCAD",
+      "command": "${command:cmake.buildDirectory}/bin/FuCad",
       "args": ["-t", "0"],
       "group": {
         "kind": "test"

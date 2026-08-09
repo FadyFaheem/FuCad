@@ -147,7 +147,7 @@ wbListItem::wbListItem(
     // 5: Autoloaded checkBox.
     autoloadCheckBox = new QCheckBox(this);
     autoloadCheckBox->setText(tr("Auto-load"));
-    autoloadCheckBox->setToolTip(tr("Loads %1 automatically when FreeCAD starts").arg(wbDisplayName));
+    autoloadCheckBox->setToolTip(tr("Loads %1 automatically when FuCad starts").arg(wbDisplayName));
     autoloadCheckBox->setEnabled(enableCheckBox->isChecked());
 
     if (startupWb) {  // Figure out whether to check and/or disable this checkBox:
@@ -165,7 +165,7 @@ wbListItem::wbListItem(
     loadLabel->setEnabled(enableCheckBox->isChecked());
     loadButton = new QPushButton(tr("Load"), this);
     loadButton->setToolTip(
-        tr("To preserve resources, FreeCAD does not load workbenches until they are used. Loading "
+        tr("To preserve resources, FuCad does not load workbenches until they are used. Loading "
            "them may provide access to additional preferences related to their functionality.")
     );
     loadButton->setEnabled(enableCheckBox->isChecked());

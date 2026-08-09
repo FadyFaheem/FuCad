@@ -34,7 +34,7 @@ To run the gui tests as github ci runs them, useful for running gui tests locall
 use the below command, ie.
 
 xvfb-run \
-/path/to/local/freecad/install/bin/FreeCAD -t TestPartDesignGui.TestSuppressedStrikethrough
+/path/to/local/freecad/install/bin/FuCad -t TestPartDesignGui.TestSuppressedStrikethrough
 """
 
 import os

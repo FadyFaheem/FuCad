@@ -79,5 +79,5 @@ cmake \
 cmake --build build
 cmake --install build
 
-mv ${PREFIX}/bin/FreeCAD ${PREFIX}/bin/freecad || true
-mv ${PREFIX}/bin/FreeCADCmd ${PREFIX}/bin/freecadcmd || true
+mv ${PREFIX}/bin/FuCad ${PREFIX}/bin/fucad || true
+mv ${PREFIX}/bin/FuCadCmd ${PREFIX}/bin/fucadcmd || true

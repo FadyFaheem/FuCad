@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" version="1.1">
+  <title>FuCad</title>
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12525f"/>
+      <stop offset="1" stop-color="#082d38"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="48" height="48" rx="10.3" ry="10.3" fill="url(#plate)"/>
+  <rect x="0.5" y="0.5" width="47" height="47" rx="9.8" ry="9.8" fill="none" stroke="#f2f7f8" stroke-opacity="0.15" stroke-width="1"/>
+  <path d="M 33.445,11.569 L 33.445,19.491 L 38.930,16.322 L 38.930,8.400 Z" fill="#f0a202"/>
+  <path d="M 16.992,19.491 L 16.992,23.756 L 22.477,20.587 L 22.477,16.322 Z" fill="#f0a202"/>
+  <path d="M 28.570,23.756 L 28.570,30.459 L 34.055,27.291 L 34.055,20.587 Z" fill="#f0a202"/>
+  <path d="M 16.992,30.459 L 16.992,39.600 L 22.477,36.431 L 22.477,27.291 Z" fill="#f0a202"/>
+  <path d="M 9.070,11.569 L 33.445,11.569 L 38.930,8.400 L 14.555,8.400 Z" fill="#ffc24d"/>
+  <path d="M 16.992,23.756 L 28.570,23.756 L 34.055,20.587 L 22.477,20.587 Z" fill="#ffc24d"/>
+  <path d="M 9.070,11.569 L 33.445,11.569 L 33.445,19.491 L 16.992,19.491 L 16.992,23.756 L 28.570,23.756 L 28.570,30.459 L 16.992,30.459 L 16.992,39.600 L 9.070,39.600 Z" fill="#f2f7f8"/>
+</svg>

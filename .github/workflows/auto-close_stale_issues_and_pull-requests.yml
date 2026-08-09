@@ -19,7 +19,7 @@ permissions:
 jobs:
   stale:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'FreeCAD' || github.event_name == 'workflow_dispatch'
+    if: github.repository_owner == 'FadyFaheem' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
@@ -46,7 +46,7 @@ jobs:
             Hi! This issue hasn’t seen activity in a while. If it’s still relevant, please update to the latest FreeCAD weekly build [download here](https://github.com/FreeCAD/FreeCAD/releases/) to see if the problem is resolved.
 
             If the issue persists, let us know by adding a comment with any updates or details. Otherwise, we’ll close this issue automatically in 14 days to keep our backlog tidy. Feel free to comment anytime to keep it open. Closed issues can always be reopened.
-            Thanks for helping improve FreeCAD!
+            Thanks for helping improve FuCad!
 
             Access additional [FreeCAD](https://freecad.org) resources:
               - **Forum**: https://forum.freecad.org
@@ -74,7 +74,7 @@ jobs:
             If it’s still relevant, please update to the latest FreeCAD weekly build [download here](https://github.com/FreeCAD/FreeCAD/releases/) to see if the problem is resolved.
 
             If the issue persists, let us know by adding a comment with any updates or details. Otherwise, we’ll close this issue automatically in 14 days to keep our backlog tidy. Feel free to comment anytime to keep it open. Closed issues can always be reopened.
-            Thanks for helping improve FreeCAD!
+            Thanks for helping improve FuCad!
 
             Access additional [FreeCAD](https://freecad.org) resources:
               - **Forum**: https://forum.freecad.org
@@ -105,7 +105,7 @@ jobs:
             Otherwise, we’ll close this issue automatically in 60 days.
 
             Feel free to comment anytime to keep it open. Closed issues can always be reopened.
-            Thanks for helping improve FreeCAD!
+            Thanks for helping improve FuCad!
 
             Access additional [FreeCAD](https://freecad.org) resources:
               - **Forum**: https://forum.freecad.org
@@ -128,7 +128,7 @@ jobs:
           remove-stale-when-updated: true
           ascending: true
           stale-pr-message: |
-            Thanks for helping improve FreeCAD!
+            Thanks for helping improve FuCad!
             This pull request hasn’t seen activity in a while. We automatically check each PR after 120 days without activity to keep the repository tidy.
 
             If the PR is still relevant, let us know by adding a comment.

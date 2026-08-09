@@ -6,7 +6,7 @@
 """
 The module can be executed with:
 FreeCAD -P <path_to_file> Automation.py
-FreeCADCmd -P <path_to_file> Automation.py
+FuCadCmd -P <path_to_file> Automation.py
 """
 
 import FreeCAD, Part

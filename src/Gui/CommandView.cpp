@@ -2084,8 +2084,8 @@ StdCmdViewVR::StdCmdViewVR()
     : Command("Std_ViewVR")
 {
     sGroup = "Standard-View";
-    sMenuText = QT_TR_NOOP("FreeCAD VR");
-    sToolTipText = QT_TR_NOOP("Extends the FreeCAD 3D Window to a VR device");
+    sMenuText = QT_TR_NOOP("FuCad VR");
+    sToolTipText = QT_TR_NOOP("Extends the FuCad 3D Window to a VR device");
     sWhatsThis = "Std_ViewVR";
     sStatusTip = sToolTipText;
     eType = Alter3DView;

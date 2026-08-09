@@ -1,4 +1,4 @@
-summary: Run All FreeCADCmd python tests
-test: /usr/bin/FreeCADCmd -v
-require: /usr/bin/FreeCADCmd
+summary: Run All FuCadCmd python tests
+test: /usr/bin/FuCadCmd -v
+require: /usr/bin/FuCadCmd
 duration: 1m

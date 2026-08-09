@@ -21,7 +21,7 @@
 # *                                                                         *
 # ***************************************************************************
 
-# This is the lint workflow for CI of FreeCAD.
+# This is the lint workflow for CI of FuCad.
 # Formatting checks (black, clang-format, trailing whitespace, line endings,
 # tabs) are handled by pre-commit, so they are intentionally not duplicated
 # here.
@@ -79,7 +79,7 @@ on:
         type: string
         required: false
       spellingIgnore:
-        default: ./.git*,*.po,*.ts,*.svg,./src/3rdParty,./src/Base/swig*,./src/Mod/Robot/App/kdl_cp,./src/Mod/Import/App/SCL*,./src/Doc/FreeCAD.uml,./build/
+        default: ./.git*,*.po,*.ts,*.svg,./src/3rdParty,./src/Base/swig*,./src/Mod/Robot/App/kdl_cp,./src/Mod/Import/App/SCL*,./src/Doc/FuCad.uml,./build/
         type: string
         required: false
       codespellFailSilent:
@@ -176,7 +176,7 @@ jobs:
 
     # C++ linting steps
 
-      - name: Install FreeCAD dependencies
+      - name: Install FuCad dependencies
         if: inputs.changedCppFiles != '' && always()
         run: ./package/ubuntu/install-apt-packages.sh
 

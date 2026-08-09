@@ -1,0 +1,4 @@
+[Thumbnailer Entry]
+TryExec=@CMAKE_INSTALL_BINDIR@/fucad-thumbnailer
+Exec=@CMAKE_INSTALL_BINDIR@/fucad-thumbnailer -s %s %i %o
+MimeType=application/x-extension-fcstd;

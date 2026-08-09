@@ -4,7 +4,7 @@ import os.log
 
 private let logger = Logger(
     subsystem: Bundle(for: ThumbnailProvider.self).bundleIdentifier
-        ?? "org.freecad.quicklook.thumbnail.fallback",
+        ?? "org.fucad.quicklook.thumbnail.fallback",
     category: "ThumbnailProvider"
 )
 

@@ -21,8 +21,8 @@
 # *                                                                         *
 # ***************************************************************************
 
-# This is a build and test workflow for CI of FreeCAD.
-# This workflow aims at building and testing FreeCAD on Ubuntu 24.04 using GCC.
+# This is a build and test workflow for CI of FuCad.
+# This workflow aims at building and testing FuCad on Ubuntu 24.04 using GCC.
 
 name: Build Ubuntu 24.04
 
@@ -93,10 +93,10 @@ jobs:
         with:
           submodules: true
 
-      - name: Install FreeCAD dependencies
+      - name: Install FuCad dependencies
         run: ./package/ubuntu/install-apt-packages.sh
 
-      - name: Install FreeCAD Python test dependencies
+      - name: Install FuCad Python test dependencies
         run: |
           sudo apt-get update -y -qq
           sudo apt-get install -y -qq python3-pip
@@ -164,23 +164,23 @@ jobs:
         run: |
           ccache -s
 
-      - name: FreeCAD CLI tests on build dir
+      - name: FuCad CLI tests on build dir
         if: inputs.testOnBuildDir
         timeout-minutes: 10
         uses: ./.github/workflows/actions/runPythonTests
         with:
           testDescription: "CLI tests on build dir"
-          testCommand: ${{ env.builddir }}/bin/FreeCADCmd -t 0
+          testCommand: ${{ env.builddir }}/bin/FuCadCmd -t 0
           logFile: ${{ env.logdir }}TestCLIBuild.log
           reportFile: ${{env.reportdir}}${{ env.reportfilename }}
 
-      - name: FreeCAD GUI tests on build dir
+      - name: FuCad GUI tests on build dir
         if: inputs.testOnBuildDir
         timeout-minutes: 15
         uses: ./.github/workflows/actions/runPythonTests
         with:
           testDescription: "GUI tests on build dir"
-          # Use Python wrapper to run only GUI-registered tests with the built FreeCAD executable
+          # Use Python wrapper to run only GUI-registered tests with the built FuCad executable
           testCommand: xvfb-run python3 ./.github/scripts/run_gui_tests.py "${{ env.builddir }}"
           logFile: ${{ env.logdir }}TestGUIBuild.log
           reportFile: ${{env.reportdir}}${{ env.reportfilename }}
@@ -192,9 +192,9 @@ jobs:
         with:
           testDescription: "Coin node snapshot visual tests on build dir"
           testCommand: |
-            FC_VISUAL_OUT_DIR="/tmp/FreeCADTesting/CoinNodeSnapshots" \
+            FC_VISUAL_OUT_DIR="/tmp/FuCadTesting/CoinNodeSnapshots" \
             xvfb-run -a -s "-screen 0 1024x768x24" \
-              "${{ env.builddir }}/bin/FreeCAD" -t TestCoinNodeSnapshots
+              "${{ env.builddir }}/bin/FuCad" -t TestCoinNodeSnapshots
           logFile: ${{ env.logdir }}TestCoinNodeSnapshotsBuild.log
           reportFile: ${{env.reportdir}}${{ env.reportfilename }}
 
@@ -203,7 +203,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ inputs.artifactBasename }}-CoinNodeSnapshots
-          path: /tmp/FreeCADTesting/CoinNodeSnapshots
+          path: /tmp/FuCadTesting/CoinNodeSnapshots
 
       - name: C++ tests
         timeout-minutes: 1
@@ -221,22 +221,22 @@ jobs:
           errorFile: ${{ env.logdir }}InstallErrors.log
           reportFile: ${{env.reportdir}}${{ env.reportfilename }}
 
-      - name: FreeCAD CLI tests on install
+      - name: FuCad CLI tests on install
         timeout-minutes: 10
         uses: ./.github/workflows/actions/runPythonTests
         with:
           testDescription: "CLI tests on install"
-          testCommand: FreeCADCmd -t 0
+          testCommand: FuCadCmd -t 0
           logFile: ${{ env.logdir }}TestCLIInstall.log
           reportFile: ${{env.reportdir}}${{ env.reportfilename }}
 
-      - name: FreeCAD GUI tests on install
+      - name: FuCad GUI tests on install
         timeout-minutes: 15
         uses: ./.github/workflows/actions/runPythonTests
         with:
           testDescription: "GUI tests on install"
-          # Use Python wrapper to run only GUI-registered tests using the installed FreeCAD
-          testCommand: xvfb-run python3 ./.github/scripts/run_gui_tests.py "FreeCAD"
+          # Use Python wrapper to run only GUI-registered tests using the installed FuCad
+          testCommand: xvfb-run python3 ./.github/scripts/run_gui_tests.py "FuCad"
           logFile: ${{ env.logdir }}TestGUIInstall.log
           reportFile: ${{env.reportdir}}${{ env.reportfilename }}
 
@@ -255,7 +255,7 @@ jobs:
           name: ${{ inputs.artifactBasename }}-Logs
           path: |
             ${{ env.logdir }}
-            /var/crash/*FreeCAD*
+            /var/crash/*FuCad*
 
       - name: Upload report
         if: always()

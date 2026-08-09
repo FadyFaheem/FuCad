@@ -4,8 +4,8 @@
 # Built to support the Topological Naming Problem fixes from early 2024;
 # this will likely need tweaking for your use.
 
-notnp=<Path to your first executable to profile goes here>  #<dir>/bin/FreeCAD${cmd}
-tnp=<Path to your second executable to profile goes here>   #<dir/bin/FreeCAD${cmd}
+notnp=<Path to your first executable to profile goes here>  #<dir>/bin/FuCad${cmd}
+tnp=<Path to your second executable to profile goes here>   #<dir/bin/FuCad${cmd}
 results="results.txt" # File to append measurements to.  We do not clear so xargs works on script
 save="--save" # or ""  Whether to save the resulting file from the tnp executable for further testing.
 

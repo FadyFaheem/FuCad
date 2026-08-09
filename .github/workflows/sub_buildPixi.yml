@@ -21,8 +21,8 @@
 # *                                                                         *
 # ***************************************************************************
 
-# This is a build and test workflow for CI of FreeCAD.
-# This workflow aims at building and testing FreeCAD on a Conda environment on macOS.
+# This is a build and test workflow for CI of FuCad.
+# This workflow aims at building and testing FuCad on a Conda environment on macOS.
 
 name: Pixi Builds
 
@@ -170,23 +170,23 @@ jobs:
       run: |
         pixi run ccache -s
 
-    - name: FreeCAD CLI tests on build dir
+    - name: FuCad CLI tests on build dir
       if: inputs.testOnBuildDir && !inputs.skipBuild
       timeout-minutes: 10
       uses: ./.github/workflows/actions/runPythonTests
       with:
         testDescription: "CLI tests on build dir"
-        testCommand: pixi run ${{ env.builddir }}/bin/FreeCADCmd -t 0
+        testCommand: pixi run ${{ env.builddir }}/bin/FuCadCmd -t 0
         logFile: ${{ env.logdir }}TestCLIBuild.log
         reportFile: ${{env.reportdir}}${{ env.reportfilename }}
 
-    - name: FreeCAD GUI tests on build dir
+    - name: FuCad GUI tests on build dir
       if: runner.os == 'Linux' && inputs.testOnBuildDir && !inputs.skipBuild
       timeout-minutes: 15
       uses: ./.github/workflows/actions/runPythonTests
       with:
         testDescription: "GUI tests on build dir"
-        testCommand: pixi run xvfb-run ${{ env.builddir }}/bin/FreeCAD -t 0
+        testCommand: pixi run xvfb-run ${{ env.builddir }}/bin/FuCad -t 0
         logFile: ${{ env.logdir }}TestGUIBuild.log
         reportFile: ${{env.reportdir}}${{ env.reportfilename }}
 
@@ -197,9 +197,9 @@ jobs:
       with:
         testDescription: "Coin node snapshot visual tests on build dir"
         testCommand: |
-          FC_VISUAL_OUT_DIR="/tmp/FreeCADTesting/CoinNodeSnapshots" \
+          FC_VISUAL_OUT_DIR="/tmp/FuCadTesting/CoinNodeSnapshots" \
           pixi run xvfb-run -a -s "-screen 0 1024x768x24" \
-            "${{ env.builddir }}/bin/FreeCAD" -t TestCoinNodeSnapshots
+            "${{ env.builddir }}/bin/FuCad" -t TestCoinNodeSnapshots
         logFile: ${{ env.logdir }}TestCoinNodeSnapshotsBuild.log
         reportFile: ${{env.reportdir}}${{ env.reportfilename }}
 
@@ -208,7 +208,7 @@ jobs:
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: ${{ inputs.artifactBasename }}-${{ matrix.os }}-CoinNodeSnapshots
-        path: /tmp/FreeCADTesting/CoinNodeSnapshots
+        path: /tmp/FuCadTesting/CoinNodeSnapshots
 
     - name: src/Tools tests
       if: "!inputs.skipBuild"
@@ -228,17 +228,17 @@ jobs:
       run: |
         pixi run install-${{ env.config }}
 
-    - name: FreeCAD CLI tests on install
+    - name: FuCad CLI tests on install
       if: runner.os != 'Windows' && !inputs.skipBuild
       timeout-minutes: 10
       uses: ./.github/workflows/actions/runPythonTests
       with:
         testDescription: "CLI tests on install"
-        testCommand: pixi run FreeCADCmd -t 0
+        testCommand: pixi run FuCadCmd -t 0
         logFile: ${{ env.logdir }}TestCLIInstall.log
         reportFile: ${{env.reportdir}}${{ env.reportfilename }}
 
-    - name: FreeCAD GUI tests on install
+    - name: FuCad GUI tests on install
       # if: runner.os == 'Linux' && !inputs.skipBuild
       # currently broken on Qt6 builds
       if: false
@@ -246,7 +246,7 @@ jobs:
       uses: ./.github/workflows/actions/runPythonTests
       with:
         testDescription: "GUI tests on install"
-        testCommand: pixi run xvfb-run FreeCAD -t 0
+        testCommand: pixi run xvfb-run FuCad -t 0
         logFile: ${{ env.logdir }}TestGUIInstall.log
         reportFile: ${{env.reportdir}}${{ env.reportfilename }}
 
@@ -265,7 +265,7 @@ jobs:
         name: ${{ inputs.artifactBasename }}-${{ matrix.os }}-Logs
         path: |
           ${{ env.logdir }}
-          /var/crash/*FreeCAD*
+          /var/crash/*FuCad*
 
     - name: Upload report
       if: "!inputs.skipBuild"

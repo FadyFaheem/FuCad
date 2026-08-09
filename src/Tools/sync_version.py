@@ -6,7 +6,7 @@
 #   - pixi.toml (workspace version)
 #   - package/rattler-build/pixi.toml (package version, name, description)
 #   - package/rattler-build/recipe.yaml (context version, package name)
-#   - package/fedora/freecad.spec (Version, Name)
+#   - package/fedora/fucad.spec (Version, Name)
 #
 # Usage:
 #   python src/Tools/sync_version.py --check    # verify consistency (no changes)
@@ -181,7 +181,7 @@ SYNC_TARGETS = [
     ("pixi.toml", sync_workspace_pixi_toml),
     ("package/rattler-build/pixi.toml", sync_rattler_build_pixi_toml),
     ("package/rattler-build/recipe.yaml", sync_recipe_yaml),
-    ("package/fedora/freecad.spec", sync_fedora_spec),
+    ("package/fedora/fucad.spec", sync_fedora_spec),
 ]
 
 

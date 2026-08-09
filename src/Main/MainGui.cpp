@@ -59,8 +59,10 @@
 void PrintInitHelp();
 
 const auto sBanner = fmt::format(
-    "(C) 2001-{} FreeCAD contributors\n"
-    "FreeCAD is free and open-source software licensed under the terms of LGPL2+ license.\n\n",
+    "FuCad is a fork of FreeCAD (https://www.freecad.org), "
+    "(C) 2001-{} FreeCAD contributors.\n"
+    "FuCad is free and open-source software licensed under the terms of the "
+    "LGPL-2.1-or-later license.\n\n",
     FCCopyrightYear
 );
 
@@ -210,26 +212,28 @@ int main(int argc, char** argv)
 #endif
 
     // Name and Version of the Application
-    App::Application::Config()["ExeName"] = "FreeCAD";
-    App::Application::Config()["ExeVendor"] = "FreeCAD";
+    App::Application::Config()["ExeName"] = "FuCad";
+    App::Application::Config()["ExeVendor"] = "FuCad";
     App::Application::Config()["AppDataSkipVendor"] = "true";
-    App::Application::Config()["MaintainerUrl"] = "https://freecad.org";
+    App::Application::Config()["MaintainerUrl"] = "https://github.com/FadyFaheem/FuCad";
 
     // set the banner (for logging and console)
     App::Application::Config()["CopyrightInfo"] = sBanner;
-    App::Application::Config()["AppIcon"] = "freecad";
-    App::Application::Config()["SplashScreen"] = "freecadsplash";
+    App::Application::Config()["AppIcon"] = "fucad";
+    App::Application::Config()["SplashScreen"] = "fucadsplash";
     App::Application::Config()["AboutImage"] = App::Application::isDevelopmentVersion()
-        ? "freecadaboutdev"
-        : "freecadabout";
+        ? "fucadaboutdev"
+        : "fucadabout";
     App::Application::Config()["StartWorkbench"] = "PartDesignWorkbench";
     // App::Application::Config()["HiddenDockWindow"] = "Property editor";
     App::Application::Config()["SplashAlignment"] = "Bottom|Left";
-    App::Application::Config()["SplashTextColor"] = "#418FDE";
+    App::Application::Config()["SplashTextColor"] = "#F0A202";
     App::Application::Config()["SplashWarningColor"] = "#CA333B";
-    App::Application::Config()["SplashInfoColor"] = "#000000";
-    App::Application::Config()["SplashInfoPosition"] = "6,75";
-    App::Application::Config()["DesktopFileName"] = "org.freecad.FreeCAD";
+    // The wordmark is part of the splash artwork, so only the version is painted on it.
+    App::Application::Config()["SplashTitleInImage"] = "true";
+    App::Application::Config()["SplashInfoColor"] = "#7C98A1";
+    App::Application::Config()["SplashInfoPosition"] = "52,258";
+    App::Application::Config()["DesktopFileName"] = "org.fucad.FuCad";
 
     try {
         // Init phase ===========================================================

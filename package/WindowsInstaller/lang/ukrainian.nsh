@@ -1,5 +1,5 @@
 ﻿/*
-FreeCAD Installer Language File
+FuCad Installer Language File
 Language: Ukrainian
 */
 
@@ -7,25 +7,25 @@ Language: Ukrainian
 
 ${LangFileString} TEXT_INSTALL_CURRENTUSER "(Встановлено для поточного користувача)"
 
-${LangFileString} TEXT_WELCOME "За допомогою цього майстра ви зможете встановити FreeCAD у вашу систему.$\r$\n\
+${LangFileString} TEXT_WELCOME "За допомогою цього майстра ви зможете встановити FuCad у вашу систему.$\r$\n\
 				$\r$\n\
 				$_CLICK"
 
 #${LangFileString} TEXT_CONFIGURE_PYTHON "Обробка скриптів Python..."
 
 ${LangFileString} TEXT_FINISH_DESKTOP "Створити значок на стільниці"
-${LangFileString} TEXT_FINISH_WEBSITE "Відвідати freecad.org, щоб ознайомитися з новинами, довідковими матеріалами та підказками"
+${LangFileString} TEXT_FINISH_WEBSITE "Відвідати fucad.org, щоб ознайомитися з новинами, довідковими матеріалами та підказками"
 
-#${LangFileString} FileTypeTitle "Документ FreeCAD"
+#${LangFileString} FileTypeTitle "Документ FuCad"
 
 #${LangFileString} SecAllUsersTitle "Встановити для всіх користувачів?"
 ${LangFileString} SecFileAssocTitle "Прив’язка файлів"
 ${LangFileString} SecDesktopTitle "Піктограма стільниці"
 
-${LangFileString} SecCoreDescription "Файли FreeCAD."
-#${LangFileString} SecAllUsersDescription "Визначає, чи слід встановити FreeCAD для всіх користувачів, чи лише для поточного користувача."
-${LangFileString} SecFileAssocDescription "Файли з суфіксом .FCStd автоматично відкриватимуться за допомогою FreeCAD."
-${LangFileString} SecDesktopDescription "Піктограма FreeCAD на стільниці."
+${LangFileString} SecCoreDescription "Файли FuCad."
+#${LangFileString} SecAllUsersDescription "Визначає, чи слід встановити FuCad для всіх користувачів, чи лише для поточного користувача."
+${LangFileString} SecFileAssocDescription "Файли з суфіксом .FCStd автоматично відкриватимуться за допомогою FuCad."
+${LangFileString} SecDesktopDescription "Піктограма FuCad на стільниці."
 #${LangFileString} SecDictionaries "Словники"
 #${LangFileString} SecDictionariesDescription "Словники для перевірки правопису, які можна отримати і встановити."
 
@@ -34,37 +34,37 @@ ${LangFileString} SecDesktopDescription "Піктограма FreeCAD на ст�
 
 #${LangFileString} DictionariesFailed 'Спроба отримання словника для мови $\"$R3$\" зазнала невдачі.'
 
-#${LangFileString} ConfigInfo "Налаштування FreeCAD може тривати досить довго."
+#${LangFileString} ConfigInfo "Налаштування FuCad може тривати досить довго."
 
 #${LangFileString} RunConfigureFailed "Не вдалося виконати скрипт налаштування"
 ${LangFileString} InstallRunning "Засіб для встановлення вже працює!"
-${LangFileString} AlreadyInstalled "FreeCAD ${APP_SERIES_KEY2} вже встановлено!$\r$\n\
-				Чи хочете ви попри ці зауваження встановити FreeCAD на місце наявної версії?"
-${LangFileString} NewerInstalled "Ви намагаєтеся встановити версію FreeCAD, яка є застарілою порівняно з вже встановленою.$\r$\n\
-				  Якщо ви хочете встановити застарілу версію, вам слід спочатку вилучити вже встановлений FreeCAD $OldVersionNumber."
+${LangFileString} AlreadyInstalled "FuCad ${APP_SERIES_KEY2} вже встановлено!$\r$\n\
+				Чи хочете ви попри ці зауваження встановити FuCad на місце наявної версії?"
+${LangFileString} NewerInstalled "Ви намагаєтеся встановити версію FuCad, яка є застарілою порівняно з вже встановленою.$\r$\n\
+				  Якщо ви хочете встановити застарілу версію, вам слід спочатку вилучити вже встановлений FuCad $OldVersionNumber."
 
-#${LangFileString} FinishPageMessage "Вітаємо! FreeCAD було успішно встановлено.$\r$\n\
+#${LangFileString} FinishPageMessage "Вітаємо! FuCad було успішно встановлено.$\r$\n\
 #					$\r$\n\
-#					(Перший запуск FreeCAD може тривати декілька секунд.)"
-${LangFileString} FinishPageRun "Запустити FreeCAD"
+#					(Перший запуск FuCad може тривати декілька секунд.)"
+${LangFileString} FinishPageRun "Запустити FuCad"
 
-${LangFileString} UnNotInRegistryLabel "Не вдалося знайти записи FreeCAD у регістрі.$\r$\n\
+${LangFileString} UnNotInRegistryLabel "Не вдалося знайти записи FuCad у регістрі.$\r$\n\
 					Записи на стільниці і у меню запуску вилучено не буде."
-${LangFileString} UnInstallRunning "Спочатку слід завершити роботу програми FreeCAD!"
-${LangFileString} UnNotAdminLabel "Для вилучення FreeCAD вам слід мати привілеї адміністратора!"
-${LangFileString} UnReallyRemoveLabel "Ви справді бажаєте повністю вилучити FreeCAD і всі його компоненти?"
-${LangFileString} UnFreeCADPreferencesTitle 'Параметри FreeCAD, встановлені користувачем'
+${LangFileString} UnInstallRunning "Спочатку слід завершити роботу програми FuCad!"
+${LangFileString} UnNotAdminLabel "Для вилучення FuCad вам слід мати привілеї адміністратора!"
+${LangFileString} UnReallyRemoveLabel "Ви справді бажаєте повністю вилучити FuCad і всі його компоненти?"
+${LangFileString} UnFuCadPreferencesTitle 'Параметри FuCad, встановлені користувачем'
 
 #${LangFileString} SecUnProgDescription "Вилучає xxx."
-${LangFileString} SecUnPreferencesDescription 'Вилучає теку з налаштуваннями FreeCAD$\r$\n\
+${LangFileString} SecUnPreferencesDescription 'Вилучає теку з налаштуваннями FuCad$\r$\n\
 						$\"$AppPre\username\$\r$\n\
 						$AppSuff\$\r$\n\
 						${APP_DIR_USERDATA}$\")$\r$\n\
 						для всіх користувачів.'
-${LangFileString} DialogUnPreferences 'You chose to delete the FreeCADs user configuration.$\r$\n\
-						This will also delete all installed FreeCAD addons.$\r$\n\
+${LangFileString} DialogUnPreferences 'You chose to delete the FuCads user configuration.$\r$\n\
+						This will also delete all installed FuCad addons.$\r$\n\
 						Do you agree with this?'
-${LangFileString} SecUnProgramFilesDescription "Вилучити FreeCAD і всі його компоненти."
+${LangFileString} SecUnProgramFilesDescription "Вилучити FuCad і всі його компоненти."
 
 ${LangFileString} DirNotEmptyWarning "The selected folder '$INSTDIR' is not empty.$\r$\n\
                         The installer will remove all its content before installing. Continue?"

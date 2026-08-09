@@ -1,8 +1,8 @@
 /*
 
-Settings for FreeCAD installer
+Settings for FuCad installer
 
-These typically need to be modified for each FreeCAD release
+These typically need to be modified for each FuCad release
 
 */
 
@@ -20,8 +20,8 @@ These typically need to be modified for each FreeCAD release
 # File locations
 # !!! you may need to adjust them to the folders in your Windows system !!!
 # can be specified with /D command line argument to makensis.exe
-!ifndef FILES_FREECAD
-    !define FILES_FREECAD "${__FILEDIR__}\FreeCAD"
+!ifndef FILES_FUCAD
+    !define FILES_FUCAD "${__FILEDIR__}\FuCad"
 !endif
 !ifndef FILES_THUMBS
     !define FILES_THUMBS "${__FILEDIR__}\thumbnail"
@@ -33,26 +33,26 @@ These typically need to be modified for each FreeCAD release
 #!define FILES_DEPS "${__FILEDIR__}\MSVCRedist"
 
 #--------------------------------
-# get version info from freecadcmd
-!system '${FILES_FREECAD}\bin\freecadcmd.exe --safe-mode "${__FILEDIR__}\write_version_nsh.py"' = 0
+# get version info from fucadcmd
+!system '${FILES_FUCAD}\bin\fucadcmd.exe --safe-mode "${__FILEDIR__}\write_version_nsh.py"' = 0
 !include "${__FILEDIR__}\version.nsh"
 !delfile "${__FILEDIR__}\version.nsh"
 
-!define APP_VERSION_EMERGENCY "" # use "1" for an emergency release of FreeCAD otherwise ""
+!define APP_VERSION_EMERGENCY "" # use "1" for an emergency release of FuCad otherwise ""
 	# alternatively you can use APP_VERSION_EMERGENCY for a custom suffix of the version number
-!define APP_EMERGENCY_DOT "" # use "." for an emergency release of FreeCAD otherwise ""
+!define APP_EMERGENCY_DOT "" # use "." for an emergency release of FuCad otherwise ""
 !define APP_VERSION_BUILD 1 # Start with 1 for the installer releases of each version
 
 !define APP_VERSION "${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.${APP_VERSION_PATCH}${APP_EMERGENCY_DOT}${APP_VERSION_EMERGENCY}" # Version to display
 
 #--------------------------------
 # Installer file name
-# Typical names for the release are "FreeCAD-020-Installer-1.exe" etc.
+# Typical names for the release are "FuCad-020-Installer-1.exe" etc.
 
 !ifndef ExeFile
     !define ExeFile "${APP_NAME}_${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.${APP_VERSION_PATCH}${APP_VERSION_EMERGENCY}-Windows-x86_64-installer-${APP_VERSION_BUILD}.exe"
 !endif
 
 #--------------------------------
-# installer bit type - FreeCAD is only provided as 64bit build
+# installer bit type - FuCad is only provided as 64bit build
 !define MULTIUSER_USE_PROGRAMFILES64

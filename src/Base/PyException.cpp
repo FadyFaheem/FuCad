@@ -130,12 +130,12 @@ void pyThrowWrappedBaseException(const Base::Exception& e, bool report)
     if (report) {
         e.reportException();
     }
-    throw Py::Exception(e.getPyExceptionType(), fmt::format("FreeCAD exception thrown ({})", e.what()));
+    throw Py::Exception(e.getPyExceptionType(), fmt::format("FuCad exception thrown ({})", e.what()));
 }
 
 void pyThrowWrappedStdException(const std::exception& e, bool report)
 {
-    const auto what = fmt::format("FreeCAD exception thrown ({})", e.what());
+    const auto what = fmt::format("FuCad exception thrown ({})", e.what());
     if (report) {
         Base::Console().error("%s\n", what);
     }

@@ -21,14 +21,14 @@
 # *                                                                         *
 # ***************************************************************************
 
-# This is the primary CI workflow for FreeCAD.
+# This is the primary CI workflow for FuCad.
 # It runs the always-required jobs (Prepare, Ubuntu, Lint) on every PR
 # event except label additions. Label-gated jobs (macOS and Windows
 # builds) are in CI_approved.yml with a separate concurrency group so
 # that adding a label does not cancel an in-progress Linux build or
 # lint run.
 
-name: FreeCAD CI primary
+name: FuCad CI primary
 
 on:
   workflow_dispatch: ~

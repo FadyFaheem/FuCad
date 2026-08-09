@@ -1,7 +1,7 @@
 # This script contains the following functions:
 #
 # - un.DelAppPathSub and UnAppPreSuff,
-#    (delete the folder ~\Documents and Settings\username\Application Data\FreeCAD for all users), uses:
+#    (delete the folder ~\Documents and Settings\username\Application Data\FuCad for all users), uses:
 #    un.GetParentA
 #    un.GetUsers
 #    un.StrPoint
@@ -271,7 +271,7 @@ FunctionEnd
 !define TrimQuotes `!insertmacro _TrimQuotes`
 
 Function ValidateInstallDir
-  # if the $INSTDIR does not contain "FreeCAD" we must add a subfolder to avoid that FreeCAD will e.g.
+  # if the $INSTDIR does not contain "FuCad" we must add a subfolder to avoid that FuCad will e.g.
   # be installed directly to C:\programs - the uninstaller will then delete the whole
   # C:\programs directory
   StrCpy $String "$INSTDIR"

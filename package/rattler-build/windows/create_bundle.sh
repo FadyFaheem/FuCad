@@ -5,10 +5,10 @@ set -x
 
 conda_env="$(pwd)/../.pixi/envs/default/"
 
-copy_dir="FreeCAD_Windows"
+copy_dir="FuCad_Windows"
 mkdir -p ${copy_dir}/bin
 
-# Copy Conda's Python and (U)CRT to FreeCAD/bin
+# Copy Conda's Python and (U)CRT to FuCad/bin
 cp -a ${conda_env}/DLLs ${copy_dir}/bin/DLLs
 cp -a ${conda_env}/Lib ${copy_dir}/bin/Lib
 cp -a ${conda_env}/Scripts ${copy_dir}/bin/Scripts
@@ -25,9 +25,9 @@ cp -a ${conda_env}/Library/mingw-w64/bin/* ${copy_dir}/bin
 cp -a ${conda_env}/Library/share ${copy_dir}/share
 # get all the dependency .dlls
 cp -a ${conda_env}/Library/bin/*.dll ${copy_dir}/bin
-# Copy FreeCAD build
+# Copy FuCad build
 cp -a ${conda_env}/Library/bin/freecad* ${copy_dir}/bin
-cp -a ${conda_env}/Library/bin/FreeCAD* ${copy_dir}/bin
+cp -a ${conda_env}/Library/bin/FuCad* ${copy_dir}/bin
 cp -a ${conda_env}/Library/data ${copy_dir}/data
 cp -a ${conda_env}/Library/Ext ${copy_dir}/Ext
 cp -a ${conda_env}/Library/lib ${copy_dir}/lib
@@ -53,12 +53,12 @@ echo 'Prefix = ../lib/qt6' >> ${copy_dir}/bin/qt6.conf
 # convenient shortcuts to run the binaries
 if [ -x /c/ProgramData/chocolatey/tools/shimgen.exe ]; then
     pushd ${copy_dir}
-    /c/ProgramData/chocolatey/tools/shimgen.exe -p bin/freecadcmd.exe -i "$(pwd)/../../../WindowsInstaller/icons/FreeCAD.ico" -o "$(pwd)/FreeCADCmd.exe"
-    /c/ProgramData/chocolatey/tools/shimgen.exe --gui -p bin/freecad.exe -i "$(pwd)/../../../WindowsInstaller/icons/FreeCAD.ico" -o "$(pwd)/FreeCAD.exe"
+    /c/ProgramData/chocolatey/tools/shimgen.exe -p bin/fucadcmd.exe -i "$(pwd)/../../../WindowsInstaller/icons/FuCad.ico" -o "$(pwd)/FuCadCmd.exe"
+    /c/ProgramData/chocolatey/tools/shimgen.exe --gui -p bin/fucad.exe -i "$(pwd)/../../../WindowsInstaller/icons/FuCad.ico" -o "$(pwd)/FuCad.exe"
     popd
 fi
 
-version_name="FreeCAD_${BUILD_TAG}-Windows-$(uname -m)"
+version_name="FuCad_${BUILD_TAG}-Windows-$(uname -m)"
 
 echo -e "################"
 echo -e "version_name:  ${version_name}"
@@ -117,7 +117,7 @@ if [[ "${WINDOWS_SIGN_RELEASE:-0}" == "1" ]]; then
     done
 
     # Manually check the important one!
-    signtool verify -pa "$SIGN_DIR/bin/FreeCAD.exe"
+    signtool verify -pa "$SIGN_DIR/bin/FuCad.exe"
 
     echo "Signing completed."
   else
@@ -127,15 +127,15 @@ else
   echo "Not logged into Azure -- skipping signing."
 fi
 
-echo "Running FreeCAD command-line smoke test..."
-if ! "$SIGN_DIR/bin/freecadcmd.exe" --safe-mode --version; then
-  echo "FreeCAD command-line smoke test failed; the Windows bundle cannot start."
+echo "Running FuCad command-line smoke test..."
+if ! "$SIGN_DIR/bin/fucadcmd.exe" --safe-mode --version; then
+  echo "FuCad command-line smoke test failed; the Windows bundle cannot start."
   exit 1
 fi
 
-echo "Running FreeCAD bundled Pivy smoke test..."
-if ! "$SIGN_DIR/bin/freecadcmd.exe" --safe-mode --console "import pivy; from pivy import coin; print(pivy.__file__); print(coin.SoDB.getVersion())"; then
-  echo "FreeCAD bundled Pivy smoke test failed; the Windows bundle cannot import the bundled Coin/Pivy runtime."
+echo "Running FuCad bundled Pivy smoke test..."
+if ! "$SIGN_DIR/bin/fucadcmd.exe" --safe-mode --console "import pivy; from pivy import coin; print(pivy.__file__); print(coin.SoDB.getVersion())"; then
+  echo "FuCad bundled Pivy smoke test failed; the Windows bundle cannot import the bundled Coin/Pivy runtime."
   exit 1
 fi
 
@@ -150,7 +150,7 @@ if [ "${MAKE_INSTALLER}" == "true" ]; then
         -D"ExeFile=${version_name}-installer.exe" \
         -D"FILES_FREECAD=${FILES_FREECAD}" \
         -X'SetCompressor /FINAL lzma' \
-        ../../WindowsInstaller/FreeCAD-installer.nsi
+        ../../WindowsInstaller/FuCad-installer.nsi
     mv ../../WindowsInstaller/${version_name}-installer.exe .
     echo "Created installer ${version_name}-installer.exe"
     # See if we can sign the installer exe as well:

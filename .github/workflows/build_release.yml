@@ -17,7 +17,7 @@ jobs:
   upload_src:
     runs-on: ubuntu-latest
     # Forks are kept off the weekly cron, but a release they publish still has to get binaries.
-    if: github.repository_owner == 'FreeCAD' || github.event_name == 'workflow_dispatch' || github.event_name == 'release'
+    if: github.repository_owner == 'FadyFaheem' || github.event_name == 'workflow_dispatch' || github.event_name == 'release'
     permissions:
       contents: write
       actions: write
@@ -93,7 +93,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          python3 package/scripts/write_version_info.py ../freecad_version.txt
+          python3 package/scripts/write_version_info.py ../fucad_version.txt
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git config user.name 'github-actions[bot]'
           git apply package/disable_git_info.patch
@@ -181,7 +181,7 @@ jobs:
           fi
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          PP_PATH=$RUNNER_TEMP/FreeCAD_bundle.provisionprofile
+          PP_PATH=$RUNNER_TEMP/FuCad_bundle.provisionprofile
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
           export KEYCHAIN_PASSWORD=$(openssl rand -base64 8)
@@ -204,7 +204,7 @@ jobs:
           mkdir -p ~/Library/Provisioning\ Profiles
           cp $PP_PATH ~/Library/Provisioning\ Profiles
 
-          xcrun notarytool store-credentials "FreeCAD" --keychain "$KEYCHAIN_PATH" --apple-id "${APPLE_ID}" --password "${APP_SPECIFIC_PASSWORD}" --team-id "${DEVELOPER_TEAM_ID}"
+          xcrun notarytool store-credentials "FuCad" --keychain "$KEYCHAIN_PATH" --apple-id "${APPLE_ID}" --password "${APP_SPECIFIC_PASSWORD}" --team-id "${DEVELOPER_TEAM_ID}"
 
       - name: Setup .NET 10 SDK
         if: runner.os == 'Windows'
@@ -232,7 +232,7 @@ jobs:
           if [[ "${{ runner.os }}" == "macOS" ]]; then
             export MACOS_DEPLOYMENT_TARGET="${{ matrix.deploy_target }}"
           fi
-          python3 package/scripts/write_version_info.py ../freecad_version.txt
+          python3 package/scripts/write_version_info.py ../fucad_version.txt
           cd package/rattler-build
           pixi install --frozen
 

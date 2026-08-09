@@ -158,7 +158,7 @@ Currently installed workbenches:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          <widget class="QComboBox" name="AutoloadModuleCombo">
           <property name="toolTip">
            <string>Changes which workbench will be activated and shown
-after FreeCAD launches</string>
+after FuCad launches</string>
           </property>
          </widget>
         </item>

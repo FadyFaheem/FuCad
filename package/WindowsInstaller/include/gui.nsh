@@ -59,12 +59,12 @@ BrandingText " "
 !insertmacro MUI_PAGE_INSTFILES
 
 !define MUI_FINISHPAGE_RUN_TEXT "$(FinishPageRun)"
-# Use explorer to launch freecad without elevated privileges
+# Use explorer to launch fucad without elevated privileges
 !define MUI_FINISHPAGE_RUN $WINDIR\explorer.exe
 !define MUI_FINISHPAGE_RUN_PARAMETERS "$\"$INSTDIR\${APP_RUN}$\""
 
 !define MUI_FINISHPAGE_LINK $(TEXT_FINISH_WEBSITE)
-!define MUI_FINISHPAGE_LINK_LOCATION "https://www.freecad.org/"
+!define MUI_FINISHPAGE_LINK_LOCATION "https://github.com/FadyFaheem/FuCad"
 #!define MUI_PAGE_CUSTOMFUNCTION_SHOW CheckDesktopShortcut
 !insertmacro MUI_PAGE_FINISH
 

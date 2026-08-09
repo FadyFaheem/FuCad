@@ -19,8 +19,8 @@
 # *                                                                         *
 # ***************************************************************************
 
-# This is a build and test workflow for CI of FreeCAD.
-# This workflow aims at building and testing FreeCAD on Windows using MSVC.
+# This is a build and test workflow for CI of FuCad.
+# This workflow aims at building and testing FuCad on Windows using MSVC.
 
 name: Build Windows
 on:
@@ -30,7 +30,7 @@ on:
         description: "Base name for artifact"
         required: false
         type: string
-        default: "FreeCAD"
+        default: "FuCad"
       allowedToFail:
         description: "whether a failed build is allowed"
         required: false
@@ -183,10 +183,10 @@ jobs:
         run: |
           . ${{ env.builddir }}\tests\Release\Tests_run --gtest_output=json:${{ env.reportdir }}gtest_results.json # 2>&1 | tee -filepath ${{ env.logdir }}\unitTests.log
 
-      - name: FreeCAD CLI tests
+      - name: FuCad CLI tests
         if: "!inputs.skipBuild"
         run: |
-          . ${{ env.builddir }}\bin\FreeCADCmd -t 0 # 2>&1 | tee -filepath ${{ env.logdir }}\integrationTests.log
+          . ${{ env.builddir }}\bin\FuCadCmd -t 0 # 2>&1 | tee -filepath ${{ env.logdir }}\integrationTests.log
 
       - name: Save Compiler Cache
         id: cache-save

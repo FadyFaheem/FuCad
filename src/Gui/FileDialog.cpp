@@ -1130,7 +1130,7 @@ QIcon FileIconProvider::icon(const QFileInfo& info) const
             }
         }
 
-        return QIcon(QStringLiteral(":/icons/freecad-doc.png"));
+        return QIcon(QStringLiteral(":/icons/fucad-doc.png"));
     };
 
     if (info.suffix().toLower() == QLatin1String("fcstd")) {
@@ -1140,7 +1140,7 @@ QIcon FileIconProvider::icon(const QFileInfo& info) const
         return iconFromFile(thumb);
     }
     else if (info.suffix().toLower().startsWith(QLatin1String("fcstd"))) {
-        QIcon icon(QStringLiteral(":/icons/freecad-doc.png"));
+        QIcon icon(QStringLiteral(":/icons/fucad-doc.png"));
         QIcon darkIcon;
         int w = QApplication::style()->pixelMetric(QStyle::PM_ListViewIconSize);
         darkIcon.addPixmap(icon.pixmap(w, w, QIcon::Disabled, QIcon::Off), QIcon::Normal, QIcon::Off);

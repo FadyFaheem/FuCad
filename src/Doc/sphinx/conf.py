@@ -24,7 +24,7 @@
 #***************************************************************************
 
 #
-# FreeCAD documentation build configuration file, created by
+# FuCad documentation build configuration file, created by
 # sphinx-quickstart on Wed Nov 30 10:49:09 2011.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -84,8 +84,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'FreeCAD'
-copyright = u'2013, Jürgen Riegel, Werner Mayer, Yorik van Havre'
+project = u'FuCad'
+copyright = u'FuCad contributors; derived from FreeCAD by Jürgen Riegel, Werner Mayer, Yorik van Havre'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -137,7 +137,7 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 html_theme = 'default'
 
-html_style = 'freecad.css'
+html_style = 'fucad.css'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -149,7 +149,7 @@ html_style = 'freecad.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = "FreeCAD API documentation"
+html_title = "FuCad API documentation"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -210,7 +210,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'FreeCADdoc'
+htmlhelp_basename = 'FuCaddoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -224,7 +224,7 @@ htmlhelp_basename = 'FreeCADdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'FreeCAD.tex', u'FreeCAD Documentation',
+  ('index', 'FuCad.tex', u'FuCad Documentation',
    u'Jürgen Riegel, Werner Mayer,Yorik van Havre', 'manual'),
 ]
 
@@ -257,6 +257,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'freecad', u'FreeCAD Documentation',
+    ('index', 'fucad', u'FuCad Documentation',
      [u'Jürgen Riegel, Werner Mayer, Yorik van Havre'], 1)
 ]

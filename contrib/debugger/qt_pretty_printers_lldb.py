@@ -25,7 +25,7 @@
              "request": "launch",
              "name": "Debug LLDB",
              "stopOnEntry": false,
-             "program": "${workspaceFolder}/build/bin/FreeCAD",
+             "program": "${workspaceFolder}/build/bin/FuCad",
              "args": [],
              "cwd": "${workspaceFolder}/build/",
              "preLaunchTask": "CMake: build",
