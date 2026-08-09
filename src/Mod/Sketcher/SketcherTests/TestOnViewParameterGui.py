@@ -287,7 +287,7 @@ class TestOnViewParameterGui(SketcherGuiTestCase):
         )
         self.assertEqual(self.sketch.GeometryCount, 0)
 
-    def test_rectangle_ovp_escape_then_escape_then_escape_exits_sketch(self):
+    def test_rectangle_ovp_escape_then_escape_then_escape_keeps_sketch_open(self):
         viewport, first_point = self.begin_rectangle_with_visible_ovp()
 
         first_spinbox = self.active_spinbox()
@@ -332,11 +332,41 @@ class TestOnViewParameterGui(SketcherGuiTestCase):
         self.pump(100)
         self.key_click(graphics_view, QtCore.Qt.Key_Escape)
 
-        self.assertTrue(
+        self.assertFalse(
             self.wait_until(lambda: self.active_task_dialog() is None, timeout_ms=1000),
-            "Expected the third Esc to close the Sketcher task dialog",
+            "Expected the third Esc to leave the Sketcher task dialog open",
         )
-        self.assert_sketch_edit_inactive()
+        self.assert_sketch_edit_active()
+
+    def test_escape_leaves_sketch_edit_when_preference_is_enabled(self):
+        sketcher_params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Sketcher")
+        escape_key = "LeaveSketchWithEscape"
+        had_preference = escape_key in sketcher_params.GetBools()
+        old_preference = sketcher_params.GetBool(escape_key, False)
+
+        try:
+            # The task dialog reads the preference when it is constructed, so it has to be set
+            # before edit mode starts.
+            sketcher_params.SetBool(escape_key, True)
+            self.pump(100)
+
+            self.begin_sketch_edit_with_task_dialog()
+
+            graphics_view = FreeCADGui.ActiveDocument.ActiveView.graphicsView()
+            graphics_view.setFocus(QtCore.Qt.OtherFocusReason)
+            self.pump(100)
+            self.key_click(graphics_view, QtCore.Qt.Key_Escape)
+
+            self.assertTrue(
+                self.wait_until(lambda: self.active_task_dialog() is None, timeout_ms=1000),
+                "Expected Esc to close the Sketcher task dialog when the preference is enabled",
+            )
+            self.assert_sketch_edit_inactive()
+        finally:
+            if had_preference:
+                sketcher_params.SetBool(escape_key, old_preference)
+            else:
+                sketcher_params.RemBool(escape_key)
 
     def test_auto_color_restores_line_color_from_preferences(self):
         view_params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/View")
