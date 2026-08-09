@@ -160,6 +160,11 @@ void TaskExtrudeParameters::setupSideDialog(SideController& side)
 
     // --- Bind UI widgets to the correct properties ---
     side.lengthEdit->bind(*side.Length);
+
+    // The property is a length and so cannot go below zero, but the field has to
+    // be able to report a drag that has gone past the profile: that is what tells
+    // the panel to turn the operation around.
+    side.lengthEdit->setMinimum(-side.Length->getMaximum());
     side.offsetEdit->bind(*side.Offset);
     side.taperEdit->bind(*side.TaperAngle);
 
@@ -720,8 +725,44 @@ std::vector<std::string> PartDesignGui::TaskExtrudeParameters::getShapeFaces(
 
 void TaskExtrudeParameters::onLengthChanged(double len, Side side)
 {
-    getSideController(side).Length->setValue(len);
+    auto& controller = getSideController(side);
+
+    if (len < 0.0 && flipOperationThroughZero(side)) {
+        // The drag has crossed the profile, so what was being added is now being
+        // taken away. The distance is reported the way it is now meant, and the
+        // property never sees the negative that got us here.
+        len = -len;
+        QSignalBlocker mirroring(controller.lengthEdit);
+        controller.lengthEdit->setValue(len);
+    }
+
+    controller.Length->setValue(len);
     tryRecomputeFeature();
+}
+
+bool TaskExtrudeParameters::flipOperationThroughZero(Side side)
+{
+    // Only a plain distance can be dragged through zero; the up-to modes end
+    // somewhere of their own and have no length to reverse.
+    if (static_cast<Mode>(getSideController(side).changeMode->currentIndex()) != Mode::Dimension) {
+        return false;
+    }
+
+    using Operation = PartDesign::FeatureAddSub::OperationType;
+    const auto operation = static_cast<Operation>(ui->operationMode->currentIndex());
+
+    // Intersecting and starting a new body are not each other's opposite, so
+    // there is nothing for them to become.
+    if (operation == Operation::Join) {
+        ui->operationMode->setCurrentIndex(static_cast<int>(Operation::Cut));
+        return true;
+    }
+    if (operation == Operation::Cut) {
+        ui->operationMode->setCurrentIndex(static_cast<int>(Operation::Join));
+        return true;
+    }
+
+    return false;
 }
 
 void TaskExtrudeParameters::onStartOffsetChanged(double len)

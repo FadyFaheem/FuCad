@@ -195,6 +195,12 @@ private:
     void onModeChanged_Side1(int index);
     void onModeChanged_Side2(int index);
     void onLengthChanged(double len, Side side);
+    /**
+     * Turns Join into Cut and back when the drag carries the extrusion past the
+     * profile, the way Fusion swaps between adding and removing material as the
+     * arrow crosses over. Returns whether anything was swapped.
+     */
+    bool flipOperationThroughZero(Side side);
     void onStartModeChanged(int type);
     void onStartOffsetChanged(double len);
     void onOffsetChanged(double len, Side side);
