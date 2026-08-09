@@ -423,10 +423,13 @@ OverlayTabWidget::OverlayTabWidget(QWidget* parent, Qt::DockWidgetArea pos)
     setOverlayMode(true);
     hide();
 
+    // The transparency and overlay toggles keep their actions, because the
+    // context menu and the Std_DockOverlay commands still reach them, but they
+    // are not put on the title bar: Fusion's panels carry no such chrome, and a
+    // header of four buttons was reading as more machinery than panel.
     actTransparent.setCheckable(true);
     actTransparent.setData(QStringLiteral("OBTN Transparent"));
     actTransparent.setParent(this);
-    addAction(&actTransparent);
 
     actAutoHide.setData(QStringLiteral("OBTN AutoHide"));
 
@@ -451,7 +454,6 @@ OverlayTabWidget::OverlayTabWidget(QWidget* parent, Qt::DockWidgetArea pos)
 
     actOverlay.setData(QStringLiteral("OBTN Overlay"));
     actOverlay.setParent(this);
-    addAction(&actOverlay);
 
     if (cmdHide) {
         cmdHide->addTo(this);

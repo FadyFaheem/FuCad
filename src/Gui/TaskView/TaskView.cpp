@@ -609,6 +609,7 @@ bool TaskView::showDialog(TaskDialog* dlg, App::Document* doc)
 
     // give to task dialog to customize the button box
     dlg->modifyStandardButtons(outInfo.ActiveCtrl->buttonBox);
+    outInfo.ActiveCtrl->decorateButtons();
 
     outInfo.taskPanel = new TaskPanel(this);
     if (dlg->buttonPosition() == TaskDialog::North) {

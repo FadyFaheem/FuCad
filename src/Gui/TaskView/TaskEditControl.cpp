@@ -22,23 +22,71 @@
  ***************************************************************************/
 
 
+#include <QAbstractButton>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
+#include <QList>
+#include <QSize>
 
+#include "BitmapFactory.h"
 #include "TaskEditControl.h"
 
 
 using namespace Gui::TaskView;
+
+namespace
+{
+constexpr int buttonIconExtent = 14;
+
+/// The icon that says what a standard button does, or a null icon for the ones
+/// that read plainly enough on their own.
+QIcon iconForRole(QDialogButtonBox::ButtonRole role)
+{
+    switch (role) {
+        case QDialogButtonBox::AcceptRole:
+            return Gui::BitmapFactory().iconFromTheme("button_valid");
+        case QDialogButtonBox::RejectRole:
+            return Gui::BitmapFactory().iconFromTheme("button_invalid");
+        case QDialogButtonBox::ApplyRole:
+            return Gui::BitmapFactory().iconFromTheme("view-refresh");
+        case QDialogButtonBox::HelpRole:
+            return Gui::BitmapFactory().iconFromTheme("help-browser");
+        default:
+            return {};
+    }
+}
+}  // namespace
 
 TaskEditControl::TaskEditControl(QWidget* parent)
     : TaskWidget(parent)
 {
     hboxLayout = new QHBoxLayout(this);
     buttonBox = new QDialogButtonBox(this);
+    buttonBox->setObjectName(QStringLiteral("TaskEditControlButtons"));
     buttonBox->setStandardButtons(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
-    buttonBox->setCenterButtons(true);
 
+    // Fusion puts them at the trailing edge of the panel and marks accept and
+    // cancel with a tick and a cross, so the pair can be read at a glance.
+    buttonBox->setCenterButtons(false);
+    hboxLayout->addStretch(1);
     hboxLayout->addWidget(buttonBox);
+
+    decorateButtons();
+}
+
+void TaskEditControl::decorateButtons()
+{
+    for (QAbstractButton* button : buttonBox->buttons()) {
+        if (!button->icon().isNull()) {
+            continue;
+        }
+
+        const QIcon icon = iconForRole(buttonBox->buttonRole(button));
+        if (!icon.isNull()) {
+            button->setIcon(icon);
+            button->setIconSize(QSize(buttonIconExtent, buttonIconExtent));
+        }
+    }
 }
 
 TaskEditControl::~TaskEditControl() = default;

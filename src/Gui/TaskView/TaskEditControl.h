@@ -54,6 +54,13 @@ public:
     friend class TaskView;
 
 protected:
+    /**
+     * Gives the standard buttons an icon for what they do. Called again once the
+     * task dialog has had its say over the box, since it may have added buttons
+     * of its own.
+     */
+    void decorateButtons();
+
     QHBoxLayout* hboxLayout;
     QDialogButtonBox* buttonBox;
 };
