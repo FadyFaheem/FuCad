@@ -2758,6 +2758,41 @@ QToolButton#RibbonQuickAccessButton:disabled {
   border: 1px solid transparent;
 }
 
+/* The app bar is also the title bar when the system frame is off, see
+   src/Gui/Ribbon/FramelessWindow.cpp */
+QLabel#RibbonWindowTitle {
+  background-color: transparent;
+  color: @TextDisabledColor;
+}
+
+QToolButton#RibbonMinimizeButton,
+QToolButton#RibbonMaximizeButton,
+QToolButton#RibbonCloseButton {
+  background-color: transparent;
+  border: none;
+  border-radius: 0px;
+  margin: -2px 0px -2px 0px;
+}
+
+QToolButton#RibbonMinimizeButton:hover,
+QToolButton#RibbonMaximizeButton:hover {
+  background-color: @AccentHoverColor;
+}
+
+QToolButton#RibbonMinimizeButton:pressed,
+QToolButton#RibbonMaximizeButton:pressed {
+  background-color: @AccentBackgroundColor;
+}
+
+/* Closing is the one button whose mistake cannot be undone, so it says so. */
+QToolButton#RibbonCloseButton:hover {
+  background-color: #ca333b;
+}
+
+QToolButton#RibbonCloseButton:pressed {
+  background-color: #8f2429;
+}
+
 QWidget#RibbonBar {
   background-color: @PrimaryColor;
   border-bottom: 1px solid @GeneralBorderColor;
@@ -2953,6 +2988,147 @@ QToolButton#RibbonPrimaryButton:checked {
 }
 
 QToolButton#RibbonPrimaryButton:disabled {
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: @TextDisabledColor;
+}
+
+/*==================================================================================================
+Fusion style navigation bar, see src/Gui/NavigationBar.cpp
+
+Floats over the canvas rather than sitting in a toolbar area, so it carries its
+own rounded plate instead of blending into the window chrome.
+==================================================================================================*/
+QToolBar#NavigationBar {
+  background-color: @PrimaryColorDarken4;
+  border: 1px solid @GeneralBorderColor;
+  border-radius: 6px;
+  padding: 2px 4px 2px 4px;
+  spacing: 1px;
+}
+
+QToolBar#NavigationBar QToolButton {
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: @InputFieldBorderRadius;
+  padding: 3px;
+}
+
+QToolBar#NavigationBar QToolButton:hover {
+  background-color: @AccentHoverColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolBar#NavigationBar QToolButton:pressed,
+QToolBar#NavigationBar QToolButton:checked {
+  background-color: @AccentBackgroundColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolBar#NavigationBar QToolButton:disabled {
+  background-color: transparent;
+  border: 1px solid transparent;
+}
+
+QToolBar#NavigationBar::separator {
+  background-color: @GeneralBorderColor;
+  margin: 4px 3px 4px 3px;
+  width: 1px;
+}
+
+/*==================================================================================================
+Sketch status badge, see src/Mod/Sketcher/Gui/SketchStatusChip.cpp
+
+Floats over the top of the canvas while a sketch is open. The severity property
+carries what the solver made of the sketch.
+==================================================================================================*/
+QLabel#SketchStatusChip {
+  background-color: @PrimaryColorDarken4;
+  border: 1px solid @GeneralBorderColor;
+  border-radius: 9px;
+  color: @TextForegroundColor;
+  padding: 3px 12px 3px 12px;
+}
+
+QLabel#SketchStatusChip[severity="solved"] {
+  border: 1px solid #28a745;
+  color: #5cd97a;
+}
+
+QLabel#SketchStatusChip[severity="open"] {
+  border: 1px solid #f0a202;
+  color: #f5c65a;
+}
+
+QLabel#SketchStatusChip[severity="redundant"] {
+  border: 1px solid #ff8c00;
+  color: #ffb454;
+}
+
+QLabel#SketchStatusChip[severity="broken"] {
+  border: 1px solid #ca333b;
+  color: #f07079;
+}
+
+/*==================================================================================================
+Fusion style marking menu, see src/Gui/MarkingMenu.cpp
+
+The ring is painted rather than built from widgets, so its colours arrive as
+properties instead of as background and border rules.
+==================================================================================================*/
+Gui--MarkingMenu {
+  qproperty-backdropColor: @PrimaryColorDarken4;
+  qproperty-outlineColor: @GeneralBorderColor;
+  qproperty-accentColor: @AccentColor;
+  color: @TextForegroundColor;
+}
+
+/*==================================================================================================
+Fusion style command palette, see src/Gui/Ribbon/CommandPalette.cpp
+==================================================================================================*/
+QWidget#CommandPalette {
+  background-color: @PrimaryColor;
+  border: 1px solid @AccentColor;
+  border-radius: @InputFieldBorderRadius;
+}
+
+QWidget#CommandPaletteBody,
+QWidget#CommandPaletteGrid {
+  background-color: transparent;
+  border: none;
+}
+
+QLabel#CommandPaletteSectionCaption {
+  background-color: transparent;
+  color: @TextDisabledColor;
+  padding: 2px 2px 0px 2px;
+}
+
+QLabel#CommandPaletteEmptyLabel {
+  background-color: transparent;
+  color: @TextDisabledColor;
+  padding: 8px 2px 8px 2px;
+}
+
+QToolButton#CommandPaletteTile {
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: @InputFieldBorderRadius;
+  padding: 4px 2px 2px 2px;
+}
+
+QToolButton#CommandPaletteTile:hover,
+QToolButton#CommandPaletteTile:focus {
+  background-color: @AccentHoverColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolButton#CommandPaletteTile:pressed {
+  background-color: @AccentBackgroundColor;
+  border: 1px solid @AccentColor;
+}
+
+QToolButton#CommandPaletteTile:disabled {
   background-color: transparent;
   border: 1px solid transparent;
   color: @TextDisabledColor;
