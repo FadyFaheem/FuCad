@@ -59,6 +59,7 @@
 #include "Macro.h"
 #include "MainWindow.h"
 #include "Python.h"
+#include "Ribbon/CommandPalette.h"
 #include "Selection.h"
 #include "View3DInventor.h"
 #include "View3DInventorViewer.h"
@@ -461,6 +462,13 @@ void Command::_invoke(int id, bool disablelog)
 
         // check if it really works NOW (could be a delay between click deactivation of the button)
         if (isActive()) {
+            // Only what the user themselves reached for belongs in the palette's
+            // recent list: an untriggered invocation is the state restoration of
+            // a startup, a macro, or one group command dispatching to its member.
+            if (_trigger != TriggerNone) {
+                Ribbon::CommandPalette::noteCommandUsed(sName);
+            }
+
             auto manager = getGuiApplication()->macroManager();
 
             if (!logdisabler) {

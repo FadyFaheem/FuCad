@@ -371,6 +371,8 @@ protected:
 
 private:
     void setupRibbon();
+    /// Gives the window the actions of commands that are only reachable by key.
+    void setupWindowShortcuts();
     void setupDockWindows();
     bool setupTaskView();
     bool setupSelectionView();

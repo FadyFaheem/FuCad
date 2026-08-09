@@ -68,6 +68,7 @@
 #endif
 
 #include <algorithm>
+#include <array>
 #include <vector>
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -95,6 +96,7 @@
 #include "BitmapFactory.h"
 #include "ComboView.h"
 #include "Command.h"
+#include "DefaultShortcuts.h"
 #include "DockWindowManager.h"
 #include "DownloadManager.h"
 #include "FileDialog.h"
@@ -109,6 +111,7 @@
 #include "PythonConsole.h"
 #include "ReportView.h"
 #include "Ribbon/AppBar.h"
+#include "Ribbon/CommandPalette.h"
 #include "Ribbon/RibbonBar.h"
 #include "Ribbon/RibbonManager.h"
 #include "SelectionView.h"
@@ -399,6 +402,7 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags f)
     // QMainWindow menu slot and any bar Qt creates for that slot beforehand
     // would be destroyed by setMenuWidget().
     setupRibbon();
+    setupWindowShortcuts();
 
     d->connParam = App::GetApplication().GetUserParameter().signalParamChanged.connect(
         [this](ParameterGrp* Param, ParameterGrp::ParamType, const char* Name, const char*) {
@@ -678,6 +682,38 @@ void MainWindow::setupRibbon()
     Ribbon::RibbonManager::instance()->attach(ribbonBar);
 }
 
+void MainWindow::setupWindowShortcuts()
+{
+    applyDefaultShortcutPriorities();
+
+    // Qt only delivers a shortcut to its action while that action lives in a
+    // widget of the active window. The commands below appear in no menu and no
+    // toolbar because Fusion reaches them by key alone, so the window itself has
+    // to hold them for their key to arrive.
+    static const std::array<const char*, 1> keyOnlyCommands = {
+        "Std_CommandPalette",
+    };
+
+
+    if (!Application::Instance) {
+        return;
+    }
+
+    CommandManager& manager = Application::Instance->commandManager();
+    for (const char* name : keyOnlyCommands) {
+        Command* command = manager.getCommandByName(name);
+        if (!command) {
+            Base::Console().warning("MainWindow: '%s' is not registered\n", name);
+            continue;
+        }
+
+        command->initAction();
+        if (Action* action = command->getAction()) {
+            addAction(action->action());
+        }
+    }
+}
+
 QMenuBar* MainWindow::menuBar() const
 {
     if (d->ribbonMenuBar) {
@@ -696,6 +732,7 @@ MainWindow::~MainWindow()
         disconnect(d->mdiArea, &QMdiArea::subWindowActivated, this, &MainWindow::onWindowActivated);
     }
     Ribbon::RibbonManager::destruct();
+    Ribbon::CommandPalette::destruct();
     delete d->status;
     delete d;
     instance = nullptr;

@@ -49,6 +49,7 @@
 #include "GuiConsole.h"
 #include "MainWindow.h"
 #include "OnlineDocumentation.h"
+#include "Ribbon/CommandPalette.h"
 #include "Selection.h"
 #include "WhatsThis.h"
 #include "Workbench.h"
@@ -880,6 +881,29 @@ void StdCmdUnitsCalculator::activated(int iMsg)
 }
 
 //===========================================================================
+// Std_CommandPalette
+//===========================================================================
+DEF_STD_CMD(StdCmdCommandPalette)
+
+StdCmdCommandPalette::StdCmdCommandPalette()
+    : Command("Std_CommandPalette")
+{
+    sGroup = "Tools";
+    sMenuText = QT_TR_NOOP("Command Palette");
+    sToolTipText = QT_TR_NOOP("Opens a searchable palette of pinned, recent and all commands");
+    sWhatsThis = "Std_CommandPalette";
+    sStatusTip = sToolTipText;
+    sPixmap = "Std_CommandPalette";
+    sAccel = "S";
+    eType = 0;
+}
+
+void StdCmdCommandPalette::activated(int)
+{
+    Ribbon::CommandPalette::instance()->popUp();
+}
+
+//===========================================================================
 // StdCmdUserEditMode
 //===========================================================================
 class StdCmdUserEditMode: public Gui::Command
@@ -1102,6 +1126,7 @@ void CreateStdCommands()
     rcCmdMgr.addCommand(new StdCmdDlgPreferences());
     rcCmdMgr.addCommand(new StdCmdDlgCustomize());
     rcCmdMgr.addCommand(new StdCmdCommandLine());
+    rcCmdMgr.addCommand(new StdCmdCommandPalette());
     rcCmdMgr.addCommand(new StdCmdWorkbench());
     rcCmdMgr.addCommand(new StdCmdRecentFiles());
     rcCmdMgr.addCommand(new StdCmdRecentMacros());
