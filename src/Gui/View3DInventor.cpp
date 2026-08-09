@@ -67,6 +67,7 @@
 #include "FileDialog.h"
 #include "MainWindow.h"
 #include "NaviCube.h"
+#include "NavigationBar.h"
 #include "Navigation/NavigationStyle.h"
 #include "SoFCDB.h"
 #include "SoFCSelectionAction.h"
@@ -143,6 +144,12 @@ View3DInventor::View3DInventor(
     // By default, the wheel events are processed by the 3d view AND the mdi area.
     //_viewer->getGLWidget()->setAttribute(Qt::WA_NoMousePropagation);
     setCentralWidget(stack);
+
+    // Floats over the central widget rather than taking a strip of the window,
+    // the way Fusion keeps its navigation controls inside the canvas.
+    if (NavigationBar::isEnabled()) {
+        new NavigationBar(this);
+    }
 
     // apply the user settings
     applySettings();
