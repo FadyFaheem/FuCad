@@ -66,9 +66,8 @@ compile_commands.json
 *.sublime-project
 *.sublime-workspace
 
-# crowdin file
+# translation tooling files (updatets.py)
 files_to_translate.txt
-src/Tools/freecad.zip
 tsupdate_stderr.log
 tsupdate_stdout.log
 # pixi environments

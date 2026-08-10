@@ -3,7 +3,7 @@
 These files provide read only resources for the workbench.
 - `icons/`: SVG images to use as icons.
 - `patterns/`: in SVG, to fill closed shapes.
-- `translations/`: translation files generated from Qt tools and Crowdin.
+- `translations/`: translation files generated from Qt tools.
 - `ui/`: Qt user interface files made with QtCreator, and which connect
 to the corresponding modules in `drafttaskpanels/`.
 

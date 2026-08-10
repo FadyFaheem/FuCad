@@ -513,10 +513,6 @@ def main(mod=None):
     else:
         print("SUCCESS: All translations updated successfully")
 
-    print(
-        "\nIf updatets.py was run successfully, the next step is to run ./src/Tools/updatecrowdin.py"
-    )
-
 
 if __name__ == "__main__":
     if len(sys.argv[1:]) > 0:
