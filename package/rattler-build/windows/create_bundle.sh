@@ -25,9 +25,10 @@ cp -a ${conda_env}/Library/mingw-w64/bin/* ${copy_dir}/bin
 cp -a ${conda_env}/Library/share ${copy_dir}/share
 # get all the dependency .dlls
 cp -a ${conda_env}/Library/bin/*.dll ${copy_dir}/bin
-# Copy FuCad build
-cp -a ${conda_env}/Library/bin/freecad* ${copy_dir}/bin
-cp -a ${conda_env}/Library/bin/FuCad* ${copy_dir}/bin
+# Copy FuCad build. The conda package lowercases the executables (fucad.exe, fucadcmd.exe) and the
+# Python module keeps the FreeCAD name (FreeCAD.pyd); globs are case-sensitive here, so match both.
+cp -a ${conda_env}/Library/bin/fucad* ${copy_dir}/bin
+cp -a ${conda_env}/Library/bin/FreeCAD* ${copy_dir}/bin
 cp -a ${conda_env}/Library/data ${copy_dir}/data
 cp -a ${conda_env}/Library/Ext ${copy_dir}/Ext
 cp -a ${conda_env}/Library/lib ${copy_dir}/lib

@@ -59,6 +59,11 @@ jobs:
       stagingdir: C:/FC/install/
       libpackdir: C:/FC/libpack/
       config: release
+      # Signing only happens when the Azure Trusted Signing secrets are configured; forks without
+      # them skip the whole signing toolchain (x64 .NET SDK + sign tool + Azure login) instead of
+      # risking a failure on it. That toolchain is also the only consumer of x64 emulation on the
+      # ARM64 runner, where the x64 dotnet install has proven crash-prone.
+      HAS_WINDOWS_SIGNING: ${{ secrets.AZURE_CLIENT_ID != '' }}
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -123,12 +128,14 @@ jobs:
       # x64 SDK is requested on every runner and the signer runs under x64 emulation on ARM64.
       # Authenticode does not care about the host architecture: an x64 signer signs ARM64 binaries.
       - name: Setup .NET SDK
+        if: env.HAS_WINDOWS_SIGNING == 'true'
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
           dotnet-version: '10.0.103'
           architecture: 'x64'
 
       - name: Install sign tool
+        if: env.HAS_WINDOWS_SIGNING == 'true'
         run: |
           # When the requested architecture is not the runner's native one, setup-dotnet installs
           # into an architecture subdirectory but still points DOTNET_ROOT and PATH at the base
@@ -176,6 +183,7 @@ jobs:
 
       - name: Azure login for code signing
         id: azure_login
+        if: env.HAS_WINDOWS_SIGNING == 'true'
         continue-on-error: true
         uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # v3.0.0
         with:

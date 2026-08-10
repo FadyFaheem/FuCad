@@ -124,6 +124,10 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     environment: weekly-build
+    env:
+      # Signing only happens when the Azure Trusted Signing secrets are configured; forks without
+      # them skip the whole signing toolchain instead of failing on it.
+      HAS_WINDOWS_SIGNING: ${{ secrets.AZURE_CLIENT_ID != '' }}
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
@@ -207,13 +211,13 @@ jobs:
           xcrun notarytool store-credentials "FuCad" --keychain "$KEYCHAIN_PATH" --apple-id "${APPLE_ID}" --password "${APP_SPECIFIC_PASSWORD}" --team-id "${DEVELOPER_TEAM_ID}"
 
       - name: Setup .NET 10 SDK
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && env.HAS_WINDOWS_SIGNING == 'true'
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
           dotnet-version: '10.0.103'
 
       - name: Install sign tool
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && env.HAS_WINDOWS_SIGNING == 'true'
         run: |
           # NOTE: The sign tool is ONLY available as a prerelease package, they never issue real releases.
           dotnet tool install --global --prerelease sign
@@ -238,7 +242,7 @@ jobs:
 
       - name: Azure login for Windows build code signing
         id: azure_login
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && env.HAS_WINDOWS_SIGNING == 'true'
         continue-on-error: true
         uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # v3.0.0
         with:
