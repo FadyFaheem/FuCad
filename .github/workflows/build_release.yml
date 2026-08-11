@@ -43,6 +43,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           if [ "${{ github.event_name }}" = "release" ]; then
             export BUILD_TAG="${{ github.event.release.tag_name }}"
           else
@@ -55,10 +56,24 @@ jobs:
               SAFE_BRANCH=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9._-]/-/g')
               export BUILD_TAG=${SAFE_BRANCH}-$(date "+%Y.%m.%d")
             fi
-            gh release create ${BUILD_TAG} --title "Development Build ${BUILD_TAG}" \
-                                           -F .github/workflows/weekly-build-notes.md \
-                                           --prerelease || \
-            gh release view ${BUILD_TAG} > /dev/null  # fail if it doesn't exist
+            # The GitHub API occasionally answers with transient 5xx errors, so retry before
+            # giving up; without a usable release every downstream upload is doomed anyway.
+            release_ready=0
+            for attempt in 1 2 3; do
+              if gh release create ${BUILD_TAG} --title "Development Build ${BUILD_TAG}" \
+                                                -F .github/workflows/weekly-build-notes.md \
+                                                --prerelease || \
+                 gh release view ${BUILD_TAG} > /dev/null; then
+                release_ready=1
+                break
+              fi
+              echo "Could not create or find release ${BUILD_TAG} (attempt ${attempt}), retrying..."
+              sleep 20
+            done
+            if [ "${release_ready}" != "1" ]; then
+              echo "Release ${BUILD_TAG} could not be created or found." >&2
+              exit 1
+            fi
           fi
           echo "BUILD_TAG=${BUILD_TAG}" >> "$GITHUB_ENV"
           echo "build_tag=${BUILD_TAG}" >> "$GITHUB_OUTPUT"
@@ -93,11 +108,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
+          # write_version_info.py bakes the git info into Version.h.cmake, disables the rewrite in
+          # SubWCRev.py, and commits the result itself, so the tarball archives that commit as HEAD.
           python3 package/scripts/write_version_info.py ../fucad_version.txt
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git config user.name 'github-actions[bot]'
-          git apply package/disable_git_info.patch
-          git commit -a -m "Disable git info write to Version.h"
           git archive HEAD -o freecad_source_${BUILD_TAG}.tar
           git submodule foreach --recursive \
             "git archive HEAD --prefix=\$path/ -o \$sha1.tar && \
