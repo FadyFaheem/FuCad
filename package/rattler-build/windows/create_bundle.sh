@@ -145,11 +145,11 @@ fi
 sha256sum ${version_name}.7z > ${version_name}.7z-SHA256.txt
 
 if [ "${MAKE_INSTALLER}" == "true" ]; then
-    FILES_FREECAD="$(cygpath -w $(pwd))\\${version_name}"
+    FILES_FUCAD="$(cygpath -w $(pwd))\\${version_name}"
     nsis_cmd="${CONDA_PREFIX}/NSIS/makensis.exe"
     "${nsis_cmd}" -V4 \
         -D"ExeFile=${version_name}-installer.exe" \
-        -D"FILES_FREECAD=${FILES_FREECAD}" \
+        -D"FILES_FUCAD=${FILES_FUCAD}" \
         -X'SetCompressor /FINAL lzma' \
         ../../WindowsInstaller/FuCad-installer.nsi
     mv ../../WindowsInstaller/${version_name}-installer.exe .
