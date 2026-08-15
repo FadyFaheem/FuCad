@@ -424,14 +424,14 @@ void ViewProvider2DObject::onChanged(const App::Property* property)
 {
     ViewProviderPart::onChanged(property);
 
-    if (property == &ShowPlane) {
+    if (property == &ShowPlane || property == &Visibility) {
         plane->whichChild = isPlaneVisible() ? SO_SWITCH_ALL : SO_SWITCH_NONE;
     }
 }
 
 bool ViewProvider2DObject::isPlaneVisible() const
 {
-    if (!ShowPlane.getValue()) {
+    if (!ShowPlane.getValue() || !Visibility.getValue()) {
         return false;
     }
 

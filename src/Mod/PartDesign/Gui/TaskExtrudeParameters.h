@@ -280,6 +280,7 @@ private:
     void updateStartReferenceName();
 
     std::unique_ptr<Gui::GizmoContainer> gizmoContainer;
+    Gui::LinearGizmo* startOffsetGizmo = nullptr;
     Gui::LinearGizmo* lengthGizmo1 = nullptr;
     Gui::LinearGizmo* lengthGizmo2 = nullptr;
     Gui::RotationGizmo* taperAngleGizmo1 = nullptr;

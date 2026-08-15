@@ -60,7 +60,8 @@ jobs:
             # giving up; without a usable release every downstream upload is doomed anyway.
             release_ready=0
             for attempt in 1 2 3; do
-              if gh release create ${BUILD_TAG} --title "Development Build ${BUILD_TAG}" \
+              if gh release create ${BUILD_TAG} --target "${{ github.sha }}" \
+                                                --title "Development Build ${BUILD_TAG}" \
                                                 -F .github/workflows/weekly-build-notes.md \
                                                 --prerelease || \
                  gh release view ${BUILD_TAG} > /dev/null; then

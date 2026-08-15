@@ -1754,7 +1754,7 @@ bool Document::save()
         }
         catch (const Base::FileException& e) {
             e.reportException();
-            return askIfSavingFailed(QString::fromUtf8(e.what()));
+            return askIfSavingFailed(QString::fromStdString(e.getTranslatedMessage()));
         }
         catch (const Base::Exception& e) {
             QMessageBox::critical(
@@ -1818,7 +1818,7 @@ bool Document::saveAs()
         }
         catch (const Base::FileException& e) {
             e.reportException();
-            return askIfSavingFailed(QString::fromUtf8(e.what()));
+            return askIfSavingFailed(QString::fromUtf8(e.getTranslatedMessage().c_str()));
         }
         catch (const Base::Exception& e) {
             QMessageBox::critical(
