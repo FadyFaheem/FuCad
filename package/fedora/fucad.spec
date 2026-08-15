@@ -16,7 +16,7 @@
 
 Name:           fucad
 Epoch:          1
-Version:        26.3.1
+Version:        26.3.2
 Release:        1%{?dist}
 
 Summary:        A general purpose 3D CAD modeler
