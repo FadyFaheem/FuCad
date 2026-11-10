@@ -1641,3 +1641,4 @@ INSTALL(
     DESTINATION
         ${CMAKE_INSTALL_DATADIR}/3Dconnexion
 )
+set_source_files_properties(TaskView/TaskOrientation.cpp PROPERTIES COMPILE_OPTIONS "-O0")
