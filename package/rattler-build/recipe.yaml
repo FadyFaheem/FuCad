@@ -34,8 +34,8 @@ requirements:
 
     - if: linux and x86_64
       then:
-        - clang
-        - clangxx
+        - clang 20.*
+        - clangxx 20.*
         - kernel-headers_linux-64
         - libdrm-cos7-x86_64
         - libselinux-cos7-x86_64
@@ -67,8 +67,8 @@ requirements:
 
     - if: linux and aarch64
       then:
-        - clang
-        - clangxx
+        - clang 20.*
+        - clangxx 20.*
         - kernel-headers_linux-aarch64
         - libdrm-cos7-aarch64
         - libselinux-cos7-aarch64
@@ -107,6 +107,8 @@ requirements:
         - cross-python_${{ target_platform }}
 
   host:
+    - defusedxml
+    - pip
     - eigen >=3.3,<5
     - fmt >=12.1,<12.2
     - freetype
