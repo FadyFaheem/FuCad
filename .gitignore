@@ -73,3 +73,9 @@ tsupdate_stdout.log
 # pixi environments
 *.egg-info
 .pixi
+package/rattler-build/.pixi
+package/rattler-build/linux/appimagetool
+package/rattler-build/linux/*.AppImage
+package/rattler-build/linux/*.AppImage.zsync
+package/rattler-build/linux/*-SHA256.txt
+/dist/

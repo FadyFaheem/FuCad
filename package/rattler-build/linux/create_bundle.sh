@@ -84,6 +84,9 @@ if [ "${UPLOAD_RELEASE}" == "true" ]; then
     esac
 fi
 
+# For local builds, use a sensible default so appimagetool gets a valid update tag.
+GH_UPDATE_TAG="${GH_UPDATE_TAG:-latest}"
+
 echo -e "\nCreate the appimage"
 # export GPG_TTY=$(tty)
 chmod a+x ./AppDir/AppRun

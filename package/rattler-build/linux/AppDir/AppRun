@@ -1,10 +1,10 @@
 #!/bin/bash
 HERE="$(dirname "$(readlink -f "${0}")")"
 export PREFIX=${HERE}/usr
+export QT_PLUGIN_PATH=${HERE}/usr/lib/qt6/plugins
 # export LD_LIBRARY_PATH=${HERE}/usr/lib${LD_LIBRARY_PATH:+':'}$LD_LIBRARY_PATH
 export PYTHONHOME=${HERE}/usr
 export PATH_TO_FREECAD_LIBDIR=${HERE}/usr/lib
-# export QT_QPA_PLATFORM_PLUGIN_PATH=${HERE}/usr/plugins
 # export QT_XKB_CONFIG_ROOT=${HERE}/usr/lib
 export FONTCONFIG_FILE=/etc/fonts/fonts.conf
 export FONTCONFIG_PATH=/etc/fonts
@@ -28,7 +28,7 @@ export GIT_SSL_CAINFO=$HERE/usr/ssl/cacert.pem
 if [ ! -z "$1" ] && [ -e "$HERE/usr/bin/$1" ] ; then
     MAIN="$HERE/usr/bin/$1" ; shift
 else
-    MAIN="$HERE/usr/bin/freecad"
+    MAIN="$HERE/usr/bin/fucad"
 fi
 
 exec "${MAIN}" "$@"

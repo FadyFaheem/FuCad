@@ -61,6 +61,7 @@ cmake \
     ${CMAKE_ARGS} \
     ${CMAKE_PLATFORM_FLAGS[@]} \
     --preset ${CMAKE_PRESET} \
+    -D FREECAD_WARN_ERROR=OFF \
     -D CMAKE_IGNORE_PREFIX_PATH="/opt/homebrew;/usr/local/homebrew" \
     -D CMAKE_INCLUDE_PATH:FILEPATH="$PREFIX/include" \
     -D CMAKE_INSTALL_LIBDIR:FILEPATH="$PREFIX/lib" \

@@ -1,0 +1,24 @@
+services:
+  appimage:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    image: fucad-appimage-builder:latest
+    working_dir: /src
+    init: true
+    environment:
+      BUILD_TAG: "${BUILD_TAG:-local}"
+      UPLOAD_RELEASE: "false"
+      APPIMAGE_EXTRACT_AND_RUN: "1"
+      CMAKE_BUILD_PARALLEL_LEVEL: "${CMAKE_BUILD_PARALLEL_LEVEL:-4}"
+    volumes:
+      - .:/src
+      - pixi-envs:/src/package/rattler-build/.pixi
+      - pixi-cache:/root/.cache/pixi
+      - rattler-cache:/root/.cache/rattler
+    shm_size: "2gb"
+
+volumes:
+  pixi-envs:
+  pixi-cache:
+  rattler-cache:
